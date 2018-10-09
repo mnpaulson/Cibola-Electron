@@ -1,0 +1,419 @@
+
+// Fonts
+@import url("https://fonts.googleapis.com/css?family=Raleway:300,400,600");
+
+// Variables
+// @import "variables";
+
+// Bootstrap
+// @import "~bootstrap-sass/assets/stylesheets/bootstrap";
+
+// .cdb-app-drawer {
+    a {
+        text-decoration: none;
+    }
+    
+// }
+
+.cdb-toolbar-icon {
+    height: 48px;
+}
+
+.cdb-bottom-right {
+    position: absolute;
+    // bottom: -45px;
+    right: 0;
+    // width: 100%;
+}
+
+.close-btn {
+    border: none !important;
+    right: -5px !important;
+    top: -5px !important;
+    // z-index: 0 !important;
+}
+
+.cus-edit-btn {
+    left: 0px !important;
+    bottom: 0px !important;
+}
+
+.cus-save-btn {
+    right: 0px !important;
+    bottom: 0px !important;
+}
+
+.redText > div.v-input__control > div.v-input__slot > div.v-text-field__slot input{
+    color: red !important;
+}
+
+.vital-date {
+    color: red !important;    
+}
+
+.est-note-align {
+    padding-top: 21px !important;
+}
+
+.bottom-nav {
+    justify-content: left !important;
+    margin-left: -4px;
+}
+
+.bottom-nav > .btn {
+    opacity: 1 !important;
+    // color: blue !important;
+    filter: none !important;
+}
+
+/* TRANSITION */
+.component-fade-enter-active {
+    transition: transform 0.3s ease, opacity 0.5s ease;
+}
+  
+.component-fade-enter, .component-fade-leave-to, .component-fade-leave-active {
+    transition: opacity 0s ease;
+    transform: translateX(-20%);
+    opacity: 0;
+}
+
+.component-lightbox-enter-active {
+    transition: opacity 0.5s ease;
+}
+  
+.component-lightbox-enter, .component-fade-leave-to, .component-fade-leave-active {
+    transition: opacity 0s ease;
+    // transform: translateX(-20%);
+    opacity: 0;
+}
+
+.complete-btn {
+    font-size: 3.75em !important;
+}
+
+.fab-fix {
+    line-height: 1.5em !important;
+    font-size: 2em !important;
+    z-index: 0 !important;    
+}
+
+.fab-up {
+    bottom: 5px !important;
+}
+
+.new-cus-btn {
+    bottom: -8px;
+}
+
+.lightBoxWrapper {
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: 0px;
+    left: 0px;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 10;
+}
+
+.lightBoxImage {
+    width: 65%;
+    height: auto;
+    object-fit: contain
+}
+
+.catpure-cont{
+    text-align: center;
+}
+
+.capture-error{
+    width: auto;
+    height: auto;
+    display: inline-block;
+    max-height: 75vh;
+}
+
+@media print {
+
+    * {
+        // display: none !important;
+        visibility: hidden !important;
+        margin: 0px;
+    }
+
+    .v-content {
+        padding: 0px !important;
+    }
+
+    body{
+        height: 11in;
+        overflow: hidden;
+    }
+
+    @page{
+        margin: 0mm;
+        // size: auto;
+    }
+
+    @mixin box-shadow {
+        box-shadow: 0 2px 1px -1px rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.14), 0 1px 3px 0 rgba(0,0,0,.12);        
+    }
+
+    .cb-print {
+        // display: block !important;
+        visibility: visible !important;
+        position: absolute !important;        
+        top: 0px;
+        left: 0px;
+        width: 8in;
+        height: 10.5in;
+        margin: 0.2in;
+        margin-left: 0.2325in;        
+        // background-color: red;
+    }
+
+    .cb-print-element {
+        position: absolute !important;
+        visibility: visible !important;
+        // border: 1px solid black;
+    }
+
+    .cb-print-blanks {
+        height: 0.45in;
+        width: 3.95in;        
+        // background-color: blue;
+        
+    }
+
+    .cb-print-top-box{
+        display: inline-block;
+        visibility: visible !important;
+        height: 100%;
+        @include box-shadow;
+    }
+
+    .cb-print-top-text{
+        visibility: visible !important;
+        position: relative;
+        bottom: -0.275in;
+        font-size: 0.75em;
+        color: grey;
+        // left: 0px;
+    }
+
+    .cb-print-top-flags{
+        width: 1.34in;
+    }
+
+    .cb-print-top-deposit{
+        width: 0.75in;
+    }
+
+    .cb-print-top-gold-credit {
+        width: 0.75in;
+    }
+
+    .cb-print-total {
+        width: 1in;
+    }
+
+    .cb-print-customer-info {
+        height: 0.85in;
+        top: 0.5in;
+        width: 2.45in;        
+        font-size: 1.3em;
+        padding-left: 30px;
+        @include box-shadow;        
+    }
+
+    .cb-print-customer-icon {
+        left: 0px;
+        // top: 5px;
+    }
+
+    .cb-print-note {
+        top: 0in;
+        left: 4.05in;
+        width: 3.95in;        
+        height: 1.95in;
+        padding: 5px;
+        @include box-shadow;        
+        
+    }
+
+    .cb-print-job-num {
+        top: 0.5in;
+        width: 1.45in;
+        height: 0.55in;
+        left: 2.5in;
+        font-size: 1.75em;
+        line-height: 2.2em;
+        text-align: center;
+        @include box-shadow;
+        padding-left: 40px;        
+        
+    }
+
+    .cb-print-estimate {
+        height: 0.85in;
+        top: 1.1in;
+        left: 2.5in;
+        width: 1.45in;
+        @include box-shadow;        
+        padding: 3px;
+        line-height: 0.7em;
+        
+    }
+
+    .cb-print-est-amt {
+        visibility: visible !important;
+        font-size: 1.2em;
+        font-weight: bold;
+        text-align: center;
+        margin-top: 3px;
+    }
+
+    .cb-print-est-note {
+        font-size: 0.9em;
+        visibility: visible !important;
+        line-height: 0.9em;
+    }
+
+    .cb-print-due {
+        top: 1.4in;
+        width: 2.45in;
+        height: 0.55in;
+        @include box-shadow;
+        font-size: 2.5em;
+        text-align: center;
+        padding-left: 0.5in;
+    }
+
+    .cbPrintRed {
+        color: red !important;        
+    }
+
+    .cb-print-alarm-icon {
+        font-size: 50px !important;
+        left: 5px;
+        line-height: 1.1em !important;
+    }
+
+    .cb-print-work-icon {
+        font-size: 40px !important;
+        left: 5px;
+        line-height: 1.4em !important;
+    }
+
+    .cb-print-images{
+        top: 2in;
+        width: 100%;
+        height: 4in;
+        column-count: 2;
+        column-fill: auto;
+        column-gap: 0.1in;
+    }
+
+    .cb-print-image-cont {
+        position: static !important;
+        height: 0.99in;
+        margin-bottom: 0.01in;
+        width: 100%;
+        padding: 1px;
+    }
+
+    .cb-print-image{
+        position: static !important;
+        float: left;
+        height: 100%;
+        border-top-left-radius: 3%;
+        border-bottom-left-radius: 3%;
+        @include box-shadow;
+    }
+
+    .cb-print-image-note {
+        position: static !important;
+        height: 0.97in;
+        max-height: 0.97in;
+        @include box-shadow;        
+        overflow: hidden;
+        padding-left: 5px;
+        padding-right: 5px;
+        padding-top: 3px;
+        line-height: 1.1em;
+    }
+
+    .cb-print-logo {
+        width: 3.4in;
+        top: 6.2in;
+        left: 0.25in;
+    }
+
+    .cb-print-customer-name {
+        top: 7.4in;
+        font-weight: bold;
+        margin-left: 0.25in;
+    }
+
+    .cb-print-cus-images {
+        top: 7.6in;
+        width: 100%;
+        height: 3in;
+        column-count: 2;
+        column-fill: auto;
+        column-gap: 0.1in;
+        text-align: center;
+        line-height: 0em;
+    }
+
+    .cb-print-cus-img-cont {
+        position: static !important;
+        height: 1.49in;
+        padding: 1px;
+        display: inline-block;
+    }
+
+    .cb-print-cust-img {
+        position: static !important;
+        height: 100%;
+
+        @include box-shadow;
+    }
+    
+    .cb-print-cus-job-info {
+        left: 4.05in;
+        width: 2.45in;
+        height: 0.85in;
+        top: 6.25in;
+        @include box-shadow;
+    }
+
+    .cb-print-cus-estimate {
+        top: 6.25in;
+        width: 1.45in;
+        height: 0.85in;
+        @include box-shadow;
+        left: 6.55in;       
+    }
+
+    .cb-print-cus-warning {
+        top: 10in;
+        font-size: 1.2em;
+        left: 4.25in;
+        font-weight: bold;
+        -webkit-text-stroke: 1px white;
+        text-align: center;
+    }
+
+}
+
+@media screen {
+
+    .cb-print {
+        display: none !important;
+
+    }
+
+}
