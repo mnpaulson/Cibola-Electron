@@ -41,7 +41,7 @@ Vue.use(Vuetify)
 Vue.use(VueFuse)
 
 var store = {
-   serverURL : "http://127.0.0.1:8888",
+  serverURL : "http://127.0.0.1:8888",
   alert: {
       status: null,
       msg: null,

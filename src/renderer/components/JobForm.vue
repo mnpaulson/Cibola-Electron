@@ -138,7 +138,7 @@
                 <span>Update Job</span>
                 <v-icon>save</v-icon>
                 </v-btn>
-                <v-btn class="v-btn--active info--text">
+                <v-btn class="v-btn--active info--text" @click="printJob()">
                 <span>Print</span>
                 <v-icon>print</v-icon>
                 </v-btn>
@@ -246,7 +246,7 @@
                     </div>
                 </template>
             </div>
-            <img class="cb-print-logo cb-print-element" src="img/logo.png" alt="">
+            <img class="cb-print-logo cb-print-element" src="static/logo.png" alt="">
             <div class="cb-print-element cb-print-cus-images">
                 <template v-for="(image) in job.job_images">
                     <div class="cb-print-element cb-print-cus-img-cont" :key="image.id">
@@ -274,6 +274,8 @@
 </template>
 
 <script>
+const { remote, BrowserWindow } = require('electron')
+const sharp = require('sharp')
 
     export default {
         data: () => ({
@@ -308,6 +310,7 @@
                 vital_date: false,
                 job_images: []
             },
+            test: null,
             estimateRules: [
                 v => !!v || 'Estimate is required',
                 v => {
@@ -323,11 +326,28 @@
             saveImage() {
                 this.img = this.$refs.img;
                 var context = this.img.getContext("2d").drawImage(this.video, 0, 0, 1280, 1024);
-                this.job.job_images.push({
-                    image: this.img.toDataURL("image/png"),
-                    note: null,
-                    id: null
-                });
+                var buffer = this.img.toDataURL("image/png");
+                var meta = buffer.substr(0, buffer.indexOf(',') + 1);
+                let imgBuffer = Buffer.from(buffer.substr(buffer.indexOf(',') + 1), 'base64');
+                sharp(imgBuffer)
+                    // .resize(800, 600)
+                    // .png()
+                    .jpeg({quality: 90})
+                    .toBuffer()
+                    .then(data => {
+                        this.job.job_images.push({
+                            // image: this.img.toDataURL("image/png"),
+                            image: meta + data.toString("base64"),
+                            note: null,
+                            id: null
+                        });
+                    });
+                // this.job.job_images.push({
+                //     // image: this.img.toDataURL("image/png"),
+                //     image: this.test,
+                //     note: null,
+                //     id: null
+                // });
                 this.img = null;
                 this.captureDialog = false;
             },
@@ -427,7 +447,13 @@
                         this.job.due_date = response.data.due_date;
                         this.job.completed_at = response.data.completed_at;
                         this.job.vital_date = response.data.vital_date;                        
-                        this.job.job_images = response.data.job_images;
+                        // this.job.job_images = response.data.job_images;
+
+                        response.data.job_images.forEach(element => {
+                            console.log(element);
+                            element.image = this.store.serverURL + element.image;
+                            this.job.job_images.push(element);
+                        });
 
                         this.$emit('customerId', this.job.customer_id);
 
@@ -464,6 +490,11 @@
                     .catch((error) => {
                         console.log(error);
                     })
+            },
+            printJob() {
+                var currentWindow = remote.getCurrentWindow()
+
+                currentWindow.webContents.print({silent: false, printBackground: false, deviceName: ''});
             }
         },
         mounted() {
