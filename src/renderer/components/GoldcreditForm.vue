@@ -139,6 +139,7 @@
                 fixed
                 :value="true"
                 :app="true"
+                color="white"
                 class="elevation-1"
             >
                 <v-btn v-show="!credit.id || credit.id == 0" @click="createCredit()" class="v-btn--active primary--text">

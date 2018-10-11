@@ -128,6 +128,7 @@
                 fixed
                 :value="true"
                 :app="true"
+                color="white"
                 class="elevation-1"
             >
                 <v-btn v-show="!job.id || job.id == 0" @click="createJob()" class="v-btn--active primary--text">
@@ -161,9 +162,10 @@
             <v-card>
                 <!-- <v-flex d-flex xs12> -->
                 <div class="catpure-cont">
-                    <video ref="video" id="video" width="1280px" height="1024px" autoplay></video>
+                    <video ref="videoDisplay" id="videoDisplay" autoplay></video>
+                    <video v-show="false" ref="video" id="video" :width="store.camera.width + 'px'" :height="store.camera.height + 'px'" autoplay></video>
                     <!-- <img class="capture-error" v-show="img" :src="img">                             -->
-                    <canvas v-show="false" ref="img" id="img" width="1280" height="1024"></canvas>
+                    <canvas v-show="false" ref="img" id="img" :width="store.camera.width" :height="store.camera.height"></canvas>
                 </div>
                 <!-- </v-flex> -->
                 <v-flex d-flex xs12>                    
@@ -297,6 +299,7 @@ const sharp = require('sharp')
             employeeList: [],
             img: {},
             video: {},
+            videoDisplay: {},
             job: {
                 id: null,
                 customer_id: null,
@@ -325,7 +328,7 @@ const sharp = require('sharp')
         methods: {
             saveImage() {
                 this.img = this.$refs.img;
-                var context = this.img.getContext("2d").drawImage(this.video, 0, 0, 1280, 1024);
+                var context = this.img.getContext("2d").drawImage(this.video, 0, 0, this.store.camera.width, this.store.camera.height);
                 var buffer = this.img.toDataURL("image/png");
                 var meta = buffer.substr(0, buffer.indexOf(',') + 1);
                 let imgBuffer = Buffer.from(buffer.substr(buffer.indexOf(',') + 1), 'base64');
@@ -343,8 +346,7 @@ const sharp = require('sharp')
                         });
                     });
                 // this.job.job_images.push({
-                //     // image: this.img.toDataURL("image/png"),
-                //     image: this.test,
+                //     image: this.img.toDataURL("image/png"),
                 //     note: null,
                 //     id: null
                 // });
@@ -514,6 +516,22 @@ const sharp = require('sharp')
                     this.video.play();
                 });
             }
+
+            this.videoDisplay = this.$refs.videoDisplay;
+
+            if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
+                    try {
+                        this.videoDisplay.srcObject = stream;
+                    } catch (error) {
+                        this.videoDisplay.src = URL.createObjectURL(stream);
+                        console.log('Could not create video stream');
+                        this.img = "img/webcamError.png";
+
+                    }                   
+                    this.videoDisplay.play();
+                });
+            }
         },
         props: {
             customer_id: Number,
@@ -526,6 +544,15 @@ const sharp = require('sharp')
                 }
             },
             job_id (val) {
+                this.job.employee_id = null;
+                this.job.estimate = null;
+                this.job.est_note = null;
+                this.job.note = null;                        
+                this.job.appraisal = null;
+                this.job.due_date = null;
+                this.job.completed_at = null;
+                this.job.vital_date = null;                        
+                this.job.job_images = [];
                 if (!isNaN(this.job_id) && this.job_id !== null) {
                     this.getJob(this.job_id);
                 }

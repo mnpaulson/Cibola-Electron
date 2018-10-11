@@ -73,13 +73,35 @@
 </template>
 
 <script>
+const { app } = require('electron');
+const settings = require('electron-settings');
+
   export default {
     data: () => ({
       drawer: null
     }),
     props: {
       source: String
-    }
+    },
+    mounted() {
+      if (!settings.has('serverURL')){
+          settings.set('serverURL', 'localhost');
+      }
+      
+      this.store.serverURL = settings.get('serverURL');
+
+      if (!settings.has('camera')) {
+          settings.set('camera', {height: '1024', width: '1280'});
+      }
+
+      this.store.camera.width = settings.get('camera.width');
+      this.store.camera.height = settings.get('camera.height');
+    },
+    computed: {
+      store() {
+          return this.$root.$data.store;
+      }
+    }   
   }
 </script>
 

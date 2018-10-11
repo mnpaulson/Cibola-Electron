@@ -54,7 +54,7 @@
         methods: {
             getOutstandingJobs() {
             this.$http
-                .get("/employees/outstandingJobs")
+                .get(this.store.serverURL +  "/employees/outstandingJobs")
                 .then(response => {
                     // console.log(response.data);
                     this.employees = response.data;

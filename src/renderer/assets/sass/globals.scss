@@ -66,6 +66,13 @@
     filter: none !important;
 }
 
+#videoDisplay {
+    max-height: 80vh;
+    min-height: 80vh;
+    // height: 100%;
+    // width: 100%;
+}
+
 /* TRANSITION */
 .component-fade-enter-active {
     transition: transform 0.3s ease, opacity 0.5s ease;
