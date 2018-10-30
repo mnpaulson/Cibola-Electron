@@ -67,7 +67,7 @@
                                     v-model="credit.exchange"
                                     label="Exchange"
                                 ></v-text-field> -->
-                             <v-btn flat color="primary" @click="getNewGoldValue"><v-icon>refresh</v-icon>{{lastGoldValues}}</v-btn>
+                             <v-btn flat color="primary" @click="getNewGoldValue"><v-icon>refresh</v-icon>{{credit.metalPriceDate}}</v-btn>
                         </v-flex>
                         <v-flex row xs12 md12>
                             <v-textarea no-resize v-model="credit.note" class="" label="Credit Note"></v-textarea>                    
@@ -211,17 +211,17 @@
                 goldCAD: null,
                 // exchange: null,
                 platCAD: null,
-                metalPriceDate: null,
+                metalPriceDate: "",
                 creditDate: null,
                 creditValue: null,
                 used: false,
-                note: null
+                note: null,
+                creditItems: []
             },
             items: [],
             employeeRules: [
                 v => !!v || 'Select employee'
             ],
-            lastGoldValues: ""
         }),
         methods: {
             //Gets employee list
@@ -248,7 +248,7 @@
                         response.data.forEach(function(v){
                             if (v.name === 'GoldCAD') {
                                 this.credit.goldCAD = this.round(v.value1, 2);
-                                this.lastGoldValues = v.updated_at;
+                                this.credit.metalPriceDate = v.updated_at;
                             } else if (v.name === 'PlatCAD') {
                                 this.credit.platCAD = this.round(v.value1, 2);
                             }
@@ -294,7 +294,7 @@
                         var platG = response.data;
                         // platG = platG * this.credit.exchange;
                         this.credit.platCAD = this.round(platG, 2);
-                        this.lastGoldValues = this.today + " " + this.now;
+                        this.credit.metalPriceDate = this.today + " " + this.now;
                     })
                     .catch((error) => {
                         console.log(error);
@@ -306,7 +306,24 @@
             },
             //Create new gold credit
             createCredit() {
-                console.log("todo: createCredit");
+                this.credit.creditItems = this.itemList;
+                this.$http.post(this.store.serverURL +  '/goldcredit/create', this.credit)
+                    .then((response) => {
+                        this.credit.id = response.data.id;
+                        var i = 0;
+                        // response.data.image_ids.forEach(id => {
+                        //     this.job.job_images[i].id = id;
+                        //     i++;
+                        // });
+                        this.store.setAlert(true, "success", "Credit Created with ID: " + this.credit.id);
+                        this.$router.replace("/credit/" + this.credit.id);
+                        this.loading = false;                                                                                                                                                        
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                        this.loading = false;
+                        this.store.setAlert(true, "error", error.message);                                                                    
+                    });
             },
             //Update existing gold credit
             updateCredit() {
