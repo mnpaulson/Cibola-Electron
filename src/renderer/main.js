@@ -111,6 +111,16 @@ const router = new VueRouter({
           path: '/goldcredit',
           name: 'goldcredits',
           component: GoldCredit
+      },      
+      {
+        path: '/goldcredit/:id',
+        name: 'goldcredit',
+        component: GoldCredit
+      },
+      {
+        path: '/goldcredit/:id/:cus',
+        name: 'goldcus',
+        component: GoldCredit
       },
       {
           path: '*',

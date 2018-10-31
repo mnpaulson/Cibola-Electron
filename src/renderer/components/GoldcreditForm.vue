@@ -18,11 +18,13 @@
                                     v-model="credit.employee_id"
                                     item-text="name"
                                     item-value="id"
+                                    :disabled="disabled"
                             ></v-autocomplete>
                             <v-text-field
                                 label="Total Value"
                                 v-model="credit.total"
                                 prepend-icon="attach_money"
+                                :disabled="disabled"
                             ></v-text-field>
                             <v-menu
                                 ref="dateMenu"
@@ -42,6 +44,7 @@
                                     v-model="credit.creditDate"
                                     prepend-icon="event"
                                     readonly
+                                    :disabled="disabled"
                                     ></v-text-field>
                                     <v-date-picker v-model="credit.creditDate" no-title scrollable>
                                     <v-spacer></v-spacer>
@@ -58,10 +61,12 @@
                                 <v-text-field
                                     v-model="credit.goldCAD"
                                     label="Gold (g)"
+                                    :disabled="disabled"
                                 ></v-text-field>
                                 <v-text-field
                                     v-model="credit.platCAD"
                                     label="Platinum (g)"
+                                    :disabled="disabled"
                                 ></v-text-field>
                                 <!-- <v-text-field
                                     v-model="credit.exchange"
@@ -87,6 +92,7 @@
                                     <v-flex xs6 md3>
                                         <v-autocomplete
                                             label="Item Select"
+                                            :disabled="disabled"
                                             cache-items
                                             :items="valueList"
                                             :return-object=true
@@ -99,13 +105,14 @@
                                         <v-text-field
                                             v-model="item.weight"
                                             label="Weight(g)/Amount"
+                                            :disabled="disabled"
                                         ></v-text-field>
                                     </v-flex>
                                     <v-flex xs6 md1>
                                         <v-text-field
                                             v-model="item.multiplier"
                                             label="*"
-                                            disabled
+                                            :disabled="multiplierDisable"
                                         ></v-text-field>
                                     </v-flex>
                                     <v-flex xs6 md1>
@@ -119,6 +126,7 @@
                                         <v-text-field
                                             v-model="item.value"
                                             label="Value"
+                                            :disabled="disabled"
                                         ></v-text-field>
                                     </v-flex>
                                     <v-flex xs6 md1>
@@ -135,6 +143,18 @@
                 <v-btn color="primary" @click="newItem">Add Item</v-btn>
             </v-flex>
         </v-layout>
+        <template v-for="(image, index) in credit.credit_images" >
+            <v-flex d-flex class="xs12 sm12 md6 lg3 xl3" :key="image.id">
+                <transition name="component-fade" appear>                    
+                <v-card>
+                    <v-btn class="close-btn" dark small right absolute outline fab color="grey" @click="removeImage(index)"><v-icon class="fab-fix" dark>delete</v-icon></v-btn>                    
+                    <v-img :src="image.image" height="200px" @click="showLightBox(image.image)">
+                    </v-img>
+                    <v-textarea v-model="image.note" name="input-1" label=" Note" multi-line rows="5" no-resize></v-textarea>
+                </v-card>
+                </transition>
+            </v-flex>
+        </template>
             <v-bottom-nav
                 fixed
                 :value="true"
@@ -190,11 +210,57 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+        <v-dialog v-model="imageDeleteDialog" max-width="500px">
+            <v-card>
+                <v-toolbar color="error" dark clipped-left flat>
+                    <v-toolbar-title><v-icon>warning</v-icon> Delete Credit Image</v-toolbar-title>
+                </v-toolbar>
+                <v-card-text>
+                    Are you sure you want to delete this image? <br>
+                    This image was previously saved to this credit. <br>
+                    This action is not reversable
+                </v-card-text>
+                <v-card-actions>
+                    <v-btn color="error"  @click.stop="deleteImage()">
+                        <v-icon>delete</v-icon>
+                        Delete
+                    </v-btn>                    
+                    <v-btn color="primary" right absolute @click.stop="imageDeleteDialog=false">
+                        <v-icon>cancel</v-icon>
+                        Cancel
+                        </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+        <v-dialog v-model="captureDialog" transition="dialog-transition" fullscreen >
+            <v-card>
+                <!-- <v-flex d-flex xs12> -->
+                <div class="catpure-cont">
+                    <video ref="videoDisplay" id="videoDisplay" autoplay></video>
+                    <video v-show="false" ref="video" id="video" :width="store.camera.width + 'px'" :height="store.camera.height + 'px'" autoplay></video>
+                    <!-- <img class="capture-error" v-show="img" :src="img">                             -->
+                    <canvas v-show="false" ref="img" id="img" :width="store.camera.width" :height="store.camera.height"></canvas>
+                </div>
+                <!-- </v-flex> -->
+                <v-flex d-flex xs12>                    
+                <v-btn color="primary" @click="saveImage()">Capture</v-btn>
+                <v-btn color="error" @click="discardCapture()">discard</v-btn>
+                </v-flex>
+            </v-card>
+        </v-dialog>
+        <transition name="component-lightbox" appear>                            
+            <div v-if="lightBoxDialog" class="lightBoxWrapper" @click="lightBoxDialog = false">
+                <img :src='lightBoxImage' alt="" class="lightBoxImage">
+            </div>
+        </transition>
     </div>
     </transition>
 </template>
 
 <script>
+const { remote, BrowserWindow } = require('electron')
+const sharp = require('sharp')
+
     export default {
         data: () => ({
             employeeList: [],
@@ -204,21 +270,33 @@
             date: false,
             dateMenu: false,
             creditDeleteDialog: false,
+            disabled: false,
+            multiplierDisable: true,
             credit: {
                 id: null,
                 employee_id: null,
                 customer_id: null,
                 goldCAD: null,
-                // exchange: null,
                 platCAD: null,
                 metalPriceDate: "",
                 creditDate: null,
                 creditValue: null,
                 used: false,
                 note: null,
-                creditItems: []
+                credit_items: [],
+                credit_images: []
             },
             items: [],
+            img: {},
+            video: {},
+            videoDisplay: {},
+            captureDialog: false,
+            imageDeleteDialog: false,
+            creditDeleteDialog: false,
+            lightBoxDialog: false,
+            lightBoxImage: null,
+            deleteImageId: null,
+            deleteImageIndex: null,
             employeeRules: [
                 v => !!v || 'Select employee'
             ],
@@ -306,7 +384,7 @@
             },
             //Create new gold credit
             createCredit() {
-                this.credit.creditItems = this.itemList;
+                this.credit.credit_items = this.itemList;
                 this.$http.post(this.store.serverURL +  '/goldcredit/create', this.credit)
                     .then((response) => {
                         this.credit.id = response.data.id;
@@ -316,7 +394,7 @@
                         //     i++;
                         // });
                         this.store.setAlert(true, "success", "Credit Created with ID: " + this.credit.id);
-                        this.$router.replace("/credit/" + this.credit.id);
+                        this.$router.replace("/goldcredit/" + this.credit.id);
                         this.loading = false;                                                                                                                                                        
                     })
                     .catch((error) => {
@@ -335,16 +413,124 @@
             },
             //Get credit
             getCredit(id) {
+                this.loading = true;
+                this.$http.post(this.store.serverURL +  '/goldcredit/show', {id: id})
+                    .then((response) => {
+                        this.credit.id = response.data.id;
+                        this.credit.customer_id = response.data.customer_id;
+                        this.credit.employee_id = response.data.employee_id;
+                        this.credit.note = response.data.note;
+                        this.credit.goldCAD = response.data.gold_cad;
+                        this.credit.platCAD = response.data.plat_cad;
+                        this.credit.metalPriceDate = response.data.metalPriceDate;
+                        this.credit.creditDate = response.data.gold_date;
+                        this.credit.used = response.data.used;
 
+                        response.data.credit_images.forEach(element => {
+                            element.image = this.store.serverURL + element.image;
+                            this.credit.credit_images.push(element);
+                        });
+
+                        response.data.credit_items.forEach(element => {
+                            var item = {
+                                id: element.id,
+                                itemObj: this.valueList[element.itemId - 1],
+                                item: element.itemId,
+                                markup: element.markup,
+                                multiplier: element.multiplier,
+                                value: element.value,
+                                weight: element.weight
+                            }
+                            this.credit.credit_items.push(item)
+                        });
+
+                        this.itemList = this.credit.credit_items;
+
+                        this.$emit('customerId', this.credit.customer_id);
+
+                        this.loading = false;
+                    })
+                    .catch((error) => {
+                        this.store.setAlert(true, "error", "Credit ID " + id + " not found.");
+                        this.loading = false;
+                        console.log(error);
+                    });
             },
             //Deletes credit item
             removeItem(index) {
 
+            },
+            saveImage() {
+                this.img = this.$refs.img;
+                var context = this.img.getContext("2d").drawImage(this.video, 0, 0, this.store.camera.width, this.store.camera.height);
+                var buffer = this.img.toDataURL("image/png");
+                var meta = buffer.substr(0, buffer.indexOf(',') + 1);
+                let imgBuffer = Buffer.from(buffer.substr(buffer.indexOf(',') + 1), 'base64');
+                sharp(imgBuffer)
+                    .jpeg({quality: 90})
+                    .toBuffer()
+                    .then(data => {
+                        this.credit.credit_images.push({
+                            image: meta + data.toString("base64"),
+                            note: null,
+                            id: null
+                        });
+                    });
+                this.img = null;
+                this.captureDialog = false;
+            },
+            discardCapture() {
+                this.captureDialog = false;
+            },
+            showLightBox(image) {
+                this.lightBoxImage = image;
+                this.lightBoxDialog = true;
+            },
+            removeImage(index) {
+                if (this.credit.credit_images[index].id !== null) {
+                    this.deleteImageId = this.credit.credit_images[index].id;
+                    this.deleteImageIndex = index;
+                    this.imageDeleteDialog = true;
+                } else {
+                    this.credit.credit_images.splice(index, 1);                
+                }
             }
         },
         mounted() {
             this.getEmployees();
             this.getValues();
+
+            this.video = this.$refs.video;
+
+            if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
+                    try {
+                        this.video.srcObject = stream;
+                    } catch (error) {
+                        this.video.src = URL.createObjectURL(stream);
+                        console.log('Could not create video stream');
+                        this.img = "img/webcamError.png";
+
+                    }                   
+                    this.video.play();
+                });
+            }
+
+            this.videoDisplay = this.$refs.videoDisplay;
+
+            if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
+                    try {
+                        this.videoDisplay.srcObject = stream;
+                    } catch (error) {
+                        this.videoDisplay.src = URL.createObjectURL(stream);
+                        console.log('Could not create video stream');
+                        this.img = "img/webcamError.png";
+
+                    }                   
+                    this.videoDisplay.play();
+                });
+            }
         },
         props: {
             customer_id: Number,
@@ -357,8 +543,25 @@
                 }
             },
             goldcredit_id (val) {
-                if (!isNaN(this.goldcredit_id) && this.goldcredit_id !== null) {
+                this.credit.id = null;
+                this.credit.employee_id = null;
+                this.credit.goldCAD = null;
+                this.credit.platCAD = null;
+                this.credit.metalPriceDate = "";
+                this.credit.creditDate = null;
+                this.credit.creditValue = null;
+                this.credit.used = false;
+                this.credit.note = null;
+                this.credit.credit_items = [];
+                this.credit.credit_images = [];
+                this.itemList = [];
+                this.disabled = false;
+                if (!isNaN(this.goldcredit_id) && this.goldcredit_id !== null && this.goldcredit_id) {
                     this.getCredit(this.goldcredit_id);
+                    this.disabled = true;
+                }
+                else {
+                    this.disabled = false;
                 }
             },
             //Calculate values on changes
@@ -366,23 +569,32 @@
                 handler(list) {
                     var total = 0;
                     list.forEach(function(e){
-                        var metal;
-                        if (e.itemObj) {
-                            e.multiplier = e.itemObj.value1;
-                            e.markup = e.itemObj.value2;
-                            e.item = e.itemObj.id;
-                            if (e.itemObj.value3 === "Gold" ) {
-                                metal = this.credit.goldCAD;
-                            } else if (e.itemObj.value3 === "Platinum" ) {
-                                metal = this.credit.platCAD;
-                            } else {
-                                metal = 1;
+                        if(e.id == null) {
+                            var metal;
+                            if (e.itemObj) {
+                                if (e.itemObj.name == "Other") {
+                                    this.multiplierDisable = false;
+                                }
+                                else {
+                                    this.multiplierDisable = true;
+                                    e.multiplier = e.itemObj.value1;
+                                }
+                                e.markup = e.itemObj.value2;
+                                e.item = e.itemObj.id;
+                                if (e.itemObj.value3 === "Gold" ) {
+                                    metal = this.credit.goldCAD;
+                                } else if (e.itemObj.value3 === "Platinum" ) {
+                                    metal = this.credit.platCAD;
+                                } else {
+                                    metal = 1;
+                                }
                             }
-                        }
 
-                        if (e.weight && e.multiplier && e.markup) e.value = this.round(e.weight * e.multiplier * e.markup * metal, 2);
-                        else e.value = 0;
+                            if (e.weight && e.multiplier && e.markup) e.value = this.round(e.weight * e.multiplier * e.markup * metal, 2);
+                            else e.value = 0;
+                        }
                         total += e.value;
+                        total = this.round(total, 2);
                     }.bind(this));
                     this.credit.total = total;
                 },

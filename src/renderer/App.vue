@@ -83,7 +83,7 @@ const settings = require('electron-settings');
     props: {
       source: String
     },
-    mounted() {
+    created() {
       if (!settings.has('serverURL')){
           settings.set('serverURL', 'localhost');
       }
