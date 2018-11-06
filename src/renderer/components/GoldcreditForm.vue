@@ -72,7 +72,7 @@
                                     v-model="credit.exchange"
                                     label="Exchange"
                                 ></v-text-field> -->
-                             <v-btn flat color="primary" @click="getNewGoldValue"><v-icon>refresh</v-icon>{{credit.metalPriceDate}}</v-btn>
+                             <v-btn v-show="credit.id == null" flat color="primary" @click="getNewGoldValue"><v-icon>refresh</v-icon>{{credit.metalPriceDate}}</v-btn>
                         </v-flex>
                         <v-flex row xs12 md12>
                             <v-textarea no-resize v-model="credit.note" class="" label="Credit Note"></v-textarea>                    
@@ -130,7 +130,7 @@
                                         ></v-text-field>
                                     </v-flex>
                                     <v-flex xs6 md1>
-                                        <v-btn class="close-btn" dark small right absolute outline fab color="grey" @click="removeItem(index)"><v-icon class="fab-fix" dark>delete</v-icon></v-btn>                    
+                                        <v-btn v-show="credit.id == null" class="close-btn" dark small right absolute outline fab color="grey" @click="removeItem(index)"><v-icon class="fab-fix" dark>delete</v-icon></v-btn>                    
                                     </v-flex>
                                 </v-layout>
                             </v-card-text>
@@ -140,14 +140,14 @@
         </template>
          <v-layout row wrap>
             <v-flex d-flex xs12 lg2 xl2>
-                <v-btn color="primary" @click="newItem">Add Item</v-btn>
+                <v-btn v-show="credit.id == null" color="primary" @click="newItem">Add Item</v-btn>
             </v-flex>
         </v-layout>
         <template v-for="(image, index) in credit.credit_images" >
             <v-flex d-flex class="xs12 sm12 md6 lg3 xl3" :key="image.id">
                 <transition name="component-fade" appear>                    
                 <v-card>
-                    <v-btn class="close-btn" dark small right absolute outline fab color="grey" @click="removeImage(index)"><v-icon class="fab-fix" dark>delete</v-icon></v-btn>                    
+                    <v-btn v-show="credit.id == null" class="close-btn" dark small right absolute outline fab color="grey" @click="removeImage(index)"><v-icon class="fab-fix" dark>delete</v-icon></v-btn>                    
                     <v-img :src="image.image" height="200px" @click="showLightBox(image.image)">
                     </v-img>
                     <v-textarea v-model="image.note" name="input-1" label=" Note" multi-line rows="5" no-resize></v-textarea>
@@ -174,7 +174,7 @@
                 <span>Print</span>
                 <v-icon>print</v-icon>
                 </v-btn>
-                <v-btn @click="captureDialog = true" class="v-btn--active accent--text">
+                <v-btn v-show="credit.id == null" @click="captureDialog = true" class="v-btn--active accent--text">
                 <span>Capture</span>
                 <v-icon>camera_alt</v-icon>
                 </v-btn>
@@ -405,11 +405,27 @@ const sharp = require('sharp')
             },
             //Update existing gold credit
             updateCredit() {
-                console.log("todo: updateCredit");
+                this.$http.post(this.store.serverURL +  '/goldcredit/update', {id: this.credit.id, note: this.credit.note, used: this.credit.used})
+                    .then((response) => {
+                        this.creditDeleteDialog = false;
+                        this.store.setAlert(true, "success", "Credit ID " + this.credit.id + " updated.");                        
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                    })
             },
             //Delete current credit
             deleteCredit() {
-                console.log("todo: deletecredit");
+                this.$http.post(this.store.serverURL +  '/goldcredit/delete', {id: this.credit.id})
+                    .then((response) => {
+                        // this.$router.push("/");
+                        this.creditDeleteDialog = false;
+                        this.store.setAlert(true, "warning", "Credit ID " + this.credit.id + " deleted.");                        
+                        this.$router.go(-1);
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                    })
             },
             //Get credit
             getCredit(id) {
@@ -458,7 +474,7 @@ const sharp = require('sharp')
             },
             //Deletes credit item
             removeItem(index) {
-
+                        this.itemList.splice(index, 1);                
             },
             saveImage() {
                 this.img = this.$refs.img;

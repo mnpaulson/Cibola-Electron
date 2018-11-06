@@ -28,7 +28,7 @@
                                 <td class="text-xs-left">{{ props.item.customer.fname }} {{ props.item.customer.lname }}</td>
                                 <td class="text-xs-left" v-if="props.item.employee">{{ props.item.employee.name }}</td>
                                 <td class="text-xs-left">{{ props.item.created_at }}</td>
-                                <td class="text-xs-left">{{ props.item.used }}</td>
+                                <td class="text-xs-left"><span v-if="props.item.used">Yes</span><span v-else>No</span></td>
                             </tr>
                         </template>
                     </v-data-table>

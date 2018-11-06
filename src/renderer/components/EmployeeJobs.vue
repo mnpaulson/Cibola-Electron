@@ -29,9 +29,11 @@
                                 </span> — For: ${{ job.estimate.toLocaleString() }}</v-list-tile-sub-title>
                         </v-list-tile-content>
                         <v-list-tile-action>
-                            <v-btn color="" icon ripple @click.stop="completeToggle(job.id, emp_index, index)">
-                                <v-icon v-if="!job.completed_at" class="complete-btn" color="grey lighten-1">check_circle</v-icon>
-                                <v-icon v-if="job.completed_at" class="complete-btn" color="green lighten-2">check_circle</v-icon>                                
+                            <v-btn v-show="!job.completed_at" color="grey lighten-1" fab dark  icon ripple @click.stop="completeToggle(job.id, emp_index, index)">
+                                <v-icon>check</v-icon>                               
+                            </v-btn>
+                            <v-btn v-show="job.completed_at" color="green lighten-1" fab dark  icon ripple @click.stop="completeToggle(job.id, emp_index, index)">
+                                <v-icon>check</v-icon>                                
                             </v-btn>
                         </v-list-tile-action>
                         </v-list-tile>
