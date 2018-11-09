@@ -539,6 +539,7 @@ const { remote, BrowserWindow } = require('electron')
                 this.job.completed_at = null;
                 this.job.vital_date = null;                        
                 this.job.job_images = [];
+                this.job.id = null;
                 if (!isNaN(this.job_id) && this.job_id !== null) {
                     this.getJob(this.job_id);
                 }
@@ -589,11 +590,22 @@ const { remote, BrowserWindow } = require('electron')
                 return now.getHours() + ":" + now.getMinutes();
             },
             employeeName() {
-                if (this.employeeList[this.job.employee_id - 1]) {
-                    return this.employeeList[this.job.employee_id - 1].name;
+                if (this.job.employee_id != null) {
+                    var e = this.employeeList.find((element) => {
+                        if (element.id == this.job.employee_id) {
+                            return element.name;
+                        }
+                    });
+                    // console.log(e);
+                    return e.name;
                 } else {
                     return null;
                 }
+                // if (this.employeeList[this.job.employee_id - 1]) {
+                //     return this.employeeList[this.job.employee_id - 1].name;
+                // } else {
+                //     return null;
+                // }
             }
         }
     }

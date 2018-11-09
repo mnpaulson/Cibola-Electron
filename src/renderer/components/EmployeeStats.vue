@@ -57,7 +57,7 @@
                                 emp.total += job.estimate;
                             })
                             emp.total = emp.total.toLocaleString();
-                            emp.days = this.compareDate(emp.wait);
+                            if (emp.wait != null) emp.days = this.compareDate(emp.wait);
                             delete emp.jobs;
                         }
                     }); 
