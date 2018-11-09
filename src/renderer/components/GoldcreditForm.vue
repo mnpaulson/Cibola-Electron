@@ -259,7 +259,6 @@
 
 <script>
 const { remote, BrowserWindow } = require('electron')
-const sharp = require('sharp')
 
     export default {
         data: () => ({
@@ -482,16 +481,12 @@ const sharp = require('sharp')
                 var buffer = this.img.toDataURL("image/png");
                 var meta = buffer.substr(0, buffer.indexOf(',') + 1);
                 let imgBuffer = Buffer.from(buffer.substr(buffer.indexOf(',') + 1), 'base64');
-                sharp(imgBuffer)
-                    .jpeg({quality: 90})
-                    .toBuffer()
-                    .then(data => {
-                        this.credit.credit_images.push({
-                            image: meta + data.toString("base64"),
-                            note: null,
-                            id: null
-                        });
-                    });
+
+                this.credit.credit_images.push({
+                    image: this.img.toDataURL("image/png"),
+                    note: null,
+                    id: null
+                });
                 this.img = null;
                 this.captureDialog = false;
             },

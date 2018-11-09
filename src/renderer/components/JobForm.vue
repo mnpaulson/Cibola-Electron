@@ -234,11 +234,11 @@
                 <v-icon class="cb-print-element cb-print-work-icon">work</v-icon>{{ job.id }}
             </div>
             <div class="cb-print-element cb-print-estimate">
-                <div class="cb-print-est-amt"> Est: ${{ job.estimate}} </div><br>
+                <div class="cb-print-est-amt"> Est: ${{ job.estimate}}</div><br>
                 <div class="cb-print-est-note"> {{ job.est_note }} </div>
             </div>
             <div :class="{cbPrintRed: job.vital_date}"  class="cb-print-element cb-print-due">
-                <v-icon class="cb-print-element cb-print-alarm-icon">alarm</v-icon>{{ job.due_date }}
+                <v-icon class="cb-print-element cb-print-alarm-icon">alarm</v-icon>{{ dateMMDDYY }}
             </div>
             <div class="cb-print-element cb-print-images">
                 <template v-for="(image) in job.job_images">
@@ -264,7 +264,7 @@
                 E-mail: goldmail@thegoldworks.com
             </div>
             <div class="cb-print-element cb-print-cus-estimate">
-                <div class="cb-print-est-amt"> Estimate: ${{ job.estimate}} </div><br>
+                <div class="cb-print-est-amt"> Estimate: ${{ job.estimate}} + GST</div><br>
                 <div class="cb-print-est-note"> {{ job.est_note }} </div>
             </div>
             <div class="cb-print-element cb-print-cus-warning">
@@ -277,7 +277,6 @@
 
 <script>
 const { remote, BrowserWindow } = require('electron')
-const sharp = require('sharp')
 
     export default {
         data: () => ({
@@ -332,24 +331,11 @@ const sharp = require('sharp')
                 var buffer = this.img.toDataURL("image/png");
                 var meta = buffer.substr(0, buffer.indexOf(',') + 1);
                 let imgBuffer = Buffer.from(buffer.substr(buffer.indexOf(',') + 1), 'base64');
-                sharp(imgBuffer)
-                    // .resize(800, 600)
-                    // .png()
-                    .jpeg({quality: 90})
-                    .toBuffer()
-                    .then(data => {
-                        this.job.job_images.push({
-                            // image: this.img.toDataURL("image/png"),
-                            image: meta + data.toString("base64"),
-                            note: null,
-                            id: null
-                        });
-                    });
-                // this.job.job_images.push({
-                //     image: this.img.toDataURL("image/png"),
-                //     note: null,
-                //     id: null
-                // });
+                this.job.job_images.push({
+                    image: this.img.toDataURL("image/png"),
+                    note: null,
+                    id: null
+                });
                 this.img = null;
                 this.captureDialog = false;
             },
@@ -582,6 +568,21 @@ const sharp = require('sharp')
                 }
 
                 return yyyy + "-" + mm + "-" + dd;
+            },
+            dateMMDDYY() {
+                var today = new Date(this.job.due_date);
+                var yyyy = today.getFullYear();
+                var mm = (1+today.getMonth());
+                var dd = today.getDate() + 1;
+
+                if (mm < 10 ) {
+                    mm = "0" + mm;
+                }
+                if (dd < 10 ) {
+                    dd = "0" + dd;
+                }
+
+                return mm + "-" + dd + "-" + yyyy
             },
             now() {
                 var now = new Date()

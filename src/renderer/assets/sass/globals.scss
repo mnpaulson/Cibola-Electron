@@ -223,7 +223,7 @@
     }
 
     .cb-print-total {
-        width: 1in;
+        width: 0.986in;
     }
 
     .cb-print-customer-info {
@@ -232,7 +232,8 @@
         width: 2.45in;        
         font-size: 1.3em;
         padding-left: 30px;
-        @include box-shadow;        
+        @include box-shadow;
+        overflow: hidden;        
     }
 
     .cb-print-customer-icon {

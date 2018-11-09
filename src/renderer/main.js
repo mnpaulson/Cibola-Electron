@@ -3,6 +3,7 @@ import axios from 'axios'
 import Vuetify from 'vuetify'
 import VueRouter from 'vue-router'
 import 'vuetify/dist/vuetify.css'
+import 'material-design-icons-iconfont/dist/material-design-icons.css'
 
 import App from './App'
 
@@ -39,7 +40,9 @@ Vue.component('GoldcreditForm', require('./components/GoldcreditForm.vue').defau
 Vue.component('PageNotFound', require('./components/PageNotFound.vue').default);
 
 Vue.use(VueRouter)
-Vue.use(Vuetify)
+Vue.use(Vuetify, {
+    iconfont: 'mdi'
+})
 Vue.use(VueFuse)
 
 var store = {
