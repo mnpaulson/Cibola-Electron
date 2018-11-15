@@ -109,6 +109,14 @@
             </v-card>
             </transition>
         </v-flex>
+        <v-flex v-if="job.id != null" xs12></v-flex>
+        <v-flex lg8 xl6 v-if="job.id != null">
+            <transition name="component-fade" appear>
+                <v-card>
+                    <v-card-text ><b>Created at:</b> {{job.created_at}} <b>Job:</b> {{job.id}} </v-card-text>
+                </v-card>
+            </transition>
+        </v-flex>
         <v-flex xs12></v-flex>
         <template v-for="(image, index) in job.job_images" >
             <v-flex d-flex class="xs12 sm12 md6 lg3 xl3" :key="image.id">
@@ -226,19 +234,20 @@
                 <img :src='lightBoxImage' alt="" class="lightBoxImage">
             </div>
         </transition>
-        <span v-if="job.id" class="cb-print">
+        <span class="cb-print">
             <div class="cb-print-element cb-print-note">
                 {{job.note}}
             </div>
             <div class="cb-print-element cb-print-job-num">
-                <v-icon class="cb-print-element cb-print-work-icon">work</v-icon>{{ job.id }}
+               # {{ job.id }}
             </div>
             <div class="cb-print-element cb-print-estimate">
-                <div class="cb-print-est-amt"> Est: ${{ job.estimate}}</div><br>
+                <div class="cb-print-est-amt"> Est: ${{ job.estimate}} + GST</div><br>
                 <div class="cb-print-est-note"> {{ job.est_note }} </div>
             </div>
-            <div :class="{cbPrintRed: job.vital_date}"  class="cb-print-element cb-print-due">
-                <v-icon class="cb-print-element cb-print-alarm-icon">alarm</v-icon>{{ dateMMDDYY }}
+            <div class="cb-print-element cb-print-due">
+            &nbsp&nbspIn: {{ createdDateMMDDYY }}<br />
+                Due: <span class="cb-print-element" :class="{cbPrintRed: job.vital_date}"> {{ dateMMDDYY }} </span>
             </div>
             <div class="cb-print-element cb-print-images">
                 <template v-for="(image) in job.job_images">
@@ -258,10 +267,10 @@
           
             </div>
             <div class="cb-print-element cb-print-cus-job-info">
-                Date: {{ today }} {{ now }} <br>
+                Date: {{ today }} <br>
                 Employee: {{ employeeName }} <br>
                 Phone: 403-320-0846 <br>
-                E-mail: goldmail@thegoldworks.com
+                E-mail: info@thegoldworks.com
             </div>
             <div class="cb-print-element cb-print-cus-estimate">
                 <div class="cb-print-est-amt"> Estimate: ${{ job.estimate}} + GST</div><br>
@@ -277,6 +286,7 @@
 
 <script>
 const { remote, BrowserWindow } = require('electron')
+const sharp = require('sharp')
 
     export default {
         data: () => ({
@@ -309,6 +319,7 @@ const { remote, BrowserWindow } = require('electron')
                 note: null,
                 due_date: null,
                 completed_at: null,
+                created_at: null,
                 vital_date: false,
                 job_images: []
             },
@@ -331,11 +342,24 @@ const { remote, BrowserWindow } = require('electron')
                 var buffer = this.img.toDataURL("image/png");
                 var meta = buffer.substr(0, buffer.indexOf(',') + 1);
                 let imgBuffer = Buffer.from(buffer.substr(buffer.indexOf(',') + 1), 'base64');
-                this.job.job_images.push({
-                    image: this.img.toDataURL("image/png"),
-                    note: null,
-                    id: null
-                });
+                sharp(imgBuffer)
+                    // .resize(800, 600)
+                    // .png()
+                    .jpeg({quality: 90})
+                    .toBuffer()
+                    .then(data => {
+                        this.job.job_images.push({
+                            // image: this.img.toDataURL("image/png"),
+                            image: meta + data.toString("base64"),
+                            note: null,
+                            id: null
+                        });
+                    });
+                // this.job.job_images.push({
+                //     image: this.img.toDataURL("image/png"),
+                //     note: null,
+                //     id: null
+                // });
                 this.img = null;
                 this.captureDialog = false;
             },
@@ -434,7 +458,8 @@ const { remote, BrowserWindow } = require('electron')
                         this.job.appraisal = response.data.appraisal;
                         this.job.due_date = response.data.due_date;
                         this.job.completed_at = response.data.completed_at;
-                        this.job.vital_date = response.data.vital_date;                        
+                        this.job.vital_date = response.data.vital_date;
+                        this.job.created_at = response.data.created_at;                      
                         // this.job.job_images = response.data.job_images;
 
                         response.data.job_images.forEach(element => {
@@ -483,6 +508,7 @@ const { remote, BrowserWindow } = require('electron')
                 var currentWindow = remote.getCurrentWindow()
 
                 currentWindow.webContents.print({silent: false, printBackground: false, deviceName: ''});
+                if (this.job.id == null) this.createJob();
             }
         },
         mounted() {
@@ -534,10 +560,10 @@ const { remote, BrowserWindow } = require('electron')
                 this.job.estimate = null;
                 this.job.est_note = null;
                 this.job.note = null;                        
-                this.job.appraisal = null;
+                this.job.appraisal = false;
                 this.job.due_date = null;
                 this.job.completed_at = null;
-                this.job.vital_date = null;                        
+                this.job.vital_date = false;                        
                 this.job.job_images = [];
                 this.job.id = null;
                 if (!isNaN(this.job_id) && this.job_id !== null) {
@@ -571,10 +597,26 @@ const { remote, BrowserWindow } = require('electron')
                 return yyyy + "-" + mm + "-" + dd;
             },
             dateMMDDYY() {
+                if (this.job.due_date == null) return "";
                 var today = new Date(this.job.due_date);
                 var yyyy = today.getFullYear();
                 var mm = (1+today.getMonth());
                 var dd = today.getDate() + 1;
+
+                if (mm < 10 ) {
+                    mm = "0" + mm;
+                }
+                if (dd < 10 ) {
+                    dd = "0" + dd;
+                }
+
+                return mm + "-" + dd + "-" + yyyy
+            },
+            createdDateMMDDYY() {
+                var today = new Date(this.job.created_at);
+                var yyyy = today.getFullYear();
+                var mm = (1+today.getMonth());
+                var dd = today.getDate();
 
                 if (mm < 10 ) {
                     mm = "0" + mm;
