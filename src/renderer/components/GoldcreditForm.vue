@@ -636,6 +636,11 @@ const { remote, BrowserWindow } = require('electron')
             store() {
                 return this.$root.$data.store;
             }
-        }
+        },
+        beforeDestroy() {
+            //Close webcam Streams when navigating away
+            this.stopStreamedVideo(this.videoDisplay);
+            this.stopStreamedVideo(this.video);
+        },
     }
 </script>

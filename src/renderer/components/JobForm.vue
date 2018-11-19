@@ -246,7 +246,7 @@
                 <div class="cb-print-est-note"> {{ job.est_note }} </div>
             </div>
             <div class="cb-print-element cb-print-due">
-            &nbsp&nbspIn: {{ createdDateMMDDYY }}<br />
+            &nbsp;&nbsp; In: {{ createdDateMMDDYY }}<br />
                 Due: <span class="cb-print-element" :class="{cbPrintRed: job.vital_date}"> {{ dateMMDDYY }} </span>
             </div>
             <div class="cb-print-element cb-print-images">
@@ -506,9 +506,18 @@ const sharp = require('sharp')
             },
             printJob() {
                 var currentWindow = remote.getCurrentWindow()
-
-                currentWindow.webContents.print({silent: false, printBackground: false, deviceName: ''});
+                currentWindow.webContents.print({silent: true, printBackground: false, deviceName: this.store.printers.job});
                 if (this.job.id == null) this.createJob();
+            },
+            stopStreamedVideo(videoElem) {
+                let stream = videoElem.srcObject;
+                let tracks = stream.getTracks();
+
+                tracks.forEach(function(track) {
+                    track.stop();
+                });
+
+                videoElem.srcObject = null;
             }
         },
         mounted() {
@@ -649,6 +658,11 @@ const sharp = require('sharp')
                 //     return null;
                 // }
             }
-        }
+        },
+        beforeDestroy() {
+            //Close webcam Streams when navigating away
+            this.stopStreamedVideo(this.videoDisplay);
+            this.stopStreamedVideo(this.video);
+        },
     }
 </script>

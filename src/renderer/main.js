@@ -49,6 +49,10 @@ var store = {
     width: null,
     height: null
   },
+  printers: {
+      job: '',
+      credit: ''
+  },
   alert: {
       status: null,
       msg: null,

@@ -94,8 +94,14 @@ const settings = require('electron-settings');
           settings.set('camera', {height: '1024', width: '1280'});
       }
 
+      if(!settings.has('printers')) {
+          settings.set('printers', {job: '', credit: ''});
+      }
+
       this.store.camera.width = settings.get('camera.width');
       this.store.camera.height = settings.get('camera.height');
+      this.store.printers.job = settings.get('printers.job');
+      this.store.printers.credit = settings.get('printers.credit');
     },
     computed: {
       store() {
