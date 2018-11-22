@@ -18,12 +18,16 @@ function createWindow () {
    * Initial window options
    */
   mainWindow = new BrowserWindow({
-    height: 563,
+    height: 900,
+    // fullscreen: true,
     useContentSize: true,
     width: 1000
   })
 
+  mainWindow.maximize();
+
   mainWindow.loadURL(winURL)
+  // mainWindow.webContents.openDevTools()
 
   mainWindow.on('closed', () => {
     mainWindow = null
@@ -52,8 +56,17 @@ app.on('activate', () => {
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-electron-builder.html#auto-updating
  */
 
-/*
+
 import { autoUpdater } from 'electron-updater'
+
+// const log = require('electron-log');
+// log.transports.file.level = 'info';
+// log.transports.file.file = 'C:\\log.txt';
+
+// log.info('Begining Log');
+
+// autoUpdater.logger = log;
+// autoUpdater.logger.transports.file.level = "info"
 
 autoUpdater.on('update-downloaded', () => {
   autoUpdater.quitAndInstall()
@@ -62,4 +75,4 @@ autoUpdater.on('update-downloaded', () => {
 app.on('ready', () => {
   if (process.env.NODE_ENV === 'production') autoUpdater.checkForUpdates()
 })
- */
+

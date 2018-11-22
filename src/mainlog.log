@@ -1,0 +1,36 @@
+[2018-11-21 15:17:24.740] [info] Checking for update
+[2018-11-21 15:17:25.667] [error] Error: Error: ENOENT, dev-app-update.yml not found in C:\Users\s0147873\Desktop\lunchtime\Cibola-Electron\node_modules\electron\dist\resources\default_app.asar
+    at notFoundError (ELECTRON_ASAR.js:108:19)
+    at fs.readFile (ELECTRON_ASAR.js:511:16)
+    at go$readFile (C:\Users\s0147873\Desktop\lunchtime\Cibola-Electron\node_modules\graceful-fs\graceful-fs.js:73:14)
+    at readFile (C:\Users\s0147873\Desktop\lunchtime\Cibola-Electron\node_modules\graceful-fs\graceful-fs.js:70:12)
+    at readFile (C:\Users\s0147873\Desktop\lunchtime\Cibola-Electron\node_modules\universalify\index.js:5:67)
+From previous event:
+    at C:\Users\s0147873\Desktop\lunchtime\Cibola-Electron\node_modules\electron-updater\src\AppUpdater.ts:427:27
+    at Generator.next (<anonymous>)
+From previous event:
+    at NsisUpdater.loadUpdateConfig (C:\Users\s0147873\Desktop\lunchtime\Cibola-Electron\node_modules\electron-updater\src\AppUpdater.ts:423:33)
+    at Lazy.AppUpdater.configOnDisk (C:\Users\s0147873\Desktop\lunchtime\Cibola-Electron\node_modules\electron-updater\src\AppUpdater.ts:138:43)
+    at Lazy.get value [as value] (C:\Users\s0147873\Desktop\lunchtime\Cibola-Electron\node_modules\lazy-val\src\main.ts:18:23)
+    at C:\Users\s0147873\Desktop\lunchtime\Cibola-Electron\node_modules\electron-updater\src\AppUpdater.ts:339:46
+    at Generator.next (<anonymous>)
+    at runCallback (timers.js:789:20)
+    at tryOnImmediate (timers.js:751:5)
+    at processImmediate [as _immediateCallback] (timers.js:722:5)
+From previous event:
+    at NsisUpdater.getUpdateInfo (C:\Users\s0147873\Desktop\lunchtime\Cibola-Electron\node_modules\electron-updater\src\AppUpdater.ts:335:32)
+    at C:\Users\s0147873\Desktop\lunchtime\Cibola-Electron\node_modules\electron-updater\src\AppUpdater.ts:349:35
+    at Generator.next (<anonymous>)
+From previous event:
+    at NsisUpdater.doCheckForUpdates (C:\Users\s0147873\Desktop\lunchtime\Cibola-Electron\node_modules\electron-updater\src\AppUpdater.ts:348:34)
+    at C:\Users\s0147873\Desktop\lunchtime\Cibola-Electron\node_modules\electron-updater\src\AppUpdater.ts:287:25
+    at Generator.next (<anonymous>)
+    at runCallback (timers.js:789:20)
+    at tryOnImmediate (timers.js:751:5)
+    at processImmediate [as _immediateCallback] (timers.js:722:5)
+From previous event:
+    at NsisUpdater._checkForUpdates (C:\Users\s0147873\Desktop\lunchtime\Cibola-Electron\node_modules\electron-updater\src\AppUpdater.ts:282:33)
+    at NsisUpdater.checkForUpdates (C:\Users\s0147873\Desktop\lunchtime\Cibola-Electron\node_modules\electron-updater\src\AppUpdater.ts:221:35)
+    at App.<anonymous> (C:\Users\s0147873\Desktop\lunchtime\Cibola-Electron\dist\electron\main.js:2604:65)
+    at emitTwo (events.js:131:20)
+    at App.emit (events.js:214:7)

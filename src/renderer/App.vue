@@ -84,6 +84,8 @@ const settings = require('electron-settings');
       source: String
     },
     created() {
+
+      //Local Setting Stuff
       if (!settings.has('serverURL')){
           settings.set('serverURL', 'localhost');
       }
@@ -102,6 +104,7 @@ const settings = require('electron-settings');
       this.store.camera.height = settings.get('camera.height');
       this.store.printers.job = settings.get('printers.job');
       this.store.printers.credit = settings.get('printers.credit');
+  
     },
     computed: {
       store() {
