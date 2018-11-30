@@ -505,6 +505,16 @@ const { remote, BrowserWindow } = require('electron')
                 } else {
                     this.credit.credit_images.splice(index, 1);                
                 }
+            },
+            stopStreamedVideo(videoElem) {
+                let stream = videoElem.srcObject;
+                let tracks = stream.getTracks();
+
+                tracks.forEach(function(track) {
+                    track.stop();
+                });
+
+                videoElem.srcObject = null;
             }
         },
         mounted() {
@@ -635,6 +645,9 @@ const { remote, BrowserWindow } = require('electron')
             },
             store() {
                 return this.$root.$data.store;
+            },
+            toolbarText() {
+              return this.$root.$data.store.toolbarText;
             }
         },
         beforeDestroy() {

@@ -25,17 +25,17 @@
           <v-flex xs12 md6>
             <router-link :to="{ path: `/customer/${customer.id}` }">          
               <h3 class="headline mb-0">
-                <v-icon large>person</v-icon>
+                <!-- <v-icon large>person</v-icon> -->
                 <span>{{ customer.fname }}</span>
                 <span>{{ customer.lname }}</span>
               </h3>
             </router-link>
             <p>
-              <v-icon>phone</v-icon> {{ customer.phone }} <br>
-              <v-icon>email</v-icon> {{ customer.email }} <br>
-              <v-icon>home</v-icon> {{ customer.addr_st }} <br>
-              {{ customer.addr_city }}, {{ customer.addr_prov }} {{ customer.addr_postal }} <br>
-              {{ customer.addr_country }}
+              <span v-show="customer.phone != null"><v-icon>phone</v-icon> {{ customer.phone }} <br></span>
+              <span v-show="customer.email != null"><v-icon>email</v-icon> {{ customer.email }} <br></span>
+              <span v-show="hasAddress"><v-icon>home</v-icon> {{ customer.addr_st }} <br>
+              {{ customer.addr_city }}<span v-show="customer.addr_city != null">,</span> {{ customer.addr_prov }} {{ customer.addr_postal }} <br>
+              {{ customer.addr_country }}</span>
             </p>
           </v-flex>
           <v-flex xs12 md6>
@@ -115,7 +115,7 @@
           distance: 100,
           maxPatternLength: 32,
           minMatchCharLength: 1,
-        keys: ["fname", "lname"]
+        keys: ["fname", "lname", "phone"]
       },
       customer: {
         fname: null,
@@ -184,10 +184,10 @@
         this.$search(this.search, this.searchList, this.searchOptions).then(results => {
           //Only load the 20 best matches into the display
           var length = results.length;
-          console.log(length);
+          // console.log(length);
           if (length > 20) length = 20;
           for (var i = 0; i < length; i++) {
-            this.fuseList.push({name: results[i].fname + " " + results[i].lname, id: results[i].id});
+            this.fuseList.push({name: results[i].fname + " " + results[i].lname  + " - " + results[i].phone, id: results[i].id});
           }
           // results.forEach(result => {
           //   this.fuseList.push({name: result.fname + " " + result.lname, id: result.id});
@@ -236,7 +236,12 @@
 
       //For use with search appended icon callback function
       newCustomerForm() {
+        var temp = this.search;
         this.setFormState(true);
+        var first = temp.split(" ")[0];
+        var last = temp.split(" ")[1]
+        this.customer.fname = first;
+        this.customer.lname = last;
       },
 
       //Saves new customer to DB
@@ -348,6 +353,13 @@
     computed: {
       store() {
           return this.$root.$data.store;
+      },
+      hasAddress() {
+        if (this.customer.addr_st != null) return true;
+        if (this.customer.addr_city != null) return true;
+        if (this.customer.addr_prov != null) return true;
+        if (this.customer.addr_postal != null) return true;
+        if (this.customer.addr_country != null) return true;
       }
     }
 

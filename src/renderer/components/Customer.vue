@@ -12,6 +12,12 @@
                     </v-btn>
                 </v-flex>
                 <v-flex d-flex class="xs6 sm2">
+                    <v-btn color="primary" :href="'#/goldcredit/0/' + id">
+                        <v-icon>add</v-icon>
+                        New Gold Credit
+                    </v-btn>
+                </v-flex>
+                <v-flex d-flex class="xs6 sm2">
                     <v-btn color="error" @click="deleteDialog = true" :style="{'font-size': '0.75em'}">
                         <v-icon>delete</v-icon>
                         Delete Customer
@@ -81,6 +87,25 @@
             </v-card>
         </v-flex>
         </transition>               
+        <transition>
+        <v-flex d-flex xs12 md12 lg8 xl6  class="mt-2">
+            <v-card v-show="id" class="">
+                <v-card-title>
+                    <v-card-title primary-title>
+                        <h3 class="headline mb-0">Gold Credits</h3>
+                    </v-card-title>
+                </v-card-title>
+                    <v-data-table v-bind:headers="creditHeaders" :items="credits" v-bind:pagination.sync="paginationCredit" class="elevation-1" :loading="loadingCredits">
+                        <template slot="items" slot-scope="props">
+                            <tr @click="goToCredit(props.item.id)">
+                                <td class="text-xs-center">{{ props.item.id }}</td>
+                                <td class="text-xs-left hidden-sm-and-down">{{ props.item.created_at }}</td>                              
+                            </tr>
+                        </template>
+                    </v-data-table>
+            </v-card>
+        </v-flex>
+        </transition>               
         <v-dialog v-model="deleteDialog" max-width="500px">
             <v-card xs12 md6>
                 <v-toolbar color="error" dark clipped-left flat>
@@ -114,8 +139,10 @@
             deleteDialog: false,
             loadingCustomers: false,
             loadingJobs: false,
+            loadingCredits: false,
             customers: [],
             jobs: [],
+            credits: [],
             jobHeaders: [{
                     text: 'ID',
                     value: 'id'
@@ -137,6 +164,16 @@
                 {
                     text: 'Completed',
                     value: 'completed_at'
+                }
+            ],
+            creditHeaders: [
+                {
+                    text: 'ID',
+                    value: 'id'
+                },
+                {
+                    text: 'Date',
+                    value: 'created_at'
                 }
             ],
             customerHeaders: [{
@@ -166,6 +203,11 @@
               descending: true,
               rowsPerPage: 10
             },
+            paginationCredit: {
+              sortBy: 'created_at',
+              descending: true,
+              rowsPerPage: 10
+            },
         }),
         watch: {
             id(val) {
@@ -175,6 +217,7 @@
                     if (this.customers.length == 0) this.getCustomers();                                    
                 } else {
                     this.getCustomerJobs();
+                    this.getCustomerCredits();
                 }
             },
             // Handle changing between customer view and no customer selected
@@ -210,6 +253,18 @@
                         this.loadingJobs = false;                        
                     });     
             },
+            getCustomerCredits() {
+                this.loadingCredits = true;
+                this.$http.post(this.store.serverURL +  '/goldcredit/customerCredits', {id: this.id})
+                    .then((response) => {
+                        this.credits = response.data;
+                        this.loadingCredits = false;
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                        this.loadingCredits = false;                        
+                    });     
+            },
             setId(val) {
                 this.id = Number(val);
                 this.$router.push("/customer/" + val);
@@ -232,6 +287,9 @@
             },
             goToJob(id) {
                 this.$router.push('/job/' + id);
+            },
+            goToCredit(id) {
+                this.$router.push('/goldcredit/' + id);
             }
         },
         mounted() {

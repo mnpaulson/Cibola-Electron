@@ -38,6 +38,8 @@ Vue.component('EmployeeStats', require('./components/EmployeeStats.vue').default
 Vue.component('Alert', require('./components/Alert.vue').default);
 Vue.component('GoldcreditForm', require('./components/GoldcreditForm.vue').default);
 Vue.component('PageNotFound', require('./components/PageNotFound.vue').default);
+Vue.component('Toolbar', require('./components/Toolbar.vue').default);
+
 
 Vue.use(VueRouter)
 Vue.use(Vuetify)
@@ -57,6 +59,10 @@ var store = {
       status: null,
       msg: null,
       type: null
+  },
+  toolbarText: null,
+  setToolbarText(msg){
+      this.toolbarText = msg;
   },
   setAlert(status, type, msg) {
       this.alert.status = status;
@@ -89,7 +95,7 @@ const router = new VueRouter({
       },
       {
           path: '/job/:id/:cus',
-          name: 'jobcus',
+          name: 'New Job',
           component: Job
       },
       {
@@ -114,17 +120,17 @@ const router = new VueRouter({
       },        
       {
           path: '/goldcredit',
-          name: 'goldcredits',
+          name: 'Gold Credits',
           component: GoldCredit
       },      
       {
         path: '/goldcredit/:id',
-        name: 'goldcredit',
+        name: 'Gold Credit',
         component: GoldCredit
       },
       {
         path: '/goldcredit/:id/:cus',
-        name: 'goldcus',
+        name: 'New Gold Credit',
         component: GoldCredit
       },
       {

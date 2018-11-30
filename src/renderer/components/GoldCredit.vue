@@ -4,7 +4,9 @@
         <customer-form :id.sync="customer_id"></customer-form>
     </v-layout>
     <!-- <goldcredit-form :customer_id.sync="customer_id"></goldcredit-form> -->
-    <goldcredit-form v-show="goldcredit_id !== null || customer_id !== null" :goldcredit_id.sync="goldcredit_id" :customer_id.sync="customer_id" v-on:customerId="setCustomerId"></goldcredit-form>
+    <div v-show="showForm">
+        <goldcredit-form :goldcredit_id.sync="goldcredit_id" :customer_id.sync="customer_id" v-on:customerId="setCustomerId"></goldcredit-form>
+    </div>
     <transition name="component-fade" appear>            
     <v-layout v-if="goldcredit_id == null && customer_id == null">    
         <v-flex row wrap xs12>
@@ -112,8 +114,16 @@
         watch: {
             // Handle changing between customer view and no customer selected
             '$route' (to, from) {
-                if (!to.params.id) this.goldcredit_id = null;
-                else this.goldcredit_id = Number(to.params.id);
+                // if (!to.params.id) this.goldcredit_id = null;
+                // else this.goldcredit_id = Number(to.params.id);
+
+                // if (isNaN(Number(to.params.id))) {
+                //     this.goldcredit_id = null
+                //     this.customer_id = null;
+                // }
+
+                // else if (Number(to.params.id) !== 0) this.goldcredit_id = Number(to.params.id);
+                // else this.customer_id = Number(to.params.cus);
                 if (isNaN(Number(to.params.id))) {
                     this.goldcredit_id = null
                     this.customer_id = null;
@@ -144,6 +154,11 @@
         computed: {
             store() {
                 return this.$root.$data.store;
+            },
+            showForm() {
+                console.log(window.location.href);
+                if (this.customer_id !== null || this.goldcredit_id !== null) return true;
+                else return false;
             }
         }  
     }

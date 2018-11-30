@@ -1,10 +1,6 @@
 <template>
   <v-app id="inspire">
-    <v-toolbar color="indigo" dark fixed app clipped-left>
-      <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
-      <img class="cdb-toolbar-icon" src="static/cibolaicon.svg" alt="Cibola CMS">
-      <v-toolbar-title>Cibola CRM</v-toolbar-title>
-    </v-toolbar>
+    <toolbar></toolbar>
     <v-navigation-drawer
       fixed
       v-model="drawer"
@@ -29,7 +25,7 @@
             <v-list-tile-title>Jobs</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
-        <v-list-tile :to="{ name: 'goldcredits' }">
+        <v-list-tile :to="{ name: 'Gold Credits' }">
           <v-list-tile-action>
             <v-icon>credit_card</v-icon>
           </v-list-tile-action>

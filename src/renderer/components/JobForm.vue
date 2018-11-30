@@ -110,13 +110,13 @@
             </transition>
         </v-flex>
         <v-flex v-if="job.id != null" xs12></v-flex>
-        <v-flex lg8 xl6 v-if="job.id != null">
+        <!-- <v-flex lg8 xl6 v-if="job.id != null">
             <transition name="component-fade" appear>
                 <v-card>
                     <v-card-text ><b>Created at:</b> {{job.created_at}} <b>Job:</b> {{job.id}} </v-card-text>
                 </v-card>
             </transition>
-        </v-flex>
+        </v-flex> -->
         <v-flex xs12></v-flex>
         <template v-for="(image, index) in job.job_images" >
             <v-flex d-flex class="xs12 sm12 md6 lg3 xl3" :key="image.id">
@@ -472,6 +472,8 @@ const sharp = require('sharp')
 
                         if (this.job.completed_at !== null) this.complete = true;
 
+                        this.store.setToolbarText(this.routeName + " - Created at: " + this.createdDateMMDDYY + " Job ID: " + this.job.id);
+
                         this.loading = false;
                     })
                     .catch((error) => {
@@ -657,6 +659,9 @@ const sharp = require('sharp')
                 // } else {
                 //     return null;
                 // }
+            },
+            routeName() {
+                return this.$route.name.charAt(0).toUpperCase() + this.$route.name.slice(1)
             }
         },
         beforeDestroy() {
