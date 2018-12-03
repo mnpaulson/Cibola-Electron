@@ -23,6 +23,7 @@ import EmployeeForm from './components/EmployeeForm'
 import CustomerList from './components/CustomerList'
 import JobList from './components/JobList'
 import GoldcreditForm from './components/GoldcreditForm'
+import ValueConfig from './components/ValueConfig'
 import PageNotFound from './components/PageNotFound'
 
 
@@ -39,6 +40,8 @@ Vue.component('Alert', require('./components/Alert.vue').default);
 Vue.component('GoldcreditForm', require('./components/GoldcreditForm.vue').default);
 Vue.component('PageNotFound', require('./components/PageNotFound.vue').default);
 Vue.component('Toolbar', require('./components/Toolbar.vue').default);
+Vue.component('ValueConfig', require('./components/ValueConfig.vue').default);
+
 
 
 Vue.use(VueRouter)
