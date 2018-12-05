@@ -1,6 +1,6 @@
 {
   "name": "cibola-electron",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "author": "Mike Paulson",
   "description": "Front-end for Gold Works Cibola CMS",
   "main": "./dist/electron/main.js",

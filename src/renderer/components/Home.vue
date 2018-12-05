@@ -6,6 +6,20 @@
 <v-layout row wrap>
     <job-lookup ></job-lookup>
 </v-layout>
+<v-layout>
+<v-flex d-flex class="xs6 sm2">
+    <v-btn color="primary" :href="'#/job/0/0'">
+        <v-icon>work</v-icon>
+        New Job
+    </v-btn>
+</v-flex>
+<v-flex d-flex class="xs6 sm2">
+    <v-btn color="primary" :href="'#/goldcredit/0/0'">
+        <v-icon>credit_card</v-icon>
+        New Gold Credit
+    </v-btn>
+</v-flex>
+</v-layout>
 <v-layout row wrap class="">
     <employee-stats></employee-stats>  
     <!-- <customer-list></customer-list>

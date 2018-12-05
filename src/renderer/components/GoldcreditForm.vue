@@ -170,7 +170,7 @@
                 <span>Update Credit</span>
                 <v-icon>save</v-icon>
                 </v-btn>
-                <v-btn class="v-btn--active info--text">
+                <v-btn class="v-btn--active info--text" @click="printCredit">
                 <span>Print</span>
                 <v-icon>print</v-icon>
                 </v-btn>
@@ -515,6 +515,11 @@ const { remote, BrowserWindow } = require('electron')
                 });
 
                 videoElem.srcObject = null;
+            },
+            printCredit() {
+                var currentWindow = remote.getCurrentWindow()
+                currentWindow.webContents.print({silent: true, printBackground: false, deviceName: this.store.printers.credit});
+                // if (this.job.id == null) this.createCredit();
             }
         },
         mounted() {

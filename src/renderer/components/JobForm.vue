@@ -238,6 +238,9 @@
             <div class="cb-print-element cb-print-note">
                 {{job.note}}
             </div>
+            <div class="cb-print-element cb-employee">
+                {{ employeeName }}
+            </div>
             <div class="cb-print-element cb-print-job-num">
                # {{ job.id }}
             </div>
@@ -246,8 +249,10 @@
                 <div class="cb-print-est-note"> {{ job.est_note }} </div>
             </div>
             <div class="cb-print-element cb-print-due">
-            &nbsp;&nbsp; In: {{ createdDateMMDDYY }}<br />
-                Due: <span class="cb-print-element" :class="{cbPrintRed: job.vital_date}"> {{ dateMMDDYY }} </span>
+                <v-icon class="cb-print-element cb-print-jobicon">today</v-icon>
+                <span class="cb-print-element cb-print-dates">{{ createdDateMMDDYY }}</span><br />
+                <v-icon class="cb-print-element cb-print-jobicon">event_available</v-icon>
+                <span class="cb-print-element cb-print-dates" :class="{cbPrintRed: job.vital_date}"> {{ dateMMDDYY }} </span>
             </div>
             <div class="cb-print-element cb-print-images">
                 <template v-for="(image) in job.job_images">

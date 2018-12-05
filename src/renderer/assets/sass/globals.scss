@@ -275,17 +275,29 @@
     }
 
     .cb-print-job-num {
-        top: 0.5in;
-        width: 1.45in;
-        height: 0.4in;
+        top: 1.4in;
+        width: 1.05in;
+        height: 0.55in;
         // height: 0.55in;
-        left: 2.5in;
+        left: 1.4in;
         font-size: 1.75em;
-        line-height: 1.8em;
+        line-height: 2.25em;
         text-align: center;
         @include box-shadow;
         // padding-left: 40px;        
         
+    }
+
+    .cb-employee {
+        top: 0.5in;
+        width: 1.45in;
+        height: 0.4in;
+        left: 2.5in;
+        @include box-shadow;        
+        padding: 3px;
+        line-height: 1.5em;
+        font-size: 1.5em;
+        text-align: center;
     }
 
     .cb-print-estimate {
@@ -315,12 +327,20 @@
 
     .cb-print-due {
         top: 1.4in;
-        width: 2.45in;
+        width: 1.35in;
         height: 0.55in;
         @include box-shadow;
         font-size: 1.25em;
         // text-align: center;
         // padding-left: 0.5in;
+    }
+
+    .cb-print-jobicon {
+        padding-right: 5px;
+    }
+
+    .cb-print-dates {
+        padding-left: 0.3in;
     }
 
     .cbPrintRed {

@@ -5,30 +5,23 @@
                 <v-toolbar-title>List Values</v-toolbar-title>
             </v-toolbar>
             <v-card-text>
-                <!-- <template v-for="(value, index) in values">
-                    <v-list-tile :key="value.id">
-                        <v-list-tile-content>
-                            <v-list-tile-title><b>List:</b> {{ value.type_id }} <b>Name:</b> {{value.name}} <b>Value 1:</b> {{value.value1}} <b>Value 2:</b> {{value.value2}} <b>Value 3:</b> {{value.value3}}</v-list-tile-title>
-                        </v-list-tile-content>
-                        <v-list-tile-action>
-                            <v-list-tile-action-text>
-                                <v-btn small color="secondary" @click="setCurrentValue(value.id)">Edit</v-btn>
-                                <v-btn v-show="!value.active" small color="primary" @click="toggleActive(true, value.id)">Activate</v-btn>
-                                <v-btn v-show="value.active" small color="grey" @click="toggleActive(false, value.id)">Deactivate</v-btn>
-                                <v-btn small color="error" @click="toggleDeleteDialog(value.id)">Delete</v-btn>
-                            </v-list-tile-action-text>
-                        </v-list-tile-action>
-                    </v-list-tile>
-                    <v-divider v-if="index + 1 < value.length" :key="value.name"></v-divider>
-                </template> -->
                 <div v-show="currentValue.id != null">
                     <v-text-field label="Value Type" v-model="currentValue.type_id" xs12></v-text-field>
                     <v-text-field label="Name" v-model="currentValue.name" xs12></v-text-field>
                     <v-text-field label="Value 1" v-model="currentValue.value1" xs12></v-text-field>
                     <v-text-field label="Value 2" v-model="currentValue.value2" xs12></v-text-field>
                     <v-text-field label="Value 3" v-model="currentValue.value3" xs12></v-text-field>
-                    <v-btn small color="primary" @click="updateValue()">Update</v-btn>
+                    <v-checkbox
+                    :label="'Active'"
+                    v-model="currentValue.active"
+                    ></v-checkbox>
+                    <v-btn v-show="currentValue.id != -1" small color="primary" @click="updateValue()">Update</v-btn>
+                    <v-btn v-show="currentValue.id == -1" small color="primary" @click="createNewValue()">Create</v-btn>
                     <v-btn small color="" @click="cancel()">Cancel</v-btn>
+                    <v-btn v-show="currentValue.id != -1" small color="error" @click="deleteDialog = true">Delete</v-btn>
+                </div>
+                <div v-show="currentValue.id == null">
+                    <v-btn small color="primary" @click="enterNewValue()">New</v-btn>
                 </div>
                 <v-data-table
                 :headers="headers"
@@ -54,7 +47,31 @@
                 </v-data-table>
             </v-card-text>
         </v-card>
+        <v-dialog v-model="deleteDialog" max-width="500px">
+            <v-card>
+                <v-toolbar color="error" dark clipped-left flat>
+                    <v-toolbar-title>
+                        <v-icon>warning</v-icon>Delete Value</v-toolbar-title>
+                </v-toolbar>
+                <v-card-text>
+                    WARNING DO NOT DO THIS IF YOU ARE NOT 100% SURE WHAT YOU'RE DOING
+                    <br>Are you sure you want to delete this value entry?
+                    <br> This might break anything that is currently using this value.
+                </v-card-text>
+                <v-card-actions>
+                    <v-btn color="error" @click.stop="deleteValue()">
+                        <v-icon>delete</v-icon>
+                        Delete
+                    </v-btn>
+                    <v-btn color="primary" right absolute @click.stop="deleteDialog = false">
+                        <v-icon>cancel</v-icon>
+                        Cancel
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </v-flex>
+    
 </template>
 
 <script>
@@ -75,13 +92,9 @@
             rowsPerPage: -1
         },
         currentValue: {
-            // id: null,
-            // type_id: null,
-            // name: null,
-            // value1: null,
-            // value2: null,
-            // value3: null
-        }
+
+        },
+        deleteDialog: false
     }),
     methods: {
         getValues() {
@@ -93,9 +106,6 @@
                     console.log(error);
                 })
         },
-        toggleValueActive(status, id) {
-
-        },
         editValue(value) {
             this.currentValue = value;
         },
@@ -105,11 +115,35 @@
         updateValue() {
             this.$http.post(this.store.serverURL +  '/values/update', this.currentValue)
                 .then((response) => {
-                    console.log(response);
+                    this.currentValue = {};
                 })
                 .catch((error) => {
                     console.log(error);
                 })
+        },
+        enterNewValue() {
+            this.currentValue = {id: -1};
+        },
+        createNewValue() {
+            this.$http.post(this.store.serverURL +  '/values/create', this.currentValue)
+                .then((response) => {
+                    this.currentValue = {};
+                    this.getValues();
+                })
+                .catch((error) => {
+                    console.log(error);
+                })            
+        },
+        deleteValue() {
+            this.$http.post(this.store.serverURL +  '/values/delete', this.currentValue)
+                .then((response) => {
+                    this.deleteDialog = false;
+                    this.currentValue = {};
+                    this.getValues();
+                })
+                .catch((error) => {
+                    console.log(error);
+                })             
         }
 
     },
