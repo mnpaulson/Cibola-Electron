@@ -28,7 +28,6 @@
     watch: {
         '$route' (to, from) {
             this.store.setToolbarText(to.name.charAt(0).toUpperCase() + to.name.slice(1));
-            console.log(to);
         }
     },
     computed: {

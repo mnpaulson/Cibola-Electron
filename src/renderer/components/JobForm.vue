@@ -139,6 +139,10 @@
                 color="white"
                 class="elevation-1"
             >
+                <v-btn @click="printAndClose()" class="v-btn--active primary--text">
+                <span>Print & Close</span>
+                <v-icon>done_all</v-icon>
+                </v-btn>
                 <v-btn v-show="!job.id || job.id == 0" @click="createJob()" class="v-btn--active primary--text">
                 <span>Save Job</span>
                 <v-icon>save</v-icon>
@@ -275,10 +279,11 @@
                 Date: {{ today }} <br>
                 Employee: {{ employeeName }} <br>
                 Phone: 403-320-0846 <br>
-                E-mail: info@thegoldworks.com
+                E-mail: info@thegoldworks.com <br>
+                Job ID: {{job.id}}
             </div>
             <div class="cb-print-element cb-print-cus-estimate">
-                <div class="cb-print-est-amt"> Estimate: ${{ job.estimate}} + GST</div><br>
+                <div class="cb-print-est-amt"><span v-show="job.estimate != 0">Estimate: ${{ job.estimate}} + GST</span></div>
                 <div class="cb-print-est-note"> {{ job.est_note }} </div>
             </div>
             <div class="cb-print-element cb-print-cus-warning">
@@ -325,7 +330,7 @@ const sharp = require('sharp')
                 due_date: null,
                 completed_at: null,
                 created_at: null,
-                vital_date: false,
+                vital_date: true,
                 job_images: []
             },
             test: null,
@@ -349,8 +354,8 @@ const sharp = require('sharp')
                 let imgBuffer = Buffer.from(buffer.substr(buffer.indexOf(',') + 1), 'base64');
                 sharp(imgBuffer)
                     // .resize(800, 600)
-                    // .png()
-                    .jpeg({quality: 90})
+                    .png()
+                    // .jpeg({quality: 100})
                     .toBuffer()
                     .then(data => {
                         this.job.job_images.push({
@@ -393,7 +398,8 @@ const sharp = require('sharp')
                         console.log(error);
                     });
             },
-            createJob() {
+            //Optional Print and Close parameters to print and close the job on successful save
+            createJob(print, close) {
                 this.$refs.jobForm.validate();
                 if (!this.customer_id) {
                     this.store.setAlert(true, "error", "Please select a customer.");
@@ -413,8 +419,23 @@ const sharp = require('sharp')
                             i++;
                         });
                         this.store.setAlert(true, "success", "Job Create with ID: " + this.job.id);
-                        this.$router.replace("/job/" + this.job.id);
-                        this.loading = false;                                                                                                                                                        
+                        this.loading = false;
+                        if (print) {
+                            this.job.created_at = Date(Date.now());
+                            var currentWindow = remote.getCurrentWindow()
+                            currentWindow.webContents.print({silent: true, printBackground: false, deviceName: this.store.printers.job}, (success) => {
+                                if (success) {
+                                    console.log('Create Job Print')
+                                    if (close) {
+                                        this.$router.push({name: 'home'});
+                                    } else {
+                                        this.$router.replace("/job/" + this.job.id);
+                                    }
+                                }
+                            });
+                        } else {
+                            this.$router.replace("/job/" + this.job.id);
+                        }
                     })
                     .catch((error) => {
                         console.log(error);
@@ -512,10 +533,30 @@ const sharp = require('sharp')
                     })
             },
             printJob() {
-                var currentWindow = remote.getCurrentWindow()
-                currentWindow.webContents.print({silent: true, printBackground: false, deviceName: this.store.printers.job});
-                if (this.job.id == null) this.createJob();
+                if (this.job.id == null) {
+                    console.log('here? to');
+                    this.createJob(true);
+                }
+                else {
+                    console.log('here?');
+                    var currentWindow = remote.getCurrentWindow()
+                    currentWindow.webContents.print({silent: true, printBackground: false, deviceName: this.store.printers.job}, (success) => {
+                        console.log("print print");
+                    });
+                }
+
             },
+            printAndClose() {
+                if (this.job.id == null) this.createJob(true, true);
+                else {
+                    var currentWindow = remote.getCurrentWindow()
+                    currentWindow.webContents.print({silent: true, printBackground: false, deviceName: this.store.printers.job}, (success) => {
+                        this.$router.push({name: 'home'});
+                    });
+                    
+                }
+
+            },   
             stopStreamedVideo(videoElem) {
                 let stream = videoElem.srcObject;
                 let tracks = stream.getTracks();
@@ -579,7 +620,7 @@ const sharp = require('sharp')
                 this.job.appraisal = false;
                 this.job.due_date = null;
                 this.job.completed_at = null;
-                this.job.vital_date = false;                        
+                this.job.vital_date = true;                        
                 this.job.job_images = [];
                 this.job.id = null;
                 if (!isNaN(this.job_id) && this.job_id !== null) {

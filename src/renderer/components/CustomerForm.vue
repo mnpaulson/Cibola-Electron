@@ -87,9 +87,9 @@
           <div class="cb-print-top-box cb-print-total"><span class="cb-print-top-text">Total</span></div>          
         </div>
         <div class="cb-print-element cb-print-customer-info">
-          <v-icon class="cb-print-element cb-print-customer-icon">person</v-icon><span class="cb-print-element">{{ customer.fname }} {{ customer.lname }}</span><br>
-          <v-icon class="cb-print-element cb-print-customer-icon">phone</v-icon><span class="cb-print-element">{{ customer.phone }}</span> <br>
-          <v-icon class="cb-print-element cb-print-customer-icon">email</v-icon><span class="cb-print-element">{{ customer.email }}</span>
+          <v-icon class="cb-print-element cb-print-customer-icon">person</v-icon><span class="cb-print-element cb-print-nowrap">{{ customer.fname }} {{ customer.lname }}</span><br>
+          <v-icon class="cb-print-element cb-print-customer-icon">phone</v-icon><span class="cb-print-element cb-print-nowrap">{{ customer.phone }}</span> <br>
+          <v-icon class="cb-print-element cb-print-customer-icon">email</v-icon><span class="cb-print-element cb-print-nowrap">{{ customer.email }}</span>
         </div>
           <div class="cb-print-element cb-print-customer-name">Name: {{ customer.fname }} {{ customer.lname }}</div>        
     </span>                                
@@ -143,7 +143,7 @@
 
     watch: {
       search (val) {
-        val && this.searchName(val)
+        if (val != 'undefined' && val != null && val.length > 1) val && this.searchName(val)
       },
       searchSelect (val) {
         if (!isNaN(val) && val != null) {
@@ -156,7 +156,14 @@
           this.getCustomer(this.id);
         }
         else this.setFormState(false);
-      }
+      },
+      '$route' (to, from) {
+                if (to.params.cus == 0) {
+                    this.search = [];
+                    this.fuseList = [];
+                    this.searchList = null;
+                }
+      },
     },
 
     methods: {
@@ -209,10 +216,13 @@
           } else {
             this.header = "Add New Customer";
           }
-        } else if (this.id == null || this.id == 0){
+        } else if (this.id == null || this.id == 0 || this.customer.id == 0){
           this.isForm = false;
           this.isSearch = true;
           this.isInfo = false;
+          this.search = [];
+          this.fuseList = [];
+          this.searchList = null;
           this.header = "Customer Lookup";
           this.customer.fname = null;
           this.customer.lname = null;
@@ -290,8 +300,8 @@
         this.customer.addr_postal = null;
         this.customer.addr_country = null;
         this.customer.note = null;
-        this.customer.id = null;
-        this.$emit('update:id', null);
+        this.customer.id = 0;
+        this.$emit('update:id', 0);
         this.setFormState(false);
         this.fuseList = [];
         this.searchSelect = null;

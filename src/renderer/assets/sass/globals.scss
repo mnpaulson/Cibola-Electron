@@ -207,7 +207,12 @@
     .cb-print-element {
         position: absolute !important;
         visibility: visible !important;
+        overflow: hidden;
         // border: 1px solid black;
+    }
+
+    .cb-print-nowrap {
+        white-space:nowrap;
     }
 
     .cb-print-blanks {
@@ -307,7 +312,7 @@
         width: 1.45in;
         @include box-shadow;        
         padding: 3px;
-        line-height: 0.7em;
+        line-height: 1.1em;
         
     }
 
@@ -437,7 +442,7 @@
     .cb-print-cus-job-info {
         left: 4.05in;
         width: 2.45in;
-        height: 0.85in;
+        height: 1.3in;
         top: 6.25in;
         @include box-shadow;
     }
@@ -445,7 +450,7 @@
     .cb-print-cus-estimate {
         top: 6.25in;
         width: 1.45in;
-        height: 0.85in;
+        height: 1.3in;
         @include box-shadow;
         left: 6.55in;       
     }

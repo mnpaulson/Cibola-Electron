@@ -124,6 +124,13 @@
                                     </v-flex>
                                     <v-flex xs6 md2>
                                         <v-text-field
+                                            v-model="item.unitPrice"
+                                            label="Unit Price"
+                                            disabled=true
+                                        ></v-text-field>
+                                    </v-flex>
+                                    <v-flex xs6 md2>
+                                        <v-text-field
                                             v-model="item.value"
                                             label="Value"
                                             :disabled="disabled"
@@ -345,7 +352,8 @@ const { remote, BrowserWindow } = require('electron')
                     weight: null,
                     multiplier: null,
                     markup: null,
-                    value: null
+                    value: null,
+                    unitPrice: null
                 };
                 var newList = this.itemList;
                 newList.push(list);
@@ -404,7 +412,7 @@ const { remote, BrowserWindow } = require('electron')
             },
             //Update existing gold credit
             updateCredit() {
-                this.$http.post(this.store.serverURL +  '/goldcredit/update', {id: this.credit.id, note: this.credit.note, used: this.credit.used})
+                this.$http.post(this.store.serverURL +  '/goldcredit/update', {id: this.credit.id, note: this.credit.note, used: this.credit.used, customer: this.credit.customer_id})
                     .then((response) => {
                         this.creditDeleteDialog = false;
                         this.store.setAlert(true, "success", "Credit ID " + this.credit.id + " updated.");                        
@@ -598,8 +606,9 @@ const { remote, BrowserWindow } = require('electron')
                         if(e.id == null) {
                             var metal;
                             if (e.itemObj) {
-                                if (e.itemObj.name == "Other") {
+                                if (e.itemObj.name == "Other" || e.itemObj.name == "Diamonds") {
                                     this.multiplierDisable = false;
+                                    e.multiplier = e.itemObj.value1;
                                 }
                                 else {
                                     this.multiplierDisable = true;
@@ -616,7 +625,10 @@ const { remote, BrowserWindow } = require('electron')
                                 }
                             }
 
-                            if (e.weight && e.multiplier && e.markup) e.value = this.round(e.weight * e.multiplier * e.markup * metal, 2);
+                            if (e.weight && e.multiplier && e.markup) {
+                                e.value = this.round(e.weight * e.multiplier * e.markup * metal, 2);
+                                e.unitPrice = this.round(e.value / e.weight, 2);
+                            }
                             else e.value = 0;
                         }
                         total += e.value;
