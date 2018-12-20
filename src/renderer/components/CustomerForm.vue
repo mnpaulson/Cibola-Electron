@@ -79,7 +79,7 @@
       </v-card-text>
             <v-progress-linear v-show="loading" :indeterminate="true" class="mb-0"></v-progress-linear>      
     </v-card>
-    <span class="cb-print">
+    <span class="cb-print" v-if="checkPage() == 'job'">
         <div class="cb-print-element cb-print-blanks">
           <div class="cb-print-top-box cb-print-top-flags"><span class="cb-print-top-text">EMR NA LM Check</span></div>
           <div class="cb-print-top-box cb-print-top-deposit"><span class="cb-print-top-text">Deposit</span></div>
@@ -92,7 +92,15 @@
           <v-icon class="cb-print-element cb-print-customer-icon">email</v-icon><span class="cb-print-element cb-print-nowrap">{{ customer.email }}</span>
         </div>
           <div class="cb-print-element cb-print-customer-name">Name: {{ customer.fname }} {{ customer.lname }}</div>        
-    </span>                                
+    </span>
+    <span class="cb-print" v-if="checkPage() == 'credit'">
+        <div class="cb-print-element cb-print-customercredit-info">
+          Name: {{ customer.fname }} {{ customer.lname }}<br>
+          Phone: {{ customer.phone }}<br>
+          E-mail: {{ customer.email }}<br>
+          Address: {{ customer.addr_st }} {{ customer.addr_city }}, {{ customer.addr_prov }} {{ customer.addr_postal }}
+        </div>
+    </span>
   </v-flex>
 </template>
 
@@ -349,7 +357,14 @@
             this.loading = false;
             console.log(error);
           });
-        
+      },
+      checkPage() {
+        if (this.$route.name.toLowerCase().includes("job")) {
+          return 'job';
+        }
+        if (this.$route.name.toLowerCase().includes("credit")) {
+          return 'credit';
+        }
       }
     },
 

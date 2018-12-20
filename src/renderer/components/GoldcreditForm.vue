@@ -119,14 +119,14 @@
                                         <v-text-field
                                             v-model="item.markup"
                                             label="Markup"
-                                            disabled
+                                            :disabled=true
                                         ></v-text-field>
                                     </v-flex>
                                     <v-flex xs6 md2>
                                         <v-text-field
                                             v-model="item.unitPrice"
                                             label="Unit Price"
-                                            disabled=true
+                                            :disabled=true
                                         ></v-text-field>
                                     </v-flex>
                                     <v-flex xs6 md2>
@@ -260,6 +260,30 @@
                 <img :src='lightBoxImage' alt="" class="lightBoxImage">
             </div>
         </transition>
+        <div class="cb-print">
+            <div class="cb-print-element cb-print-credit-header">
+                Scrap Gold Credit Record
+            </div>
+            <div class="cb-print-element cb-print-credit-employee">Employee: {{ employeeName }}</div>
+            <div class="cb-print-element cb-print-credit-date">Date: {{credit.creditDate}}</div>
+            <div class="cb-print-element cb-print-credit-total">Total Credit: ${{credit.total}}</div>
+            <div class="cb-print-element cb-print-credit-warning">
+                ALL PURCHASES ARE FINAL - NO EXCEPTIONS
+            </div>
+            <div class="cb-print-element cb-print-credit-images-cont">
+                <template v-for="(item, index) in itemList">
+                    <div class="cb-print-element cb-print-credit-item-cont" :key="item.id">
+                        {{valueName(item.id)}} {{item.weight}} Units
+                        @ ${{item.unitPrice}} = ${{item.value}}
+                    </div> <br />
+                </template>
+                <template v-for="(image) in credit.credit_images">
+                    <div class="cb-print-element cb-print-credit-img-cont" :key="image.id">
+                        <img :src='image.image' alt="" class="cb-print-credit-img cb-print-element">
+                    </div>
+                </template>
+            </div>
+        </div>
     </div>
     </transition>
 </template>
@@ -462,7 +486,8 @@ const { remote, BrowserWindow } = require('electron')
                                 markup: element.markup,
                                 multiplier: element.multiplier,
                                 value: element.value,
-                                weight: element.weight
+                                weight: element.weight,
+                                unitPrice: this.round(element.value / element.weight, 2)
                             }
                             this.credit.credit_items.push(item)
                         });
@@ -528,6 +553,20 @@ const { remote, BrowserWindow } = require('electron')
                 var currentWindow = remote.getCurrentWindow()
                 currentWindow.webContents.print({silent: true, printBackground: false, deviceName: this.store.printers.credit});
                 // if (this.job.id == null) this.createCredit();
+            },
+            valueName(id) {
+                if (this.valueList.length > 0 && this.goldcredit_id > 0) {
+                    var e = this.valueList.find((element) => {
+                        if (id == element.id) {
+                            return element.name;
+                        }
+                    });
+                    // console.log(e);
+                    return e.name;
+                } else {
+                    return "loading...";
+                }
+
             }
         },
         mounted() {
@@ -665,6 +704,19 @@ const { remote, BrowserWindow } = require('electron')
             },
             toolbarText() {
               return this.$root.$data.store.toolbarText;
+            },
+            employeeName() {
+                if (this.credit.employee_id != null && this.employeeList.length > 0) {
+                    var e = this.employeeList.find((element) => {
+                        if (element.id == this.credit.employee_id) {
+                            return element.name;
+                        }
+                    });
+                    // console.log(e);
+                    return e.name;
+                } else {
+                    return null;
+                }
             }
         },
         beforeDestroy() {

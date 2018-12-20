@@ -259,6 +259,7 @@
                 <span class="cb-print-element cb-print-dates" :class="{cbPrintRed: job.vital_date}"> {{ dateMMDDYY }} </span>
             </div>
             <div class="cb-print-element cb-print-images">
+                <div class="cb-print-element cb-print-image-spacer"></div>
                 <template v-for="(image) in job.job_images">
                     <div class="cb-print-element cb-print-image-cont" :key="image.id">
                       <img :src='image.image' alt="" class="cb-print-image cb-print-element">
@@ -273,7 +274,6 @@
                       <img :src='image.image' alt="" class="cb-print-cust-img cb-print-element">
                     </div>
                 </template>
-          
             </div>
             <div class="cb-print-element cb-print-cus-job-info">
                 Date: {{ today }} <br>
@@ -335,14 +335,14 @@ const sharp = require('sharp')
             },
             test: null,
             estimateRules: [
-                v => !!v || 'Estimate is required',
-                v => {
-                    var pattern = new RegExp(/^\d*(,\d+)*[\.]?\d*?$/);
-                    return pattern.test(v) || "Must be a valid number.";
-                }
+                // v => !!v || 'Estimate is required',
+                // v => {
+                //     var pattern = new RegExp(/^\d*(,\d+)*[\.]?\d*?$/);
+                //     return pattern.test(v) || "Must be a valid number.";
+                // }
             ],
             employeeRules: [
-                v => !!v || 'Select employee'
+                // v => !!v || 'Select employee'
             ]
         }),
         methods: {
@@ -498,7 +498,7 @@ const sharp = require('sharp')
 
                         if (this.job.completed_at !== null) this.complete = true;
 
-                        this.store.setToolbarText(this.routeName + " - Created at: " + this.createdDateMMDDYY + " Job ID: " + this.job.id);
+                        this.store.setToolbarText(this.routeName + " - Created at: " + this.createddateMMDDYYHHMM + " Job ID: " + this.job.id);
 
                         this.loading = false;
                     })
@@ -668,6 +668,18 @@ const sharp = require('sharp')
                 }
 
                 return mm + "-" + dd + "-" + yyyy
+            },
+            createddateMMDDYYHHMM() {
+                var today = new Date(this.job.created_at);
+                var hh = today.getHours() + 1;
+                var mm = today.getMinutes() + 1;
+                if (mm < 10 ) {
+                    mm = "0" + mm;
+                }
+                if (hh < 10 ) {
+                    hh = "0" + hh;
+                }
+                return this.createdDateMMDDYY + " " + hh + ":" + mm;
             },
             createdDateMMDDYY() {
                 var today = new Date(this.job.created_at);

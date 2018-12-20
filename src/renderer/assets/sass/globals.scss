@@ -270,10 +270,12 @@
     }
 
     .cb-print-note {
-        top: 0in;
-        left: 4.05in;
+        // top: 0in;
+        top: 2in;
+        height: 0.99in;
+        // left: 4.05in;
         width: 3.95in;        
-        height: 1.95in;
+        // height: 1.5in;
         padding: 5px;
         @include box-shadow;        
         
@@ -365,12 +367,18 @@
     }
 
     .cb-print-images{
-        top: 2in;
+        // top: 2.5in;
+        top: 0in;
         width: 100%;
-        height: 4in;
+        height: 6in;
         column-count: 2;
         column-fill: auto;
         column-gap: 0.1in;
+    }
+
+    .cb-print-image-spacer {
+        height: 3in;
+        position: static !important;
     }
 
     .cb-print-image-cont {
@@ -462,6 +470,65 @@
         font-weight: bold;
         -webkit-text-stroke: 1px white;
         text-align: center;
+    }
+
+    .cb-print-credit-header {
+        top: 0in;
+        font-size: 2em;
+        left: 0in;
+        font-weight: bold;
+    }
+
+    .cb-print-customercredit-info {
+        top: 0.5in;
+        width: 50%;
+    }
+
+    .cb-print-credit-employee {
+        top: 1.35in;
+    }
+
+    .cb-print-credit-date {
+        top: 0.5in;
+        left: 4in;
+    }
+
+    .cb-print-credit-total {
+        top: 0.65in;
+        left: 4in;    
+    }
+
+    .cb-print-credit-warning {
+        font-weight: bold;
+        color: red;
+        font-size: 1.75em;
+        top: 1.7in;
+    }
+
+    .cb-print-credit-item-cont {
+        // top: 2.2in;
+        // display: inline-block;
+        position: static !important;
+        // height: 2em;
+    }
+
+    .cb-print-credit-images-cont {
+        height: 5in;
+        top: 2in;
+    }
+
+    .cb-print-credit-img-cont {
+        position: static !important;
+        height: 2.5in;
+        padding: 1px;
+        display: inline-block;
+    }
+
+    .cb-print-credit-img {
+        position: static !important;
+        height: 100%;
+
+        @include box-shadow;
     }
 
 }

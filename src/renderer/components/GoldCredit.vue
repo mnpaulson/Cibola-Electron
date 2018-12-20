@@ -156,7 +156,6 @@
                 return this.$root.$data.store;
             },
             showForm() {
-                console.log(window.location.href);
                 if (this.customer_id !== null || this.goldcredit_id !== null) return true;
                 else return false;
             }
