@@ -326,6 +326,10 @@
         margin-top: 3px;
     }
 
+    .cb-print-visible {
+        visibility: visible !important;
+    }
+
     .cb-print-est-note {
         font-size: 0.9em;
         visibility: visible !important;
@@ -506,10 +510,31 @@
     }
 
     .cb-print-credit-item-cont {
-        // top: 2.2in;
-        // display: inline-block;
         position: static !important;
-        // height: 2em;
+    }
+
+    .cb-print-credit-table {
+        position: static !important;
+        border-collapse: collapse;
+    }
+
+    table tr td th {
+        border: 1px solid black !important;
+        border-collapse: collapse;
+    }
+
+    td {
+        padding: 3px;
+        text-align: center;
+    }
+
+    tr {
+        padding-left: 6px;
+        padding-right: 6px;
+    }
+
+    .cb-print-table-note {
+        position: static !important;
     }
 
     .cb-print-credit-images-cont {

@@ -270,13 +270,31 @@
             <div class="cb-print-element cb-print-credit-warning">
                 ALL PURCHASES ARE FINAL - NO EXCEPTIONS
             </div>
+
             <div class="cb-print-element cb-print-credit-images-cont">
+                <table class="cb-print-element cb-print-credit-table">
+                    <tr class="cb-print-visible">
+                        <th class="cb-print-visible">Item</th>
+                        <th class="cb-print-visible">Units</th>
+                        <th class="cb-print-visible">Unit Value</th>
+                        <th class="cb-print-visible">Total Value</th>
+                    </tr>
                 <template v-for="(item, index) in itemList">
-                    <div class="cb-print-element cb-print-credit-item-cont" :key="item.id">
+                    <!-- <div class="cb-print-element cb-print-credit-item-cont" :key="item.id">
                         {{valueName(item.id)}} {{item.weight}} Units
                         @ ${{item.unitPrice}} = ${{item.value}}
-                    </div> <br />
+                    </div> <br /> -->
+                    <tr :key="item.id" class="cb-print-visible">
+                        <td class="cb-print-visible">{{valueName(item.id)}}</td>
+                        <td class="cb-print-visible">{{item.weight}}</td>
+                        <td class="cb-print-visible">${{item.unitPrice}}</td>
+                        <td class="cb-print-visible">${{item.value}}</td>
+                    </tr>
                 </template>
+                </table>
+                <div class="cb-print-element cb-print-table-note">
+                    Gold and Platinum units are measured in grams.
+                </div>
                 <template v-for="(image) in credit.credit_images">
                     <div class="cb-print-element cb-print-credit-img-cont" :key="image.id">
                         <img :src='image.image' alt="" class="cb-print-credit-img cb-print-element">

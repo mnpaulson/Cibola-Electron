@@ -100,7 +100,7 @@
                             </v-layout>             
                         </v-flex>
                         <v-flex xs12>
-                                <v-textarea no-resize v-model="job.note" class="" label="Job Note"></v-textarea>                    
+                                <v-textarea counter=230 no-resize v-model="job.note" class="" label="Job Note"></v-textarea>                    
                         </v-flex>
                     </v-layout>
                     </v-form>
@@ -283,7 +283,7 @@
                 Job ID: {{job.id}}
             </div>
             <div class="cb-print-element cb-print-cus-estimate">
-                <div class="cb-print-est-amt"><span v-show="job.estimate != 0">Estimate: ${{ job.estimate}} + GST</span></div>
+                <div class="cb-print-est-amt"><span class="cb-print-visible" v-show="job.estimate !== '0'">Estimate: ${{ job.estimate}} + GST</span></div>
                 <div class="cb-print-est-note"> {{ job.est_note }} </div>
             </div>
             <div class="cb-print-element cb-print-cus-warning">
