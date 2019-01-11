@@ -72,12 +72,17 @@
 const { app } = require('electron');
 const settings = require('electron-settings');
 
+
+
   export default {
     data: () => ({
       drawer: null
     }),
     props: {
       source: String
+    },
+    methods: {
+
     },
     created() {
 
@@ -100,7 +105,7 @@ const settings = require('electron-settings');
       this.store.camera.height = settings.get('camera.height');
       this.store.printers.job = settings.get('printers.job');
       this.store.printers.credit = settings.get('printers.credit');
-  
+
     },
     computed: {
       store() {

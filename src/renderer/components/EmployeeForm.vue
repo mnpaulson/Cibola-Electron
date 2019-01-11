@@ -126,7 +126,6 @@
                     .then((response) => {
                         this.employees = [];
                         this.employees = response.data;
-                        console.log(response.data);
                     })
                     .catch((error) => {
                         console.log(error);

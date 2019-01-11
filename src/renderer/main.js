@@ -15,6 +15,7 @@ import Customer from './components/Customer'
 import Admin from './components/Admin'
 import Employee from './components/Employee'
 import LocalSettings from './components/LocalSettings'
+import Updates from './components/Updates'
 import GoldCredit from './components/GoldCredit'
 import CustomerForm from './components/CustomerForm'
 import JobLookup from './components/JobLookup'
@@ -32,6 +33,7 @@ Vue.component('JobLookup', require('./components/JobLookup.vue').default);
 Vue.component('JobForm', require('./components/JobForm.vue').default);
 Vue.component('EmployeeForm', require('./components/EmployeeForm.vue').default);
 Vue.component('LocalSettings', require('./components/LocalSettings.vue').default);
+Vue.component('Updates', require('./components/Updates.vue').default);
 Vue.component('CustomerList', require('./components/CustomerList.vue').default);
 Vue.component('JobList', require('./components/JobList.vue').default);
 Vue.component('EmployeeJobs', require('./components/EmployeeJobs.vue').default);

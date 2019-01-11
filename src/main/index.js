@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, ipcMain } from 'electron'
 
 /**
  * Set `__static` path to static files in production
@@ -74,8 +74,9 @@ app.on('activate', () => {
 
 
 import { autoUpdater } from 'electron-updater'
-
-// const log = require('electron-log');
+var downloaded = false
+var updateCalled = false;
+const log = require('electron-log');
 // log.transports.file.level = 'info';
 // log.transports.file.file = 'C:\\log.txt';
 
@@ -84,11 +85,46 @@ import { autoUpdater } from 'electron-updater'
 // autoUpdater.logger = log;
 // autoUpdater.logger.transports.file.level = "info"
 
+// autoUpdater.on('checking-for-update', () => {
+//   event.sender.send('update-message', 'Checking for Updates')
+// })
+
+// autoUpdater.on('update-available', () => {
+  // console.log('Update Avaliable')
+  // event.sender.send('update-control', 'Update Avaliable')
+// })
+
+// autoUpdater.on('update-not-available', () => {
+  // console.log('No update avaliable')
+  // event.sender.send('update-control', 'No update avaliable')
+// })
+
 autoUpdater.on('update-downloaded', () => {
+  // event.sender.send('update-message', 'Update Avaliable')
   autoUpdater.quitAndInstall()
+  // if (updateCalled) autoUpdater.quitAndInstall()
+  // downloaded = true;
 })
+
 
 app.on('ready', () => {
   if (process.env.NODE_ENV === 'production') autoUpdater.checkForUpdates()
 })
 
+// ipcMain.on('update-control', (event, arg) => {
+//   if (arg == 'checkForUpdates') {
+//     if (process.env.NODE_ENV === 'production') {
+//       event.sender.send('update-message', 'Checking for and installing updates')
+//       autoUpdater.checkForUpdates()
+//     }
+//     else {
+//       event.sender.send('update-message', 'You can not check for updates in developer mode')
+//     }
+//   }
+  // if (arg == 'update') {
+  //   updateCalled = true;
+  //   if (downloaded) {
+  //     autoUpdater.quitAndInstall();
+  //   }
+  // }
+// })
