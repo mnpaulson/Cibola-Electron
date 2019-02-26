@@ -499,7 +499,11 @@
 
     .cb-print-credit-total {
         top: 0.65in;
-        left: 4in;    
+        left: 4in;
+        margin-top: 5px;
+        font-weight: bold;
+        border-bottom: 1px solid black;
+        border-top: 1px solid black;
     }
 
     .cb-print-credit-warning {
@@ -515,26 +519,47 @@
 
     .cb-print-credit-table {
         position: static !important;
+        margin-top: 10px !important;
+        margin-bottom: 10px !important;
         border-collapse: collapse;
     }
 
-    table tr td th {
-        border: 1px solid black !important;
-        border-collapse: collapse;
+    table, tr, td, th {
+        // border: 2px solid black !important;
+        // border-collapse: collapse;
+        border: none !important;
     }
 
     td {
-        padding: 3px;
-        text-align: center;
-    }
-
-    tr {
         padding-left: 6px;
         padding-right: 6px;
+        padding-top: 3px;
+        padding-bottom: 3px;
+        // border: 1px solid black !important;
+        text-align: left;
+    }
+
+    th:nth-child(even), td:nth-child(even) {
+        background: #EBEBEB;
+    }
+
+    th {
+        padding-left: 6px !important;
+        padding-right: 6px !important;
+        text-align: left;
+        border: none;
+        border-bottom: 1px solid black !important;
+    }
+
+    tfoot {
+        border-top: 1px solid black !important;
+        font-weight: bold;
+        background: none !important;
     }
 
     .cb-print-table-note {
         position: static !important;
+        margin-bottom: 10px;
     }
 
     .cb-print-credit-images-cont {
@@ -555,6 +580,7 @@
 
         @include box-shadow;
     }
+
 
 }
 

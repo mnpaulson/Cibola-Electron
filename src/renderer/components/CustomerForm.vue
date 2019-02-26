@@ -3,6 +3,8 @@
     <div v-if="isSearch">
       <v-autocomplete
           v-model="searchSelect"
+          v-on:keyup.enter="searchEnter"
+          ref="search"
           :search-input.sync="search"
           label="Customer Search"
           cache-items
@@ -16,12 +18,12 @@
           @click:append="newCustomerForm"
         ></v-autocomplete>
     </div>                           
-    <v-card  v-if="!isSearch">      
+    <v-card  v-show="!isSearch">      
       <span v-show="isInfo" class="">          
         <v-btn style="z-index:0" class="close-btn" dark small right absolute outline fab color="grey" @click="clearCustomer()"><v-icon class="fab-fix" dark>close</v-icon></v-btn>
       </span>
       <v-card-text>
-        <v-layout v-if="isInfo" row wrap>
+        <v-layout v-show="isInfo" row wrap>
           <v-flex xs12 md6>
             <router-link :to="{ path: `/customer/${customer.id}` }">          
               <h3 class="headline mb-0">
@@ -43,15 +45,15 @@
           </v-flex>
         </v-layout>
         <v-form>
-          <v-layout row wrap v-if="isForm">
+          <v-layout row wrap v-show="isForm">
             <v-flex xs12 sm6>
-              <v-text-field  label="First Name" :rules="nameRules" required v-model="customer.fname" xs12 ></v-text-field>
+              <v-text-field  label="First Name" ref="firstName" :rules="nameRules" required v-model="customer.fname" xs12 ></v-text-field>
             </v-flex>
             <v-flex xs12 sm6>
-              <v-text-field append-icon="person" label="Last Name" :rules="nameRules" required v-model="customer.lname" xs12 ></v-text-field>
+              <v-text-field append-icon="person" ref="lastName" label="Last Name" :rules="nameRules" required v-model="customer.lname" xs12 ></v-text-field>
             </v-flex>
             <v-flex xs12 sm6>
-              <v-text-field append-icon="phone" label="Phone Number" v-model="customer.phone" xs12 ></v-text-field>
+              <v-text-field append-icon="phone" ref="phoneNumber" label="Phone Number" v-model="customer.phone" xs12 ></v-text-field>
             </v-flex>
             <v-flex xs12 sm6>
               <v-text-field append-icon="mail" label="E-Mail" v-model="customer.email" xs12 ></v-text-field>
@@ -95,10 +97,10 @@
     </span>
     <span class="cb-print" v-if="checkPage() == 'credit'">
         <div class="cb-print-element cb-print-customercredit-info">
-          Name: {{ customer.fname }} {{ customer.lname }}<br>
-          Phone: {{ customer.phone }}<br>
-          E-mail: {{ customer.email }}<br>
-          Address: {{ customer.addr_st }} {{ customer.addr_city }}, {{ customer.addr_prov }} {{ customer.addr_postal }}
+          Name: <span class="cb-print-element">{{ customer.fname }} {{ customer.lname }}</span><br>
+          Phone: <span class="cb-print-element">{{ customer.phone }}</span><br>
+          E-mail: <span class="cb-print-element">{{ customer.email }}</span><br>
+          Address: <span class="cb-print-element">{{ customer.addr_st }} {{ customer.addr_city }}, {{ customer.addr_prov }} {{ customer.addr_postal }}</span>
         </div>
     </span>
   </v-flex>
@@ -163,7 +165,9 @@
         if (!isNaN(this.id) && this.id !== null) {
           this.getCustomer(this.id);
         }
-        else this.setFormState(false);
+        else {
+          this.setFormState(false);
+        }
       },
       '$route' (to, from) {
                 if (to.params.cus == 0) {
@@ -194,6 +198,12 @@
         }       
       },
 
+      searchEnter() {
+        if (this.id === null && this.search != null) {
+          this.newCustomerForm();
+        }
+      },
+
       fuseMatch() {
         this.fuseList = [];
         this.$search(this.search, this.searchList, this.searchOptions).then(results => {
@@ -204,10 +214,24 @@
           for (var i = 0; i < length; i++) {
             this.fuseList.push({name: results[i].fname + " " + results[i].lname  + " - " + results[i].phone, id: results[i].id});
           }
-          // results.forEach(result => {
-          //   this.fuseList.push({name: result.fname + " " + result.lname, id: result.id});
-          // });
         })
+      },
+
+      //This function will attempt to determine the current state of the new customer form and
+      //set the best focus location
+      setBestFocus() {
+        // this.$refs.search.focus();
+        this.$nextTick(() => {
+          if (this.customer.fname === null) {
+            this.$refs.firstName.focus();
+          } else if (this.customer.lname === null) {
+            this.$refs.lastName.focus();
+          } else {
+            console.log('here');
+            this.$refs.phoneNumber.focus();
+          }
+        });
+
       },
 
       //Sets the state of the customer card
@@ -223,6 +247,7 @@
             this.header = "Edit Customer Details";
           } else {
             this.header = "Add New Customer";
+            this.setBestFocus();
           }
         } else if (this.id == null || this.id == 0 || this.customer.id == 0){
           this.isForm = false;
@@ -255,11 +280,18 @@
       //For use with search appended icon callback function
       newCustomerForm() {
         var temp = this.search;
+        var first = "";
+        var last = "";
+        if (temp != null && temp.includes(" ")) {
+          first = temp.split(" ")[0];
+          last = temp.split(" ")[1]
+        } else if (temp != null ) {
+          first = temp;
+        }
+        if (first.length > 0) this.customer.fname = first;
+        if (last.length > 0) this.customer.lname = last;
         this.setFormState(true);
-        var first = temp.split(" ")[0];
-        var last = temp.split(" ")[1]
-        this.customer.fname = first;
-        this.customer.lname = last;
+
       },
 
       //Saves new customer to DB
@@ -372,7 +404,9 @@
       if (this.id !== null) {
         this.getCustomer(this.id);
       }
-      else this.setFormState(false);
+      else {
+        this.setFormState(false);
+      }
         
     },
     computed: {

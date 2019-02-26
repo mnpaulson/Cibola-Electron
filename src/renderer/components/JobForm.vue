@@ -7,7 +7,7 @@
                     <v-form ref="jobForm" v-model="valid" lazy-validation>                    
                     <v-layout row wrap>
                         <v-flex row xs12 md6>
-                            <v-text-field required :rules="estimateRules" v-model="job.estimate" label="Estimate" prepend-icon="attach_money"></v-text-field>
+                            <v-text-field ref="estimateField" required :rules="estimateRules" v-model="job.estimate" label="Estimate" prepend-icon="attach_money"></v-text-field>
                             <v-autocomplete
                             label="Employee Select"
                             cache-items
@@ -77,7 +77,7 @@
                         <v-flex row xs12 md6>
                             <v-layout row wrap>   
                             <v-flex xs12>                 
-                                <v-textarea no-resize rows="3" v-model="job.est_note" class="mt-2 est-note-align" label="Estimate Details"></v-textarea>
+                                <v-textarea  no-resize rows="3" v-model="job.est_note" class="mt-2 est-note-align" label="Estimate Details"></v-textarea>
                             </v-flex>
                             <v-flex xs5>                                     
                                 <v-checkbox
@@ -280,7 +280,7 @@
                 Employee: {{ employeeName }} <br>
                 Phone: 403-320-0846 <br>
                 E-mail: info@thegoldworks.com <br>
-                Job ID: {{job.id}}
+                <!-- Job ID: {{job.id}} -->
             </div>
             <div class="cb-print-element cb-print-cus-estimate">
                 <div class="cb-print-est-amt"><span class="cb-print-visible" v-show="job.estimate !== '0'">Estimate: ${{ job.estimate}} + GST</span></div>
@@ -336,13 +336,13 @@ const sharp = require('sharp')
             test: null,
             estimateRules: [
                 // v => !!v || 'Estimate is required',
-                // v => {
-                //     var pattern = new RegExp(/^\d*(,\d+)*[\.]?\d*?$/);
-                //     return pattern.test(v) || "Must be a valid number.";
-                // }
+                v => {
+                    var pattern = new RegExp(/^\d*(,\d+)*[\.]?\d*?$|null/);
+                    return pattern.test(v) || "Must be a valid number.";
+                }
             ],
             employeeRules: [
-                // v => !!v || 'Select employee'
+                v => !!v || 'Select employee'
             ]
         }),
         methods: {
@@ -566,6 +566,13 @@ const sharp = require('sharp')
                 });
 
                 videoElem.srcObject = null;
+            },
+            setBestFocus() {
+                if (this.job.customer_id != 0 && this.job_id < 1) {
+                    this.$nextTick(() => {
+                        this.$refs.estimateField.focus();
+                    });
+                }
             }
         },
         mounted() {
@@ -610,6 +617,7 @@ const sharp = require('sharp')
             customer_id (val) {
                 if (!isNaN(this.customer_id) && this.customer_id !== null) {
                     this.job.customer_id = val;
+                    this.setBestFocus();
                 }
             },
             job_id (val) {

@@ -44,6 +44,7 @@
                                     v-model="credit.creditDate"
                                     prepend-icon="event"
                                     readonly
+                                    :placeholder="today"
                                     :disabled="disabled"
                                     ></v-text-field>
                                     <v-date-picker v-model="credit.creditDate" no-title scrollable>
@@ -84,10 +85,11 @@
         </v-flex>
     </v-layout>
         <template v-for="(item, index) in itemList">
-            <v-layout row wrap :key="item.id">
+            <v-layout row wrap v-bind:key="item.id">
                 <v-flex d-flex xs12 lg8 xl6>
                         <v-card>
                             <v-card-text>
+                                {{item.id}}
                                 <v-layout row wrap>
                                     <v-flex xs6 md3>
                                         <v-autocomplete
@@ -177,7 +179,7 @@
                 <span>Update Credit</span>
                 <v-icon>save</v-icon>
                 </v-btn>
-                <v-btn class="v-btn--active info--text" @click="printCredit">
+                <v-btn :disabled="!credit.id || credit.id == 0" class="v-btn--active info--text" @click="printCredit">
                 <span>Print</span>
                 <v-icon>print</v-icon>
                 </v-btn>
@@ -279,18 +281,26 @@
                         <th class="cb-print-visible">Unit Value</th>
                         <th class="cb-print-visible">Total Value</th>
                     </tr>
-                <template v-for="(item, index) in itemList">
-                    <!-- <div class="cb-print-element cb-print-credit-item-cont" :key="item.id">
-                        {{valueName(item.id)}} {{item.weight}} Units
-                        @ ${{item.unitPrice}} = ${{item.value}}
+                <template v-for="items in itemList">
+                    <!-- <div class="cb-print-element cb-print-credit-items-cont" :key="items.id">
+                        {{valueName(items.id)}} {{items.weight}} Units
+                        @ ${{items.unitPrice}} = ${{items.value}}
                     </div> <br /> -->
-                    <tr :key="item.id" class="cb-print-visible">
-                        <td class="cb-print-visible">{{valueName(item.id)}}</td>
-                        <td class="cb-print-visible">{{item.weight}}</td>
-                        <td class="cb-print-visible">${{item.unitPrice}}</td>
-                        <td class="cb-print-visible">${{item.value}}</td>
+                    <tr :key="items.id" class="cb-print-visible">
+                        <td class="cb-print-visible">{{valueName(items.item)}}</td>
+                        <td class="cb-print-visible">{{items.weight}}</td>
+                        <td class="cb-print-visible">${{items.unitPrice}}</td>
+                        <td class="cb-print-visible">${{items.value}}</td>
                     </tr>
                 </template>
+                <tfoot class="cb-print-visible">
+                    <tr class="cb-print-visible">
+                        <td class="cb-print-visible"></td>
+                        <td class="cb-print-visible"></td>
+                        <td class="cb-print-visible">Grand Total:</td>
+                        <td class="cb-print-visible">${{credit.total}}</td>
+                    </tr>
+                </tfoot>
                 </table>
                 <div class="cb-print-element cb-print-table-note">
                     Gold and Platinum units are measured in grams.
@@ -507,6 +517,11 @@ const { remote, BrowserWindow } = require('electron')
                                 weight: element.weight,
                                 unitPrice: this.round(element.value / element.weight, 2)
                             }
+                            for (var i = 0; i < this.valueList.length; i++) {
+                                if (this.valueList[i].id == element.itemId) {
+                                    item.itemObj = this.valueList[i];
+                                }
+                            }
                             this.credit.credit_items.push(item)
                         });
 
@@ -579,7 +594,6 @@ const { remote, BrowserWindow } = require('electron')
                             return element.name;
                         }
                     });
-                    // console.log(e);
                     return e.name;
                 } else {
                     return "loading...";
