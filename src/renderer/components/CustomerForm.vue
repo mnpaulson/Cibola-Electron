@@ -199,7 +199,7 @@
       },
 
       searchEnter() {
-        if (this.id === null && this.search != null) {
+        if ((this.id === null || this.id == 0) && this.search != null) {
           this.newCustomerForm();
         }
       },
@@ -227,7 +227,7 @@
           } else if (this.customer.lname === null) {
             this.$refs.lastName.focus();
           } else {
-            console.log('here');
+            // console.log('here');
             this.$refs.phoneNumber.focus();
           }
         });

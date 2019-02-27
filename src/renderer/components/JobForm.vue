@@ -71,14 +71,14 @@
                                 <v-btn flat color="primary" @click="$refs.completeMenu.save(completeDate)">OK</v-btn>
                                 </v-date-picker>
                             </v-menu>
-
-
+                            <v-text-field required :rules="estimateRules" v-model="job.deposit" label="Deposit" prepend-icon="attach_money"></v-text-field>
                         </v-flex>
                         <v-flex row xs12 md6>
                             <v-layout row wrap>   
                             <v-flex xs12>                 
                                 <v-textarea  no-resize rows="3" v-model="job.est_note" class="mt-2 est-note-align" label="Estimate Details"></v-textarea>
                             </v-flex>
+
                             <v-flex xs5>                                     
                                 <v-checkbox
                                 :label="'Appraisal'"
@@ -239,6 +239,7 @@
             </div>
         </transition>
         <span class="cb-print">
+            <div class="cb-print-element cb-print-deposit-value">${{job.deposit}}</div>
             <div class="cb-print-element cb-print-note">
                 {{job.note}}
             </div>
@@ -331,6 +332,7 @@ const sharp = require('sharp')
                 completed_at: null,
                 created_at: null,
                 vital_date: true,
+                deposit: null,
                 job_images: []
             },
             test: null,
@@ -487,6 +489,11 @@ const sharp = require('sharp')
                         this.job.vital_date = response.data.vital_date;
                         this.job.created_at = response.data.created_at;                      
                         // this.job.job_images = response.data.job_images;
+                        if (response.data.deposit !== null)  {
+                            this.job.deposit = response.data.deposit.toLocaleString();
+                        } else { 
+                            this.job.deposit = null;
+                        }
 
                         response.data.job_images.forEach(element => {
                             console.log(element);
@@ -623,6 +630,7 @@ const sharp = require('sharp')
             job_id (val) {
                 this.job.employee_id = null;
                 this.job.estimate = null;
+                this.job.deposit = null;
                 this.job.est_note = null;
                 this.job.note = null;                        
                 this.job.appraisal = false;
