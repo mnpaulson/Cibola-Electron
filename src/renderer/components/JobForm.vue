@@ -180,10 +180,23 @@
                     <canvas v-show="false" ref="img" id="img" :width="store.camera.width" :height="store.camera.height"></canvas>
                 </div>
                 <!-- </v-flex> -->
-                <v-flex d-flex xs12>                    
-                <v-btn color="primary" @click="saveImage()">Capture</v-btn>
-                <v-btn color="error" @click="discardCapture()">discard</v-btn>
-                </v-flex>
+                <v-layout row wrap>
+                    <v-flex d-flex xs12>                    
+                        <v-btn color="primary" @click="saveImage()">Capture</v-btn>
+                        <v-btn color="error" @click="discardCapture()">discard</v-btn>
+                    </v-flex>
+                </v-layout>
+                <v-layout row wrap justify-center=true>
+                    <v-flex xs4>
+                        <v-card-title  class="headline justify-center mt-0">Image Quality</v-card-title>
+                        <v-slider
+                            v-model="imageQuality"
+                            :step="5"
+                            thumb-color="blue"
+                            thumb-label="always"
+                        ></v-slider>
+                    </v-flex>
+                </v-layout>
             </v-card>
         </v-dialog>
 
@@ -250,7 +263,7 @@
                # {{ job.id }}
             </div>
             <div class="cb-print-element cb-print-estimate">
-                <div class="cb-print-est-amt"> Est: ${{ job.estimate}} + GST</div><br>
+                <div class="cb-print-est-amt">Est: <span v-if="job.estimate > 0">${{ job.estimate}} + GST</span></div><br>
                 <div class="cb-print-est-note"> {{ job.est_note }} </div>
             </div>
             <div class="cb-print-element cb-print-due">
@@ -335,6 +348,7 @@ const sharp = require('sharp')
                 deposit: null,
                 job_images: []
             },
+            imageQuality: 75,
             test: null,
             estimateRules: [
                 // v => !!v || 'Estimate is required',
@@ -355,9 +369,8 @@ const sharp = require('sharp')
                 var meta = buffer.substr(0, buffer.indexOf(',') + 1);
                 let imgBuffer = Buffer.from(buffer.substr(buffer.indexOf(',') + 1), 'base64');
                 sharp(imgBuffer)
-                    // .resize(800, 600)
-                    .png()
-                    // .jpeg({quality: 100})
+                    // .png()
+                    .jpeg({quality: this.imageQuality})
                     .toBuffer()
                     .then(data => {
                         this.job.job_images.push({

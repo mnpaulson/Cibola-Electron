@@ -5,7 +5,7 @@
         <v-flex d-flex xs12 lg6 xl6>
                 <v-card>
                     <v-card-text>
-                    <v-form ref="goldcreditForm" lazy-validation>                    
+                    <v-form ref="goldcreditForm" v-model="valid" lazy-validation>                    
                     <v-layout row wrap>
                         <v-flex row xs12 md6>
                             <v-autocomplete
@@ -53,10 +53,7 @@
                                     <v-btn flat color="primary" @click="$refs.dateMenu.save(dateMenu)">OK</v-btn>
                                     </v-date-picker>
                                 </v-menu>
-                                <v-checkbox
-                                    :label="'Credit Used'"
-                                    v-model="credit.used"
-                                ></v-checkbox>
+
                         </v-flex>
                         <v-flex row xs12 md2>
                                 <v-text-field
@@ -73,9 +70,31 @@
                                     v-model="credit.exchange"
                                     label="Exchange"
                                 ></v-text-field> -->
-                             <v-btn v-show="credit.id == null" flat color="primary" @click="getNewGoldValue"><v-icon>refresh</v-icon>{{credit.metalPriceDate}}</v-btn>
+
+                        </v-flex>
+                        <v-flex row xs12 md3>
+                                <v-checkbox
+                                    :label="'Credit Used'"
+                                    v-model="credit.used"
+                                ></v-checkbox>
+                                <v-radio-group v-model="credit.credit_type" :click="updateValuesOnType()">
+                                    <v-radio
+                                        :value="'credit'"
+                                        label="Credit"
+                                    ></v-radio>
+                                    <v-radio
+                                        :value="'cash'"
+                                        label="Cash"
+                                    ></v-radio>
+                                    <v-radio
+                                        :value="'split'"
+                                        label="Split"
+                                    ></v-radio>
+                                </v-radio-group>
                         </v-flex>
                         <v-flex row xs12 md12>
+                            <v-btn v-show="credit.id == null" :class="{'warning': priceAgeWarn, 'primary': !priceAgeWarn}" @click="getNewGoldValue"><v-icon>refresh</v-icon>Update&nbsp</v-btn>
+                            <p :class="{'vital-date': priceAgeWarn}" style="display: inline-block;">Prices set: {{credit.metalPriceDate}}</p>
                             <v-textarea no-resize v-model="credit.note" class="" label="Credit Note"></v-textarea>                    
                         </v-flex>
                     </v-layout>
@@ -89,7 +108,6 @@
                 <v-flex d-flex xs12 lg8 xl6>
                         <v-card>
                             <v-card-text>
-                                {{item.id}}
                                 <v-layout row wrap>
                                     <v-flex xs6 md3>
                                         <v-autocomplete
@@ -114,14 +132,14 @@
                                         <v-text-field
                                             v-model="item.multiplier"
                                             label="*"
-                                            :disabled="multiplierDisable"
+                                            :disabled="disabled"
                                         ></v-text-field>
                                     </v-flex>
                                     <v-flex xs6 md1>
                                         <v-text-field
                                             v-model="item.markup"
                                             label="Markup"
-                                            :disabled=true
+                                            :disabled="disabled"
                                         ></v-text-field>
                                     </v-flex>
                                     <v-flex xs6 md2>
@@ -132,7 +150,7 @@
                                         ></v-text-field>
                                     </v-flex>
                                     <v-flex xs6 md2>
-                                        <v-text-field
+                                        <v-text-field 
                                             v-model="item.value"
                                             label="Value"
                                             :disabled="disabled"
@@ -251,10 +269,23 @@
                     <canvas v-show="false" ref="img" id="img" :width="store.camera.width" :height="store.camera.height"></canvas>
                 </div>
                 <!-- </v-flex> -->
-                <v-flex d-flex xs12>                    
-                <v-btn color="primary" @click="saveImage()">Capture</v-btn>
-                <v-btn color="error" @click="discardCapture()">discard</v-btn>
-                </v-flex>
+                <v-layout row wrap>
+                    <v-flex d-flex xs12>                    
+                        <v-btn color="primary" @click="saveImage()">Capture</v-btn>
+                        <v-btn color="error" @click="discardCapture()">discard</v-btn>
+                    </v-flex>
+                </v-layout>
+                <v-layout row wrap justify-center=true>
+                    <v-flex xs4>
+                        <v-card-title  class="headline justify-center mt-0">Image Quality</v-card-title>
+                        <v-slider
+                            v-model="imageQuality"
+                            :step="5"
+                            thumb-color="blue"
+                            thumb-label="always"
+                        ></v-slider>
+                    </v-flex>
+                </v-layout>
             </v-card>
         </v-dialog>
         <transition name="component-lightbox" appear>                            
@@ -311,6 +342,12 @@
                     </div>
                 </template>
             </div>
+            <div class="cb-print-element cb-print-manual-lines">
+                <p class="cb-print-element cb-print-signature-line">Customer Signature:</p>
+                <br />    
+                <br />    
+                <p class="cb-print-element cb-print-signature-line">Cheque/Invoice #:</p>
+            </div>
         </div>
     </div>
     </transition>
@@ -318,9 +355,11 @@
 
 <script>
 const { remote, BrowserWindow } = require('electron')
+const sharp = require('sharp')
 
     export default {
         data: () => ({
+            valid: true,
             employeeList: [],
             employee: null,
             valueList: [],
@@ -341,9 +380,11 @@ const { remote, BrowserWindow } = require('electron')
                 creditValue: null,
                 used: false,
                 note: null,
+                credit_type: "credit",
                 credit_items: [],
                 credit_images: []
             },
+            typeHistory: "credit",
             items: [],
             img: {},
             video: {},
@@ -355,6 +396,7 @@ const { remote, BrowserWindow } = require('electron')
             lightBoxImage: null,
             deleteImageId: null,
             deleteImageIndex: null,
+            imageQuality: 75,
             employeeRules: [
                 v => !!v || 'Select employee'
             ],
@@ -443,6 +485,15 @@ const { remote, BrowserWindow } = require('electron')
             },
             //Create new gold credit
             createCredit() {
+                this.$refs.goldcreditForm.validate();
+                if (!this.customer_id) {
+                    this.store.setAlert(true, "error", "Please select a customer.");
+                    return;
+                }
+                if (!this.valid) {
+                    this.store.setAlert(true, "error", "Please fix required fields");
+                    return;
+                }
                 this.credit.credit_items = this.itemList;
                 this.$http.post(this.store.serverURL +  '/goldcredit/create', this.credit)
                     .then((response) => {
@@ -464,7 +515,13 @@ const { remote, BrowserWindow } = require('electron')
             },
             //Update existing gold credit
             updateCredit() {
-                this.$http.post(this.store.serverURL +  '/goldcredit/update', {id: this.credit.id, note: this.credit.note, used: this.credit.used, customer: this.credit.customer_id})
+                this.$http.post(this.store.serverURL +  '/goldcredit/update', {
+                        id: this.credit.id,
+                        note: this.credit.note,
+                        used: this.credit.used,
+                        credit_type: this.credit.credit_type,
+                        customer: this.credit.customer_id
+                    })
                     .then((response) => {
                         this.creditDeleteDialog = false;
                         this.store.setAlert(true, "success", "Credit ID " + this.credit.id + " updated.");                        
@@ -500,6 +557,7 @@ const { remote, BrowserWindow } = require('electron')
                         this.credit.metalPriceDate = response.data.metalPriceDate;
                         this.credit.creditDate = response.data.gold_date;
                         this.credit.used = response.data.used;
+                        this.credit.credit_type = response.data.credit_type;
 
                         response.data.credit_images.forEach(element => {
                             element.image = this.store.serverURL + element.image;
@@ -547,12 +605,23 @@ const { remote, BrowserWindow } = require('electron')
                 var buffer = this.img.toDataURL("image/png");
                 var meta = buffer.substr(0, buffer.indexOf(',') + 1);
                 let imgBuffer = Buffer.from(buffer.substr(buffer.indexOf(',') + 1), 'base64');
-
-                this.credit.credit_images.push({
-                    image: this.img.toDataURL("image/png"),
-                    note: null,
-                    id: null
-                });
+                sharp(imgBuffer)
+                    // .png()
+                    .jpeg({quality: this.imageQuality})
+                    .toBuffer()
+                    .then(data => {
+                        this.credit.credit_images.push({
+                            // image: this.img.toDataURL("image/png"),
+                            image: meta + data.toString("base64"),
+                            note: null,
+                            id: null
+                        });
+                    });
+                // this.job.job_images.push({
+                //     image: this.img.toDataURL("image/png"),
+                //     note: null,
+                //     id: null
+                // });
                 this.img = null;
                 this.captureDialog = false;
             },
@@ -599,6 +668,52 @@ const { remote, BrowserWindow } = require('electron')
                     return "loading...";
                 }
 
+            },
+            //Sets all values to defaults
+            clearCredit() {
+                this.employee = null;
+                this.itemList = [];
+                this.date = false;
+                this.dateMenu = false;
+                this.disabled = false;
+                this.credit.id = null;
+                this.credit.employee_id = null;
+                this.credit.customer_id = null;
+                this.credit.creditDate = null;
+                this.credit.creditValue = null;
+                this.credit.used = false;
+                this.credit.note = null;
+                this.credit.credit_type = 'credit';
+                this.credit.credit_items = [];
+                this.credit.credit_images = []
+                this.items = [];
+                this.img = {};
+            },
+            updateValuesOnType() {
+                var type = this.credit.credit_type;
+                if (type === this.typeHistory) return;
+
+                var change;
+                if (type == 'credit' && this.typeHistory === 'split') change = 0.1;
+                if (type == 'credit' && this.typeHistory === 'cash') change = 0.2;
+                if (type == 'split' && this.typeHistory === 'credit') change = -0.1;
+                if (type == 'split' && this.typeHistory === 'cash') change = 0.1;
+                if (type == 'cash' && this.typeHistory === 'credit') change = -0.2;
+                if (type == 'cash' && this.typeHistory === 'split') change = -0.1;
+
+                this.typeHistory = type;
+
+                this.valueList.forEach(element => {
+                    if (element.name === "8k") element.value2 = this.round(Number(element.value2) + Number(change), 2);
+                    if (element.name === "9k") element.value2 = this.round(Number(element.value2) + Number(change), 2);
+                    if (element.name === "10k") element.value2 = this.round(Number(element.value2) + Number(change), 2);
+                    if (element.name === "12k") element.value2 = this.round(Number(element.value2) + Number(change), 2);
+                    if (element.name === "14k") element.value2 = this.round(Number(element.value2) + Number(change), 2);
+                    if (element.name === "18k") element.value2 = this.round(Number(element.value2) + Number(change), 2);
+                    // if (element.name === "20k") element.value2 = Number(element.value2) + Number(change);
+                    // if (element.name === "22k") element.value2 = Number(element.value2) + Number(change);
+                    // if (element.name === "24k") element.value2 = Number(element.value2) + Number(change);
+                });
             }
         },
         mounted() {
@@ -645,6 +760,7 @@ const { remote, BrowserWindow } = require('electron')
             customer_id (val) {
                 if (!isNaN(this.customer_id) && this.customer_id !== null) {
                     this.credit.customer_id = val;
+                    if (val === 0) this.clearCredit();
                 }
             },
             goldcredit_id (val) {
@@ -657,6 +773,7 @@ const { remote, BrowserWindow } = require('electron')
                 this.credit.creditValue = null;
                 this.credit.used = false;
                 this.credit.note = null;
+                this.credit.note = 'credit';
                 this.credit.credit_items = [];
                 this.credit.credit_images = [];
                 this.itemList = [];
@@ -677,14 +794,15 @@ const { remote, BrowserWindow } = require('electron')
                         if(e.id == null) {
                             var metal;
                             if (e.itemObj) {
-                                if (e.itemObj.name == "Other" || e.itemObj.name == "Diamonds") {
-                                    this.multiplierDisable = false;
-                                    e.multiplier = e.itemObj.value1;
-                                }
-                                else {
-                                    this.multiplierDisable = true;
-                                    e.multiplier = e.itemObj.value1;
-                                }
+                                // if (e.itemObj.name == "Other" || e.itemObj.name == "Diamonds") {
+                                //     this.multiplierDisable = false;
+                                //     e.multiplier = e.itemObj.value1;
+                                // }
+                                // else {
+                                //     this.multiplierDisable = true;
+                                //     e.multiplier = e.itemObj.value1;
+                                // }
+                                e.multiplier = e.itemObj.value1;
                                 e.markup = e.itemObj.value2;
                                 e.item = e.itemObj.id;
                                 if (e.itemObj.value3 === "Gold" ) {
@@ -708,7 +826,7 @@ const { remote, BrowserWindow } = require('electron')
                     this.credit.total = total;
                 },
                 deep: true
-            },
+            }
         },
         computed: {
             today() {
@@ -730,6 +848,11 @@ const { remote, BrowserWindow } = require('electron')
             now() {
                 var now = new Date()
                 return now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
+            },
+            priceAgeWarn() {
+                var age = new Date - Date.parse(this.credit.metalPriceDate);
+                if (age > 8640000) return true;
+                else return false;
             },
             store() {
                 return this.$root.$data.store;

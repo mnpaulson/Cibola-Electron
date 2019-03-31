@@ -21,9 +21,10 @@
 </v-flex>
 </v-layout>
 <v-layout row wrap class="">
-    <employee-stats></employee-stats>  
-    <!-- <customer-list></customer-list>
-    <job-list></job-list> -->
+    <!-- <employee-stats></employee-stats>   -->
+    <!-- <customer-list></customer-list> -->
+    <job-list></job-list>
+    <stats></stats>
     <!-- <employee-jobs></employee-jobs> -->
 </v-layout>
 </div>

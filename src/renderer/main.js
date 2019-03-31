@@ -25,6 +25,7 @@ import CustomerList from './components/CustomerList'
 import JobList from './components/JobList'
 import GoldcreditForm from './components/GoldcreditForm'
 import ValueConfig from './components/ValueConfig'
+import Stats from './components/Stats'
 import PageNotFound from './components/PageNotFound'
 
 
@@ -43,6 +44,7 @@ Vue.component('GoldcreditForm', require('./components/GoldcreditForm.vue').defau
 Vue.component('PageNotFound', require('./components/PageNotFound.vue').default);
 Vue.component('Toolbar', require('./components/Toolbar.vue').default);
 Vue.component('ValueConfig', require('./components/ValueConfig.vue').default);
+Vue.component('Stats', require('./components/Stats.vue').default);
 
 
 

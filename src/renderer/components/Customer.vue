@@ -199,7 +199,7 @@
               rowsPerPage: 10
             },
             paginationJob: {
-              sortBy: 'due_date',
+              sortBy: 'created_at',
               descending: true,
               rowsPerPage: 10
             },

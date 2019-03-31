@@ -41,7 +41,7 @@
             </p>
           </v-flex>
           <v-flex xs12 md6>
-            <v-textarea no-resize v-model="customer.note" class="" label="Customer Notes"></v-textarea>                                
+            <v-textarea no-resize v-on:blur="noteBlur()" v-model.lazy="customer.note" class="" label="Customer Notes"></v-textarea>                                
           </v-flex>
         </v-layout>
         <v-form>
@@ -76,8 +76,8 @@
           </v-flex>
         </div>
         <!-- <v-btn style="z-index:0" v-show="isInfo" dark small bottom right absolute fab color="primary" @click="setFormState(true)" class="fab-up"><v-icon class="fab-fix" dark>edit</v-icon></v-btn> -->
-        <v-btn v-show="isInfo" color="blue " flat small right absolute class="cus-save-btn" @click="updateCustomer()">Save Note</v-btn>
-        <v-btn v-show="isInfo" color="grey " flat small right absolute class="cus-edit-btn" @click="setFormState(true)">Edit</v-btn>
+        <v-btn v-show="isInfo"  :class="{success: noteChanged, shake: noteChanged, 'blue--text': !noteChanged}" flat small right absolute class="cus-save-btn" @click="updateCustomer()">Save Note</v-btn>
+        <v-btn v-show="isInfo" color="grey" flat small right absolute class="cus-edit-btn" @click="setFormState(true)">Edit</v-btn>
       </v-card-text>
             <v-progress-linear v-show="loading" :indeterminate="true" class="mb-0"></v-progress-linear>      
     </v-card>
@@ -140,7 +140,8 @@
         note: null,
         id: null
       },
-
+      startingNote: null,
+      noteChanged: false,
       nameRules: [
         (v) => !!v || 'Name is required',
       ]
@@ -176,6 +177,9 @@
                     this.searchList = null;
                 }
       },
+      startingNote(val) {
+        this.noteChanged = false;
+      }
     },
 
     methods: {
@@ -267,6 +271,7 @@
           this.customer.addr_postal = null;
           this.customer.addr_country = null;
           this.customer.note = null;
+          this.startingNote = null;
           this.customer.id = null;
         } else {
           this.isForm = false;
@@ -320,7 +325,8 @@
         this.$http.post(this.store.serverURL +  '/customers/update', this.customer)
           .then((response) => {
             this.setFormState(false);
-            this.loading = false;            
+            this.loading = false;
+            this.noteChanged = false;            
           })
           .catch((error) => {
             this.loading = false;
@@ -340,6 +346,7 @@
         this.customer.addr_postal = null;
         this.customer.addr_country = null;
         this.customer.note = null;
+        this.startingNote = null;
         this.customer.id = 0;
         this.$emit('update:id', 0);
         this.setFormState(false);
@@ -359,6 +366,7 @@
           this.customer.addr_postal = null;
           this.customer.addr_country = null;
           this.customer.note = null;
+          this.startingNote = null;
           this.customer.id = null;
           this.fuseList = [];
           this.searchSelect = null;
@@ -382,6 +390,7 @@
             this.customer.addr_postal = response.data[0].addr_postal;
             this.customer.addr_country = response.data[0].addr_country;
             this.customer.note = response.data[0].note;
+            this.startingNote = response.data[0].note;
             this.setFormState(false);
             this.loading = false;                        
           })
@@ -397,6 +406,11 @@
         if (this.$route.name.toLowerCase().includes("credit")) {
           return 'credit';
         }
+      },
+      noteBlur() {
+        if (this.customer.note !== this.startingNote) this.noteChanged = true;
+        console.log(this.noteChanged);
+        return;
       }
     },
 
@@ -421,6 +435,5 @@
         if (this.customer.addr_country != null) return true;
       }
     }
-
   }
 </script>

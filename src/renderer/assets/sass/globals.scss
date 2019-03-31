@@ -165,6 +165,29 @@
     max-height: 75vh;
 }
 
+.shake {
+    animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+    transform: translate3d(0, 0, 0);
+}
+
+@keyframes shake {
+    10%, 90% {
+      transform: translate3d(-1px, 0, 0);
+    }
+    
+    20%, 80% {
+      transform: translate3d(2px, 0, 0);
+    }
+  
+    30%, 50%, 70% {
+      transform: translate3d(-4px, 0, 0);
+    }
+  
+    40%, 60% {
+      transform: translate3d(4px, 0, 0);
+    }
+  }
+
 @media print {
 
     * {
@@ -586,6 +609,19 @@
         height: 100%;
 
         @include box-shadow;
+    }
+
+    .cb-print-manual-lines {
+        position: absolute !important;
+        top: 9in;
+        height: 1in;
+        width: 4in;
+    }
+
+    .cb-print-signature-line {
+        border-bottom: 2px solid black;
+        font-weight: bold;
+        width: 4in;
     }
 
 
