@@ -20,7 +20,7 @@
     </v-btn>
 </v-flex>
 </v-layout>
-<v-layout row wrap class="">
+<v-layout row wrap>
     <!-- <employee-stats></employee-stats>   -->
     <!-- <customer-list></customer-list> -->
     <job-list></job-list>

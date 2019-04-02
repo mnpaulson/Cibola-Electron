@@ -5,8 +5,9 @@
             <!-- <v-toolbar color="indigo" dark clipped-left flat>
                 <v-toolbar-title>Recent Jobs</v-toolbar-title>
             </v-toolbar> -->
-        <v-card-title  class="headline mt-0">Recent Jobs</v-card-title>
-        <v-list dense>
+        <v-card-title  class="headline justify-center mt-0">Recent Jobs</v-card-title>
+        <v-list dense class="padding-bottom-3px">
+            <v-divider></v-divider>
             <template v-for="(job, index) in jobs">
                 <v-list-tile
                 ripple
@@ -22,7 +23,7 @@
                             Customer: {{job.customer.fname}} {{job.customer.lname}} Employee: {{employeeList[job.employee_id - 1]}}
                     </v-list-tile-title>
                     <v-list-tile-sub-title class="text--primary">Job #{{ job.id }} Date: {{job.created_at}}</v-list-tile-sub-title>
-                    <v-list-tile-sub-title>Est: ${{ job.estimate }}</v-list-tile-sub-title>
+                    <v-list-tile-sub-title>Est: ${{ job.estimate.toLocaleString() }}</v-list-tile-sub-title>
                 </v-list-tile-content>
                 </v-list-tile>
                 <v-divider v-if="index + 1 < jobs.length" :key="job.id"></v-divider>
