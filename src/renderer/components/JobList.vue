@@ -16,7 +16,7 @@
                 avatar
                 >
                 <v-list-tile-avatar>
-                    <img v-if="job.job_images[0]" :src="'http://127.0.0.1:8080' + job.job_images[0].image">
+                    <img v-if="job.job_images[0]" :src="store.serverURL + job.job_images[0].image">
                 </v-list-tile-avatar>
                 <v-list-tile-content>
                     <v-list-tile-title>

@@ -263,7 +263,7 @@
                # {{ job.id }}
             </div>
             <div class="cb-print-element cb-print-estimate">
-                <div class="cb-print-est-amt">Est: <span v-if="job.estimate > 0">${{ job.estimate}} + GST</span></div><br>
+                <div class="cb-print-est-amt">Est: <span class="cb-print-visible" v-show="job.estimate > '0'">${{ job.estimate}} + GST</span></div><br>
                 <div class="cb-print-est-note"> {{ job.est_note }} </div>
             </div>
             <div class="cb-print-element cb-print-due">
@@ -297,7 +297,7 @@
                 <!-- Job ID: {{job.id}} -->
             </div>
             <div class="cb-print-element cb-print-cus-estimate">
-                <div class="cb-print-est-amt"><span class="cb-print-visible" v-show="job.estimate !== '0'">Estimate: ${{ job.estimate}} + GST</span></div>
+                <div class="cb-print-est-amt"><span class="cb-print-visible" v-show="job.estimate > '0'">Estimate: ${{ job.estimate}} + GST</span></div>
                 <div class="cb-print-est-note"> {{ job.est_note }} </div>
             </div>
             <div class="cb-print-element cb-print-cus-warning">

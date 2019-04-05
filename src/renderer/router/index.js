@@ -67,6 +67,16 @@ export default new Router({
         component: GoldCredit
     },
     {
+        path: '/goldcredit/:id',
+        name: 'goldcredits',
+        component: GoldCredit
+    },
+    {
+        path: '/goldcredit/:id/:cus',
+        name: 'goldcredits',
+        component: GoldCredit
+    },
+    {
         path: '*',
         name: 'pageNotFound',
         component: PageNotFound

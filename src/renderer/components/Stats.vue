@@ -2,7 +2,7 @@
     <transition name="component-fade" appear v-if="stats.monthJobs.length > 0">          
         <!-- <v-layout> -->
         <v-flex xs12 md6>
-            <v-flex xs12 md4 pt-0>
+            <v-flex xs12 md6 pt-0>
                     <v-card
                         class="mx-auto text-xs-center"
                         dark
@@ -21,7 +21,7 @@
                         </v-card-text>
                     </v-card>
             </v-flex>
-            <v-flex xs12 md4 class="padding-top-8px">
+            <v-flex xs12 md6 class="padding-top-8px">
                     <v-card
                         class="mx-auto text-xs-center"
                         dark
@@ -40,7 +40,7 @@
                         </v-card-text>
                     </v-card>
             </v-flex>
-            <v-flex xs12 md4 class="padding-top-8px">
+            <v-flex xs12 md6 class="padding-top-8px">
                     <v-card
                         class="mx-auto text-xs-center"
                         dark
@@ -59,7 +59,7 @@
                         </v-card-text>
                     </v-card>
             </v-flex>
-            <v-flex xs12 md4 class="padding-top-8px">
+            <v-flex xs12 md6 class="padding-top-8px">
                     <v-card
                         class="mx-auto text-xs-center"
                         dark

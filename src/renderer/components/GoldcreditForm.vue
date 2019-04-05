@@ -77,7 +77,7 @@
                                     :label="'Credit Used'"
                                     v-model="credit.used"
                                 ></v-checkbox>
-                                <v-radio-group v-model="credit.credit_type" :click="updateValuesOnType()">
+                                <v-radio-group :disabled="disabled" v-model="credit.credit_type" :click="updateValuesOnType()">
                                     <v-radio
                                         :value="'credit'"
                                         label="Credit"
@@ -417,6 +417,7 @@ const sharp = require('sharp')
                 this.$http.get(this.store.serverURL +  '/values/gettype?type_id=1')
                     .then((response) => {
                         this.valueList = response.data;
+                        if (!this.credit.id) this.credit.credit_type = 'cash';
                     })
                     .catch((error) => {
                         console.log(error);
@@ -714,6 +715,14 @@ const sharp = require('sharp')
                     // if (element.name === "22k") element.value2 = Number(element.value2) + Number(change);
                     // if (element.name === "24k") element.value2 = Number(element.value2) + Number(change);
                 });
+                this.itemList.forEach(element => {
+                    if (element.itemObj.name === "8k") element.markup = this.round(Number(element.markup) + Number(change), 2);
+                    if (element.itemObj.name === "9k") element.markup = this.round(Number(element.markup) + Number(change), 2);
+                    if (element.itemObj.name === "10k") element.markup = this.round(Number(element.markup) + Number(change), 2);
+                    if (element.itemObj.name === "12k") element.markup = this.round(Number(element.markup) + Number(change), 2);
+                    if (element.itemObj.name === "14k") element.markup = this.round(Number(element.markup) + Number(change), 2);
+                    if (element.itemObj.name === "18k") element.markup = this.round(Number(element.markup) + Number(change), 2);
+                });
             }
         },
         mounted() {
@@ -802,9 +811,13 @@ const sharp = require('sharp')
                                 //     this.multiplierDisable = true;
                                 //     e.multiplier = e.itemObj.value1;
                                 // }
-                                e.multiplier = e.itemObj.value1;
-                                e.markup = e.itemObj.value2;
-                                e.item = e.itemObj.id;
+                                if (e.item == e.itemObj.id) {
+
+                                } else {
+                                    e.multiplier = e.itemObj.value1;
+                                    e.markup = e.itemObj.value2;
+                                    e.item = e.itemObj.id;
+                                }
                                 if (e.itemObj.value3 === "Gold" ) {
                                     metal = this.credit.goldCAD;
                                 } else if (e.itemObj.value3 === "Platinum" ) {
