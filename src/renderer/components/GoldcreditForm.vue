@@ -93,7 +93,7 @@
                                 </v-radio-group>
                         </v-flex>
                         <v-flex row xs12 md12>
-                            <v-btn v-show="credit.id == null" :class="{'warning': priceAgeWarn, 'primary': !priceAgeWarn}" @click="getNewGoldValue"><v-icon>refresh</v-icon>Update&nbsp</v-btn>
+                            <v-btn v-show="credit.id == null" :class="{'warning': priceAgeWarn, 'primary': !priceAgeWarn}" @click="getNewGoldValue"><v-icon>refresh</v-icon>Update&nbsp;</v-btn>
                             <p :class="{'vital-date': priceAgeWarn}" style="display: inline-block;">Prices set: {{credit.metalPriceDate}}</p>
                             <v-textarea no-resize v-model="credit.note" class="" label="Credit Note"></v-textarea>                    
                         </v-flex>

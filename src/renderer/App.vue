@@ -41,6 +41,14 @@
             <v-list-tile-title>Customers</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
+        <v-list-tile :to="{ name: 'customsheets' }">
+          <v-list-tile-action>
+            <v-icon>list_alt</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>Custom Sheets</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
         <!-- <v-list-tile :to="{ name: 'employee' }">
           <v-list-tile-action>
             <v-icon>folder</v-icon>

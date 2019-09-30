@@ -26,6 +26,8 @@ import JobList from './components/JobList'
 import GoldcreditForm from './components/GoldcreditForm'
 import ValueConfig from './components/ValueConfig'
 import Stats from './components/Stats'
+import CustomSheet from './components/CustomSheet'
+import CustomSheetForm from './components/CustomSheetForm'
 import PageNotFound from './components/PageNotFound'
 
 
@@ -44,6 +46,8 @@ Vue.component('GoldcreditForm', require('./components/GoldcreditForm.vue').defau
 Vue.component('PageNotFound', require('./components/PageNotFound.vue').default);
 Vue.component('Toolbar', require('./components/Toolbar.vue').default);
 Vue.component('ValueConfig', require('./components/ValueConfig.vue').default);
+Vue.component('CustomSheet', require('./components/CustomSheet.vue').default);
+Vue.component('CustomSheetForm', require('./components/CustomSheetForm.vue').default);
 Vue.component('Stats', require('./components/Stats.vue').default);
 
 
@@ -85,66 +89,81 @@ Vue.config.productionTip = false
 
 const router = new VueRouter({
   routes: [
-      {
-          path: '/',
-          name: 'home',
-          component: Home
-      },
-      {
-          path: '/job',
-          name: 'jobs',
-          component: Job
-      },
-      {
-          path: '/job/:id',
-          name: 'job',
-          component: Job
-      },
-      {
-          path: '/job/:id/:cus',
-          name: 'New Job',
-          component: Job
-      },
-      {
-          path: '/admin',
-          name: 'admin',
-          component: Admin,
-      },
-      {
-          path: '/customer',
-          name: 'customers',
-          component: Customer
-      },
-      {
-          path: '/customer/:id',
-          name: 'customer',
-          component: Customer
-      },
-      {
-          path: '/employee',
-          name: 'employee',
-          component: Employee
-      },        
-      {
-          path: '/goldcredit',
-          name: 'Gold Credits',
-          component: GoldCredit
-      },      
-      {
-        path: '/goldcredit/:id',
-        name: 'Gold Credit',
-        component: GoldCredit
-      },
-      {
-        path: '/goldcredit/:id/:cus',
-        name: 'New Gold Credit',
-        component: GoldCredit
-      },
-      {
-          path: '*',
-          name: 'pageNotFound',
-          component: PageNotFound
-      }
+        {
+            path: '/',
+            name: 'home',
+            component: Home
+        },
+        {
+            path: '/job',
+            name: 'jobs',
+            component: Job
+        },
+        {
+            path: '/job/:id',
+            name: 'job',
+            component: Job
+        },
+        {
+            path: '/job/:id/:cus',
+            name: 'New Job',
+            component: Job
+        },
+        {
+            path: '/admin',
+            name: 'admin',
+            component: Admin,
+        },
+        {
+            path: '/customer',
+            name: 'customers',
+            component: Customer
+        },
+        {
+            path: '/customer/:id',
+            name: 'customer',
+            component: Customer
+        },
+        {
+            path: '/employee',
+            name: 'employee',
+            component: Employee
+        },        
+        {
+            path: '/goldcredit',
+            name: 'Gold Credits',
+            component: GoldCredit
+        },      
+        {
+            path: '/goldcredit/:id',
+            name: 'Gold Credit',
+            component: GoldCredit
+        },
+        {
+            path: '/goldcredit/:id/:cus',
+            name: 'New Gold Credit',
+            component: GoldCredit
+        },
+        {
+            path: '/customsheet',
+            name: 'customsheets',
+            component: CustomSheet
+        },
+        {
+            path: '/customsheet/:id',
+            name: 'customsheet',
+            component: CustomSheet
+        },
+        {
+            path: '/customsheet/:id/:cus',
+            name: 'customsheet',
+            component: CustomSheet
+        },
+        {
+            path: '*',
+            name: 'pageNotFound',
+            component: PageNotFound
+        }
   ],
 });
 

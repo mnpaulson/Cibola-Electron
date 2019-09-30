@@ -77,6 +77,21 @@ export default new Router({
         component: GoldCredit
     },
     {
+        path: '/customsheet',
+        name: 'customsheets',
+        component: CustomSheet
+    },
+    {
+        path: '/customsheet/:id',
+        name: 'customsheet',
+        component: CustomSheet
+    },
+    {
+        path: '/customsheet/:id/:cus',
+        name: 'customsheet',
+        component: CustomSheet
+    },
+    {
         path: '*',
         name: 'pageNotFound',
         component: PageNotFound
