@@ -54,14 +54,8 @@
                                     <v-flex xs2>
                                         <v-card-text><h3 class="headline mb-0">{{category}}</h3></v-card-text>
                                     </v-flex>
-                                    <v-flex xs6>
-                                        <v-btn color="primary" @click="newEstVal(category)">
-                                            <v-icon>add</v-icon>
-                                            New {{category}}
-                                        </v-btn>
-                                    </v-flex>
                                     </v-layout>
-                                    <template v-for="(est_val, est_index) in customSheet.selectedEstimate.est_values">
+                                    <template v-for="est_val in customSheet.selectedEstimate.est_values">
                                         <v-list-tile v-bind:key="est_val.id" v-if="est_val.type == category">
                                             <v-layout row wrap>
                                                 <v-flex xs6 md3>
@@ -72,21 +66,18 @@
                                                         :return-object=true
                                                         item-text="name"
                                                         v-model="est_val.obj"
-                                                        @change="estValOptionSelected(est_index)"
                                                     ></v-combobox>
                                                 </v-flex>
                                                 <v-flex xs6 md3>
                                                     <v-text-field
                                                         v-model="est_val.amt"
                                                         label="Weight(g)/Amount"
-                                                        @input="calculateEstValTotal(est_index)"
                                                     ></v-text-field>
                                                 </v-flex>
                                                 <v-flex xs6 md3>
                                                     <v-text-field
                                                         v-model="est_val.pricePer"
                                                         label="Price Per"
-                                                        @input="calculateEstValTotal(est_index)"
                                                     ></v-text-field>
                                                 </v-flex>
                                                 <v-flex xs6 md3>
@@ -99,17 +90,33 @@
                                             </v-layout>
                                         </v-list-tile>
                                     </template>
+                                    <v-layout>
+                                        <v-flex xs6>
+                                            <v-btn color="primary" @click="newEstVal(category)">
+                                                <v-icon>add</v-icon>
+                                                {{category}}
+                                            </v-btn>
+                                        </v-flex>
+                                    </v-layout>
                                 </div>
                             </template>
-                            </v-list>
+                            <v-divider></v-divider>
+                            <h1 class="text-xs-right mr-3">Total: ${{customSheet.selectedEstimate.total.toLocaleString()}}</h1>
+                      </v-list>
                     </v-card>
             </v-flex>
         </v-layout>
         <v-layout row wrap>
             <v-flex d-flex xs12 lg2>
-                <v-btn color="primary" @click="saveEstimate">
+                <v-btn color="primary" @click="storeEstimate">
                     <v-icon>add</v-icon>
-                    Save Estimate
+                    Store Estimate
+                </v-btn>
+            </v-flex>
+            <v-flex d-flex xs12 lg2>
+                <v-btn v-if="isUpdate" color="primary" @click="updateEstimate">
+                    <v-icon>add</v-icon>
+                    Update Estimate
                 </v-btn>
             </v-flex>
         </v-layout>
@@ -117,13 +124,23 @@
             <template v-for="(estimate, est_index) in customSheet.estimates">
                 <v-flex d-flex xs12 lg3 xl3 v-bind:key="estimate.id">
                     <v-card class="cb-round-card ">
-                        <v-card-title class="cb-card-title" ><div class="headline">{{estimate.name}}</div></v-card-title>
-                        <template v-for="(est_val, val_index) in customSheet.estimates[est_index].est_values">
-                            <v-list-tile v-bind:key="est_val.id">
-                                {{est_val.name}} {{est_val.amt}} {{est_val.total}}
-                            </v-list-tile>
-                            <v-divider v-if="val_index + 1 < customSheet.estimates[est_index].est_values.length" :key="`divider-${val_index}`"></v-divider>
-                        </template>
+                        <v-card-title class="cb-card-title">
+                            <div class="headline">{{estimate.name}}</div>
+                            <v-btn class="close-btn" dark small right absolute fab color="green" @click="editEstimate(est_index)"><v-icon class="fab-fix" dark>edit</v-icon></v-btn>                    
+                        </v-card-title>
+                        <v-data-table
+                            :headers=estPreviewHeaders
+                            :items=customSheet.estimates[est_index].est_values
+                            hide-actions
+                        >
+                            <template v-slot:items="props">
+                                <td>{{props.item.name}}</td>
+                                <td>{{props.item.amt}}</td>
+                                <td class="text-xs-right">${{props.item.total.toLocaleString()}}</td>
+                            </template>
+                        </v-data-table>
+                        <v-divider></v-divider>
+                        <h2 class="text-xs-right mr-3">${{estimate.total.toLocaleString()}}</h2>
                     </v-card>
                 </v-flex>
             </template>
@@ -137,27 +154,63 @@
 var estValIdCounter = 1;
 
 class estValue {
-    constructor (category, id = `clientId-${estValIdCounter++}`, name = "", amt = null, pricePer = null, total = null) {
+    constructor (category, id = `clientId-${estValIdCounter++}`, name = "", amt = null, pricePer = null) {
         this.id = id
         this.type = category;
         this.name = name;
         this.amt = amt;
         this.pricePer = pricePer;
-        this.total = total; 
-        this.obj = {name: null};
+    }
+
+    //Sets estValue properties from an option value object
+    //also works for custom value if only string is passed for name
+    set obj(o) {
+        if (o.hasOwnProperty('name')) {
+            this.name = o.name;
+            this.pricePer = o.value2;
+            this.type = o.value1;
+            if (o.value3 === 'Gold'|| o.value3 === 'Plat') this.pricePer = o.metalPrice;
+        } else {
+            this.name = o;
+        }
+    }
+
+    get obj() {
+        return this.name;
+    }
+
+    get total() {
+        if (isNaN(this.amt) || isNaN(this.pricePer)) return 0;
+        return this.amt * this.pricePer;
     }
 }
 
 class estimate {
-    constructor (estimate) {
+    constructor () {
+        this.name = null;
+        this.isPrimary = false;
+        this.est_values = [];
+        this.id = null;
+    }
+
+    copy(estimate) {
         this.name = estimate.name;
         this.isPrimary = estimate.isPrimary;
         this.est_values = [];
-        estimate.est_values.forEach(est => {
+        this.id = estimate.id;
+        estimate.est_values.forEach(v => {
             this.est_values.push(
-                new estValue(est.category, est.id, est.name, est.amt, est.pricePer, est.total)
+                new estValue(v.type, v.id, v.name, v.amt, v.pricePer)
             )
         })
+    }
+
+    get total() {
+        var total = 0;
+        this.est_values.forEach(v => {
+            total += v.total;
+        })
+        return total;
     }
 }
 
@@ -166,21 +219,38 @@ export default {
         goldCAD: null,
         platCAD: null,
         metalPriceDate: null,
+        estimateIdCounter: 0,
         customSheet: {
             customSheet_id: null,
             customer_id: null,
             note: null,
             primary_est: null,
-            selectedEstimate: {
-                name: null,
-                isPrimary: true,
-                est_values: []
-            },
+            selectedEstimate: new estimate,
             estimates: []
         },
         valueList: {},
         categories: [],
-        catOptions: []
+        catOptions: [],
+        estPreviewHeaders: [
+            {
+                text: 'Type',
+                align: 'left',
+                sortable: false,
+                value: 'name'
+            },
+            {
+                text: 'Weight(g)/Amount',
+                align: 'left',
+                sortable: false,
+                value: 'amt'
+            },
+            {
+                text: 'Total',
+                align: 'right',
+                sortable: false,
+                value: 'total'
+            },
+        ]
 
     }),
     methods: {
@@ -188,9 +258,8 @@ export default {
         getNewGoldValue() {
             this.$http.get(this.store.serverURL +  '/values/getGoldValue')
                 .then((response) => {
-                    // console.log(response);
                     var goldG = response.data[0];
-                    this.goldCAD = this.round(goldG, 2);
+                    window.goldCAD = this.round(goldG, 2);
                     this.getNewPlatValue();
                 })
                 .catch((error) => {
@@ -201,8 +270,7 @@ export default {
             this.$http.get(this.store.serverURL +  '/values/getPlatValue')
                 .then((response) => {
                     var platG = response.data;
-                    // platG = platG * this.customSheet.exchange;
-                    this.platCAD = this.round(platG, 2);
+                    window.platCAD = this.round(platG, 2);
                     this.metalPriceDate = this.today + " " + this.now;
                 })
                 .catch((error) => {
@@ -222,6 +290,8 @@ export default {
                                 this.categories.push(value.value1);
                                 this.catOptions.push([]);
                             }
+                            if (value.value3 === 'Gold') value.metalPrice = this.goldCAD;
+                            if (value.value3 === 'Plat') value.metalPrice = this.platCAD;
                             let index = this.categories.indexOf(value.value1);
                             this.catOptions[this.categories.indexOf(value.value1)].push(value);
                         })
@@ -249,6 +319,7 @@ export default {
             this.customSheet.selectedEstimate.est_values.push(new estValue(category));
         },
         estValOptionSelected(index) {
+
             if (this.customSheet.selectedEstimate.est_values[index].obj.hasOwnProperty('name')) {
                 this.customSheet.selectedEstimate.est_values[index].name = this.customSheet.selectedEstimate.est_values[index].obj.name;
                 this.customSheet.selectedEstimate.est_values[index].pricePer = this.customSheet.selectedEstimate.est_values[index].obj.value2;
@@ -259,12 +330,35 @@ export default {
             }
             
         },
-        calculateEstValTotal(index) {
-            this.customSheet.selectedEstimate.est_values[index].total = this.customSheet.selectedEstimate.est_values[index].amt * this.customSheet.selectedEstimate.est_values[index].pricePer;
+        storeEstimate() {
+            //Set default name if there isn't one
+            if(this.customSheet.selectedEstimate.name == null) this.customSheet.selectedEstimate.name = `Estimate`;
+            
+            //Make a copy of selectedEstimate
+            let est = new estimate();
+            est.copy(this.customSheet.selectedEstimate);
+            
+            //Set new Id
+            est.id = `clientId-${this.estimateIdCounter++}`;
+            this.customSheet.selectedEstimate.id = est.id;
+            
+            //store estimate
+            this.customSheet.estimates.push(est);
         },
-        saveEstimate() {
-            // this.customSheet.estimates.push(Object.assign({}, this.customSheet.selectedEstimate));
-            this.customSheet.estimates.push(new estimate(this.customSheet.selectedEstimate));
+        editEstimate(est_index) {
+            let est = new estimate();
+            est.copy(this.customSheet.estimates[est_index]);
+            this.customSheet.selectedEstimate = est;
+        },
+        updateEstimate() {
+            var update = new estimate();
+            update.copy(this.customSheet.selectedEstimate);
+            this.customSheet.estimates.forEach((est, index, arr) => {
+                if (est.id == update.id) {
+                    arr[index] = update;
+                }
+            })
+            this.$forceUpdate();
         }
     },
 
@@ -305,6 +399,10 @@ export default {
             var now = new Date()
             return now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
         },
+        isUpdate() {
+            if (this.customSheet.selectedEstimate.id !== null) return true;
+            else return false;
+        }
     },
     watch: {
         customer_id(val) {
@@ -316,7 +414,21 @@ export default {
             if (!isNaN(this.customSheet_id) && this.customSheet_id !== null) {
                 this.customSheet.customSheet_id = val;
             }
-        }
+        },
+        goldCAD(val) {
+            if (this.valueList.length > 0) {
+                this.valueList.forEach(value => {
+                    if (value.value3 === 'Gold') value.metalPrice = this.goldCAD;
+                })
+            }
+        },
+        platCAD(val) {
+            if (this.valueList.length > 0) {
+                this.valueList.forEach(value => {
+                    if (value.value3 === 'Plat') value.metalPrice = this.platCAD;
+                })
+            }
+        },
     },
 };
 
