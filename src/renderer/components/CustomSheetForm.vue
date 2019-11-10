@@ -80,12 +80,17 @@
                                                         label="Price Per"
                                                     ></v-text-field>
                                                 </v-flex>
-                                                <v-flex xs6 md3>
+                                                <v-flex xs6 md2>
                                                     <v-text-field
                                                         v-model="est_val.total"
                                                         disabled
                                                         label="Total"
                                                     ></v-text-field>
+                                                </v-flex>
+                                                <v-flex xs6 md1>
+                                                    <v-btn flat icon color="grey" @click="deleteEstVal(est_val.id)">
+                                                        <v-icon>delete_outline</v-icon>
+                                                    </v-btn>
                                                 </v-flex>
                                             </v-layout>
                                         </v-list-tile>
@@ -120,9 +125,9 @@
                 </v-btn>
             </v-flex>
         </v-layout>
-        <v-layout row wrap>
+        <v-layout orw wrap>
             <template v-for="(estimate, est_index) in customSheet.estimates">
-                <v-flex d-flex xs12 lg3 xl3 v-bind:key="estimate.id">
+                <v-flex d-flex xs12 lg4 xl3 v-bind:key="estimate.id">
                     <v-card class="cb-round-card ">
                         <v-card-title class="cb-card-title">
                             <div class="headline">{{estimate.name}}</div>
@@ -205,6 +210,14 @@ class estimate {
         })
     }
 
+    deleteEstVal(id) {
+        this.est_values.forEach((v, index) => {
+            if (v.id === id) {
+                this.est_values.splice(index, 1);
+            }
+        })
+    }
+
     get total() {
         var total = 0;
         this.est_values.forEach(v => {
@@ -212,6 +225,7 @@ class estimate {
         })
         return total;
     }
+
 }
 
 export default {
@@ -359,6 +373,9 @@ export default {
                 }
             })
             this.$forceUpdate();
+        },
+        deleteEstVal(id) {
+            this.customSheet.selectedEstimate.deleteEstVal(id);
         }
     },
 
