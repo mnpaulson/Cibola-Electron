@@ -128,10 +128,12 @@
         <v-layout orw wrap>
             <template v-for="(estimate, est_index) in customSheet.estimates">
                 <v-flex d-flex xs12 lg4 xl3 v-bind:key="estimate.id">
-                    <v-card class="cb-round-card ">
-                        <v-card-title class="cb-card-title">
+                    <v-card class="cb-round-card" @click="editEstimate(est_index)">
+                        <v-card-title class="cb-card-title" 
+                        v-bind:class="{green: isSelectedEstimate(estimate.id), grey: !isSelectedEstimate(estimate.id)}"
+                        >
                             <div class="headline">{{estimate.name}}</div>
-                            <v-btn class="close-btn" dark small right absolute fab color="green" @click="editEstimate(est_index)"><v-icon class="fab-fix" dark>edit</v-icon></v-btn>                    
+                            <v-btn class="close-btn" dark small right absolute fab color="grey" @click.stop="estimate.deleteModal = true"><v-icon class="fab-fix" dark>delete_outline</v-icon></v-btn>                    
                         </v-card-title>
                         <v-data-table
                             :headers=estPreviewHeaders
@@ -147,6 +149,12 @@
                         <v-divider></v-divider>
                         <h2 class="text-xs-right mr-3">${{estimate.total.toLocaleString()}}</h2>
                     </v-card>
+                    <deleteModal 
+                    :modal="estimate.deleteModal" 
+                    :objectName="estimate.name"
+                    objectType="Estimate"
+                    v-on:close="estimate.deleteModal = false"
+                    v-on:delete="deleteEstimate(estimate.id)"></deleteModal>
                 </v-flex>
             </template>
         </v-layout>
@@ -196,6 +204,7 @@ class estimate {
         this.isPrimary = false;
         this.est_values = [];
         this.id = null;
+        this.deleteModal = false;
     }
 
     copy(estimate) {
@@ -376,6 +385,14 @@ export default {
         },
         deleteEstVal(id) {
             this.customSheet.selectedEstimate.deleteEstVal(id);
+        },
+        deleteEstimate(id) {
+            this.customSheet.estimates.forEach((e, index) => {
+                if (id === e.id) this.customSheet.estimates.splice(index, 1);
+            })
+        },
+        isSelectedEstimate(id) {
+            return (id === this.customSheet.selectedEstimate.id) ? true : false;
         }
     },
 
