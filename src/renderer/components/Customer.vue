@@ -106,6 +106,26 @@
             </v-card>
         </v-flex>
         </transition>               
+        <transition>
+        <v-flex d-flex xs12 md12 lg8 xl6  class="mt-2">
+            <v-card v-show="id" class="">
+                <v-card-title>
+                    <v-card-title primary-title>
+                        <h3 class="headline mb-0">Custom Sheets</h3>
+                    </v-card-title>
+                </v-card-title>
+                    <v-data-table v-bind:headers="customSheetHeaders" :items="customSheets" v-bind:pagination.sync="paginationCustomSheet" class="elevation-1" :loading="loadingCustomSheets">
+                        <template slot="items" slot-scope="props">
+                            <tr @click="goToCustomSheet(props.item.id)">
+                                <td class="text-xs-center">{{ props.item.id }}</td>
+                                <td class="text-xs-center">{{ props.item.name }}</td>
+                                <td class="text-xs-left hidden-sm-and-down">{{ props.item.created_at }}</td>                              
+                            </tr>
+                        </template>
+                    </v-data-table>
+            </v-card>
+        </v-flex>
+        </transition>               
         <v-dialog v-model="deleteDialog" max-width="500px">
             <v-card xs12 md6>
                 <v-toolbar color="error" dark clipped-left flat>
@@ -140,9 +160,11 @@
             loadingCustomers: false,
             loadingJobs: false,
             loadingCredits: false,
+            loadingCustomSheets: false,
             customers: [],
             jobs: [],
             credits: [],
+            customSheets: [],
             jobHeaders: [{
                     text: 'ID',
                     value: 'id'
@@ -170,6 +192,20 @@
                 {
                     text: 'ID',
                     value: 'id'
+                },
+                {
+                    text: 'Date',
+                    value: 'created_at'
+                }
+            ],
+            customSheetHeaders: [
+                {
+                    text: 'ID',
+                    value: 'id'
+                },
+                {
+                    text: 'Name',
+                    value: 'name'
                 },
                 {
                     text: 'Date',
@@ -208,6 +244,11 @@
               descending: true,
               rowsPerPage: 10
             },
+            paginationCustomSheet: {
+              sortBy: 'created_at',
+              descending: true,
+              rowsPerPage: 10
+            },
         }),
         watch: {
             id(val) {
@@ -218,6 +259,7 @@
                 } else {
                     this.getCustomerJobs();
                     this.getCustomerCredits();
+                    this.getCustomerCustomSheets();
                 }
             },
             // Handle changing between customer view and no customer selected
@@ -265,6 +307,18 @@
                         this.loadingCredits = false;                        
                     });     
             },
+            getCustomerCustomSheets() {
+                this.loadingCustomSheets = true;
+                this.$http.post(this.store.serverURL +  '/customsheet/customerCustomSheets', {id: this.id})
+                    .then((response) => {
+                        this.customSheets = response.data;
+                        this.loadingCustomSheets = false;
+                    })
+                    .catch((error) => {
+                        console.table(error);
+                        this.loadingCustomSheets = false;                        
+                    });     
+            },
             setId(val) {
                 this.id = Number(val);
                 this.$router.push("/customer/" + val);
@@ -290,6 +344,9 @@
             },
             goToCredit(id) {
                 this.$router.push('/goldcredit/' + id);
+            },
+            goToCustomSheet(id) {
+                this.$router.push('/customsheet/' + id);
             }
         },
         mounted() {
