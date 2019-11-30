@@ -165,26 +165,7 @@
                 </v-btn>
             </v-flex>
         </v-layout>
-        <!-- Name and note -->
-        <!-- <v-layout row wrap>
-            <v-flex d-flex xs12 lg6 xl6>
-                    <v-card>
-                        <v-card-text>
-                        <v-layout row wrap>
-                            <v-text-field
-                                v-model="customSheet.selectedEstimate.name"
-                                label="Name"
-                            ></v-text-field>
-                            <v-flex row xs12>
-                                <v-textarea no-resize v-model="customSheet.selectedEstimate.note" class="" label="Custom Sheet Note"></v-textarea>
-                            </v-flex>
-                        </v-layout>
-                        </v-card-text>
-                    </v-card>
-            </v-flex>
-        </v-layout> -->
-        <!-- Stored estimates -->
-        <v-layout orw wrap>
+        <v-layout row wrap>
             <template v-for="(estimate, est_index) in customSheet.estimates">
                 <v-flex d-flex xs12 lg4 xl3 v-bind:key="estimate.id">
                     <v-card class="cb-round-card" @click="editEstimate(est_index)">
@@ -235,8 +216,8 @@
             <span>Save Custom Sheet</span>
             <v-icon>save</v-icon>
             </v-btn>
-            <v-btn v-show="customSheet.customSheet_id && customSheet.customSheet_id !== 0" class="v-btn--active success--text">
-            <span>Update Job</span>
+            <v-btn v-show="customSheet.customSheet_id && customSheet.customSheet_id !== 0" class="v-btn--active success--text" @click="updateCustomSheet()">
+            <span>Update Custom Sheet</span>
             <v-icon>save</v-icon>
             </v-btn>
             <v-btn class="v-btn--active info--text" >
@@ -291,6 +272,10 @@ class estValue {
         if (isNaN(this.amt) || isNaN(this.pricePer)) return 0;
         return this.amt * this.pricePer;
     }
+    
+    get isClientId() {
+        return (isNaN(Number(this.id)));  
+    }
 }
 
 class estimate {
@@ -301,6 +286,7 @@ class estimate {
         this.id = null;
         this.deleteModal = false;
         this.isPrimary = false;
+        this.estValuesToDelete = [];
         this.created_at = null;
         this.updated_at = null;
     }
@@ -310,6 +296,7 @@ class estimate {
         this.note = estimate.note;
         this.isPrimary = estimate.isPrimary;
         this.estValues = [];
+        this.estValuesToDelete = estimate.estValuesToDelete;
         this.id = estimate.id;
         estimate.estValues.forEach(v => {
             this.estValues.push(
@@ -330,9 +317,14 @@ class estimate {
     deleteEstVal(id) {
         this.estValues.forEach((v, index) => {
             if (v.id === id) {
+                if (!v.isClientId) this.estValuesToDelete.push(id);
                 this.estValues.splice(index, 1);
             }
         })
+    }
+
+    get isClientId() {
+        return (isNaN(Number(this.id)));  
     }
 
     get total() {
@@ -351,9 +343,9 @@ class customSheet {
         this.customer_id = null;
         this.name = null;
         this.note = null;
-        // this.primary_est = null;
         this.estimates = [];
         this.selectedEstimate = new estimate;
+        this.estimatesToDelete = [];
         this.created_at = null;
         this.updated_at = null;
     }
@@ -383,6 +375,7 @@ class customSheet {
         this.customer_id = customSheet.customer_id;
         this.name = customSheet.name;
         this.note = customSheet.note;
+        this.estimatesToDelete = customSheet.estimatesToDelete;
         this.created_at = customSheet.created_at;
         this.updated_at = customSheet.updated_at;
         this.selectedEstimate = new estimate(customSheet.selectedEstimate);
@@ -398,11 +391,21 @@ class customSheet {
     cleanClientIds() {
         for(let i = 0; i < this.estimates.length; i++) {
             for(let j = 0; j < this.estimates[i].estValues.length; j++) {
-                if(isNaN(Number(this.estimates[i].estValues[j].id))) this.estimates[i].estValues[j].id = null;
+                if(this.estimates[i].estValues[j].isClientId) this.estimates[i].estValues[j].id = null;
             }
-            if(isNaN(Number(this.estimates[i].id))) this.estimates[i].id = null;
+            if(this.estimates[i].isClientId) this.estimates[i].id = null;
         }
     }
+
+    deleteEstimate(id) {
+        this.estimates.forEach((e, index) => {
+            if (e.id === id) {
+                if (!e.isClientId) this.estimatesToDelete.push(id);
+                this.estimates.splice(index, 1);
+            }
+        })
+    }
+
 }
 
 export default {
@@ -517,7 +520,7 @@ export default {
         //Makes a copy of the selectedEstimate into estimates and sets Ids
         storeEstimate() {
             //Set default name if there isn't one
-            if(this.customSheet.selectedEstimate.name == null) this.customSheet.selectedEstimate.name = `Estimate`;
+            if(this.customSheet.selectedEstimate.name == null) this.customSheet.selectedEstimate.name = `Estimate ` + this.customSheet.estimates.length;
             
             //Make a copy of selectedEstimate
             let est = new estimate();
@@ -552,17 +555,15 @@ export default {
         //Deletes est_val with the passed id from the selectedEstimate
         deleteEstVal(id) {
             this.customSheet.selectedEstimate.deleteEstVal(id);
+            
         },
         //Deletes estimate with the passed id
         deleteEstimate(id) {
-            this.customSheet.estimates.forEach((e, index) => {
-                if (id === e.id) this.customSheet.estimates.splice(index, 1);
-            })
-            if (this.customSheet.selectedEstimate.id === id) this.customSheet.selectedEstimate.id = null;
+            this.customSheet.deleteEstimate(id);
         },
         //Returns true if selectedEstimate has the passed id
         isSelectedEstimate(id) {
-            return (id === this.customSheet.selectedEstimate.id) ? true : false;
+            return (id === this.customSheet.selectedEstimate.id);
         },
         //Updates all existing plat or gold value based est_vals with new values
         updateExistingMetalPrices() {
@@ -593,6 +594,34 @@ export default {
                     console.log(response);
                     this.customSheet = this.newCustomSheetFromResponse(response.data);
                     this.store.setAlert(true, "success", "Custom Sheet Created with ID: " + this.customSheet.customSheet_id);
+                    this.loading = false;
+                    // // this.$router.replace("/job/" + this.job.id);
+                })
+                .catch((error) => {
+                    // console.table(error);
+                    this.loading = false;
+                    this.store.setAlert(true, "error", error.message);                                                                    
+                });
+        },
+        updateCustomSheet() {
+            // this.$refs.jobForm.validate();
+            if (!this.customSheet.customer_id) {
+                this.store.setAlert(true, "error", "Please select a customer.");
+                return;
+            }
+            // if (!this.valid) {
+            //     this.store.setAlert(true, "error", "Please fix required fields");
+            //     return;
+            // }
+            this.loading = true;
+            let upload = new customSheet();
+            upload.copy(this.customSheet);
+            upload.cleanClientIds();
+            this.$http.post(this.store.serverURL +  '/customsheet/update', upload)
+                .then((response) => {
+                    console.log(response);
+                    this.customSheet = this.newCustomSheetFromResponse(response.data);
+                    this.store.setAlert(true, "success", "Custom Sheet Updated with ID: " + this.customSheet.customSheet_id);
                     this.loading = false;
                     // // this.$router.replace("/job/" + this.job.id);
                 })
@@ -662,7 +691,8 @@ export default {
     },
 
     props: {
-        customSheet_id: Number
+        customSheet_id: Number,
+        customer_id: Number
     },
     mounted() {
         this.getValues();
@@ -709,6 +739,9 @@ export default {
             if (!isNaN(id) && id !== null && id !== 0 && this.customSheet.customSheet_id !== val) {
                 this.getCustomSheet(val);
             }
+        },
+        customer_id(val) {
+            if (this.customSheet.customer_id == null) this.customSheet.customer_id = val;
         },
         goldCAD(val) {
             if (this.valueList.length > 0) {

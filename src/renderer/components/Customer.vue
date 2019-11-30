@@ -18,6 +18,12 @@
                     </v-btn>
                 </v-flex>
                 <v-flex d-flex class="xs6 sm2">
+                    <v-btn color="primary" :href="'#/customsheet/0/' + id">
+                        <v-icon>add</v-icon>
+                        New Custom Sheet
+                    </v-btn>
+                </v-flex>
+                <v-flex d-flex class="xs6 sm2">
                     <v-btn color="error" @click="deleteDialog = true" :style="{'font-size': '0.75em'}">
                         <v-icon>delete</v-icon>
                         Delete Customer

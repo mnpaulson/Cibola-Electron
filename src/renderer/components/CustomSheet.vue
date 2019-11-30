@@ -1,12 +1,15 @@
 <template>
     <div>
         <div v-show="idSet">
-            <custom-sheet-form :customSheet_id.sync="customSheet_id"></custom-sheet-form>
+            <custom-sheet-form :customSheet_id="customSheet_id" :customer_id="customer_id"></custom-sheet-form>
         </div>
         <v-btn v-show="!idSet" color="primary" :href="'#/customsheet/0'">
             <v-icon>add</v-icon>
             New Custom Sheet
         </v-btn>
+        <div v-if="!idSet">
+            <custom-sheet-list v-on:select="updateRoute($event)"></custom-sheet-list>
+        </div>
     </div>
 </template>
 
@@ -14,10 +17,16 @@
 export default {
     data: () => ({
         customSheet_id: null,
+        customer_id: null
     }),
     methods: {
-
-
+        setCustomSheetId(id) {
+            this.customSheet_id = Number(id);
+            this.$forceUpdate();
+        },
+        updateRoute(id) {
+            this.$router.push('/customsheet/' + id);
+        }
     },
 
     props: {
@@ -29,8 +38,10 @@ export default {
         //Only preset customer ID if customSheet is 0
         if (isNaN(Number(this.$route.params.id))); //Do Nothing
         else if (Number(this.$route.params.id) !== 0) {
-            this.customSheet_id = Number(this.$route.params.id);
-            this.$forceUpdate();
+            this.setCustomSheetId(Number(this.$route.params.id));
+        }
+        if (!isNaN(Number(this.$route.params.cus))) {
+            this.customer_id = Number(this.$route.params.cus);
         }
     },
     computed: {
@@ -38,22 +49,22 @@ export default {
             return this.$root.$data.store;
         },
         idSet() {
-            return (this.customSheet_id === null) ? false : true; 
+            return (this.customSheet_id === null && this.customer_id === null) ? false : true; 
         }
 
     },
     watch: {
         // Handle changing between customer view and no customer selected
         '$route'(to, from) {
-            console.log(to);
-            // if (!to.params.id) this.customSheet_id = null;
-            // else this.customSheet_id = Number(to.params.id);
             if (isNaN(Number(to.params.id))) {
                 this.customSheet_id = null
             } else {
-                // this.$nextTick(() => {this.customSheet_id = Number(to.params.id)});
-                this.customSheet_id = Number(to.params.id);
+                this.setCustomSheetId(Number(to.params.id));
             }
+
+            // if (!isNaN(Number(to.params.cus))) {
+            //     this.customer_id = Number(to.params.cus);
+            // }
         },
     }
 };
