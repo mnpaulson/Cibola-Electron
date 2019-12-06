@@ -1,10 +1,10 @@
 <template>
     <div>
-        <div v-show="idSet">
-            <custom-sheet-form :customSheet_id="customSheet_id" :customer_id="customer_id"></custom-sheet-form>
+        <div  v-show="idSet">
+            <custom-sheet-form :key="key" :customSheet_id="customSheet_id" :customer_id="customer_id"></custom-sheet-form>
         </div>
-        <v-btn v-show="!idSet" color="primary" :href="'#/customsheet/0'">
-            <v-icon>add</v-icon>
+        <v-btn @click="key++" v-show="!idSet" color="primary" :href="'#/customsheet/0'">
+            <!-- <v-icon>add</v-icon> -->
             New Custom Sheet
         </v-btn>
         <div v-if="!idSet">
@@ -17,7 +17,8 @@
 export default {
     data: () => ({
         customSheet_id: null,
-        customer_id: null
+        customer_id: null,
+        key:1
     }),
     methods: {
         setCustomSheetId(id) {
