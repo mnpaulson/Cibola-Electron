@@ -29,6 +29,7 @@ import Stats from './components/Stats'
 import CustomSheet from './components/CustomSheet'
 import CustomSheetForm from './components/CustomSheetForm'
 import CustomSheetList from './components/CustomSheetList'
+import CustomSheetPrint from './components/CustomSheetPrint'
 import PageNotFound from './components/PageNotFound'
 import deleteModal from './components/deleteModal'
 
@@ -51,6 +52,7 @@ Vue.component('ValueConfig', require('./components/ValueConfig.vue').default);
 Vue.component('CustomSheet', require('./components/CustomSheet.vue').default);
 Vue.component('CustomSheetForm', require('./components/CustomSheetForm.vue').default);
 Vue.component('CustomSheetList', require('./components/CustomSheetList.vue').default);
+Vue.component('CustomSheetPrint', require('./components/CustomSheetPrint.vue').default);
 Vue.component('Stats', require('./components/Stats.vue').default);
 Vue.component('deleteModal', require('./components/deleteModal.vue').default);
 

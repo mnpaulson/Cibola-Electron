@@ -221,26 +221,31 @@
             class="elevation-1"
         >
             <v-btn v-show="!customSheet.customSheet_id || customSheet.customSheet_id == 0" @click="createCustomSheet()" class="v-btn--active primary--text">
-            <span>Save Custom Sheet</span>
+            <span>Save</span>
             <v-icon>save</v-icon>
             </v-btn>
             <v-btn v-show="customSheet.customSheet_id && customSheet.customSheet_id !== 0" class="v-btn--active success--text" @click="updateCustomSheet()">
-            <span>Update Custom Sheet</span>
+            <span>Update</span>
             <v-icon>save</v-icon>
             </v-btn>
             <v-btn class="v-btn--active info--text" >
             <span>Print</span>
             <v-icon>print</v-icon>
             </v-btn>
-            <!-- <v-btn v-show="job.id && job.id !== 0" @click="jobDeleteDialog = true" class="v-btn--active error--text">
-            <span>Delete Job</span>
+            <v-btn v-show="customSheet.customSheet_id && customSheet.customSheet_id !== 0" @click="customSheetDeleteModal = true" class="v-btn--active error--text">
+            <span>Delete</span>
             <v-icon>delete</v-icon>
             </v-btn>
-            <v-btn v-show="!job.id || job.id == 0" @click="$router.go(-1)" class="v-btn--active error--text">
-            <span>Discard Job</span>
-            <v-icon>delete</v-icon>
-            </v-btn> -->
         </v-bottom-nav>
+        <deleteModal 
+                    :modal="customSheetDeleteModal" 
+                    objectName="Custom Sheet"
+                    objectType="Custom Sheet"
+                    final="true"
+                    v-on:close="customSheetDeleteModal = false"
+                    v-on:delete="deleteCustomSheet">
+        </deleteModal>
+        <custom-sheet-print :customsheet="customSheet"></custom-sheet-print>
         </div>
     </transition>
 </template>
@@ -458,6 +463,7 @@ export default {
         extras: [],
         on: null,
         loading: false,
+        customSheetDeleteModal: false,
         estPreviewHeaders: [
             {
                 text: 'Type',
@@ -718,6 +724,9 @@ export default {
         newEstValueFromResponse(v) {
             var val = new estValue(v.type, v.id, v.name, v.amt, v.pricePer, v.priceType);
             return val;
+        },
+        deleteCustomSheet() {
+
         }
     },
 

@@ -27,19 +27,21 @@
         <v-layout v-show="isInfo" row wrap>
           <v-flex xs12 md6>
             <router-link :to="{ path: `/customer/${customer.id}` }">          
-              <h3 class="headline mb-0">
+              <h3 class="headline mb-1">
                 <!-- <v-icon large>person</v-icon> -->
                 <span>{{ customer.fname }}</span>
                 <span>{{ customer.lname }}</span>
               </h3>
             </router-link>
-            <p>
-              <span v-show="customer.phone != null"><v-icon>phone</v-icon> {{ customer.phone }} <br></span>
-              <span v-show="customer.email != null"><v-icon>email</v-icon> {{ customer.email }} <br></span>
-              <span v-show="hasAddress"><v-icon>home</v-icon> {{ customer.addr_st }} <br>
-              {{ customer.addr_city }}<span v-show="customer.addr_city != null">,</span> {{ customer.addr_prov }} {{ customer.addr_postal }} <br>
-              {{ customer.addr_country }}</span>
-            </p>
+              <!-- <div class="mb-1 cb-light-text">
+                <span v-show="customer.phone != null">{{ customer.phone }}</span> 
+                <span v-show="customer.email != null">{{ customer.email }}</span>
+              </div> -->
+              <div class="mb-0 cb-light-text" v-show="customer.phone != null">{{ customer.phone }}</div>
+              <div class="mb-1 mt-0 cb-light-text" v-show="customer.email != null"> {{ customer.email }}</div>
+              <div class="caption cb-light-text" v-show="hasAddress"> {{ customer.addr_st }} <br>
+              {{ customer.addr_city }}<span v-show="customer.addr_city != null">,</span> {{ customer.addr_prov }} {{ customer.addr_postal }},
+              {{ customer.addr_country }}</div>
           </v-flex>
           <v-flex xs12 md6>
             <v-textarea no-resize v-on:blur="noteBlur()" v-model.lazy="customer.note" class="" label="Customer Notes"></v-textarea>                                

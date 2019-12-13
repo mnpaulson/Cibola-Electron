@@ -1,25 +1,25 @@
 <template>
     <v-dialog v-model="modalData" max-width="500px">
         <v-card>
-            <v-toolbar color="error" dark clipped-left flat>
+            <v-toolbar color="white" clipped-left flat>
                 <v-toolbar-title>
-                    <v-icon>warning</v-icon> Delete {{objectName}}
+                    <v-icon class="mr-2">warning</v-icon> Delete {{objectName}}
+                    <v-btn class="pr-0 cb-close-modal-btn" flat absolute color="grey" @click.stop="emitCloseModal()"><v-icon>close</v-icon></v-btn>
                 </v-toolbar-title>
             </v-toolbar>
             <v-card-text>
-                Are you sure you want to delete this {{objectType}}? <br>
-                <br>
-                This action is not reversable
+                <p class="lighten-2">Are you sure you want to delete this {{objectType}}? <br>
+                <span v-if="final">This action can not be undone</span></p>
             </v-card-text>
-            <v-card-actions>
-                <v-btn color="error" @click.stop="emitDeleteId()">
-                    <v-icon>delete</v-icon>
-                    Delete
-                </v-btn>
-                <v-btn color="primary" right absolute @click.stop="emitCloseModal()">
-                    <v-icon>cancel</v-icon>
+            <v-card-actions class="pt-3 pb-3 text-xs-right cb-delete-modal-actions ">
+                <v-flex>
+                <v-btn flat class="text-none" color="grey" @click.stop="emitCloseModal()">
                     Cancel
                 </v-btn>
+                <v-btn class="ml-2 text-none" color="error" @click.stop="emitDeleteId()">
+                    Delete
+                </v-btn>
+                </v-flex>
             </v-card-actions>
         </v-card>
     </v-dialog>
@@ -34,7 +34,8 @@ export default {
     props: [
         'objectName',
         'objectType',
-        'modal'
+        'modal',
+        'final'
     ],
     methods: {
         emitDeleteId() {

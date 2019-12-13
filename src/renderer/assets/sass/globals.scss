@@ -38,6 +38,10 @@
     
 // }
 
+* {
+    letter-spacing: 0.3px;
+}
+
 .cdb-toolbar-icon {
     height: 48px;
 }
@@ -703,4 +707,18 @@
     background-color: #FFA000;
     height: 3px;
     position: relative;
+}
+
+.cb-delete-modal-actions {
+    background-color: #fafafa;
+}
+
+.cb-close-modal-btn {
+    min-width: 0px;
+    top: 0;
+    right: 5px;
+}
+
+.cb-light-text {
+    color: rgba(0,0,0,0.75);
 }
