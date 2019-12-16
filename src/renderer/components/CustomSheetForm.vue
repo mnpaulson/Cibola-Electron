@@ -166,9 +166,19 @@
         <!-- Estimates -->
         <v-layout pt-3 row wrap>
             <v-flex shrink>
-                <v-btn @click="newEstimate()" large color="primary" round class="cb-new-card-button cb-new-card-button-top elevation-0" ><v-icon class="cb-extra-large-icon">note_add</v-icon></v-btn>
+                <v-tooltip top>
+                        <template v-slot:activator="{ on }">
+                            <v-btn @click="newEstimate()" v-on="on" large color="primary" round class="cb-new-card-button cb-new-card-button-top elevation-0" ><v-icon class="cb-extra-large-icon">note_add</v-icon></v-btn>
+                        </template>
+                    <span>Create new estimate</span>
+                </v-tooltip>
                 <br>
-                <v-btn @click="copyEstimate()" large color="primary" round class="cb-new-card-button cb-new-card-button-bottom" ><v-icon class="cb-extra-large-icon">flip_to_front</v-icon></v-btn>
+                <v-tooltip bottom>
+                        <template v-slot:activator="{ on }">
+                            <v-btn @click="copyEstimate()" v-on="on" large color="primary" round class="cb-new-card-button cb-new-card-button-bottom" ><v-icon class="cb-extra-large-icon">flip_to_front</v-icon></v-btn>
+                        </template>
+                    <span>Copy selected estimate</span>
+                </v-tooltip>
             </v-flex>
             <template v-for="(estimate, est_index) in customSheet.estimates">
                 <v-flex shrink v-bind:key="estimate.id">
