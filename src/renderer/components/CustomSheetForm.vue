@@ -10,15 +10,17 @@
                     <v-card color="blue text--darken-10 white--text">
                         <v-card-text class="pa-2 text-lg-left">
                         <v-layout row wrap>
-                            <v-flex v-if="editMetalPrices" row xs3>
+                            <v-flex v-if="editMetalPrices" row xs3 class="mt-3">
                                 <v-text-field
                                     v-model="goldCAD"
+                                    hide-details
                                     label="Gold (g)"
                                 ></v-text-field>
                             </v-flex>
-                            <v-flex v-if="editMetalPrices" row xs3>
+                            <v-flex v-if="editMetalPrices" row xs3 class="mt-3">
                                 <v-text-field
                                     v-model="platCAD"
+                                    hide-details
                                     label="Plat (g)"
                                 ></v-text-field>
                             </v-flex>
@@ -52,7 +54,7 @@
                         <!-- <v-card-title> -->
                         <!-- </v-card-title> -->
                     <v-card>
-                        <v-layout pr-4 pb-4 pl-4 row wrap>
+                        <v-layout pr-4 pb-4 pl-4 mt-4 row wrap>
                             <v-flex row xs12>
                                 <v-text-field
                                     v-model="customSheet.name"
@@ -72,7 +74,7 @@
         <v-layout mt-3 row wrap>
             <v-flex d-flex xs12 lg6 xl6>
                     <v-card>
-                            <v-layout pr-4 pb-4 pl-4  row wrap>
+                            <v-layout pr-4 pb-4 pl-4 mt-4  row wrap>
                                 <v-flex row xs12>
                                     <v-text-field
                                         v-model="customSheet.selectedEstimate.name"
@@ -534,6 +536,7 @@ export default {
                                 this.catOptions[this.categories.indexOf(value.value1)].push(value);
                                 if (value.value1 == "Extra") this.extras.push(value);
                         })
+                        if(this.extras.length) this.categories.push(this.categories.splice(this.categories.indexOf('Extra'), 1)[0]);
                     })
                     .catch((error) => {
                         console.log(error);
@@ -645,7 +648,7 @@ export default {
                     // // this.$router.replace("/job/" + this.job.id);
                 })
                 .catch((error) => {
-                    // console.table(error);
+                    console.table(error);
                     this.loading = false;
                     this.store.setAlert(true, "error", error.message);                                                                    
                 });
@@ -683,8 +686,14 @@ export default {
             this.loading = true;
                 this.$http.post(this.store.serverURL +  '/customsheet/show', {id: id})
                     .then((response) => {
-                        console.log(response);
                         this.customSheet = this.newCustomSheetFromResponse(response.data);
+                        //handle categories to make sure none are missing
+                        this.customSheet.estimates.forEach(e => {
+                            e.estValues.forEach(v => {
+                                if (this.categories.indexOf(v.type) == -1) this.categories.push(v.type);
+                            })
+                        })
+                        if(this.extras.length) this.categories.push(this.categories.splice(this.categories.indexOf('Extra'), 1)[0]);
                         this.loading = false;
                     })
                     .catch((error) => {
@@ -736,7 +745,17 @@ export default {
             return val;
         },
         deleteCustomSheet() {
-
+            this.$http.post(this.store.serverURL +  '/customsheet/delete', this.customSheet)
+                    .then((response) => {
+                        this.store.setAlert(true, "warning", "Custom Sheet ID " + this.customSheet.customSheet_id + " deleted.");                        
+                        this.$router.go(-1);
+                        this.customSheetDeleteModal = false;
+                        this.loading = false;
+                    })
+                    .catch((error) => {
+                        this.store.setAlert(true, "error", "Custom Sheet ID " + this.customSheet.customSheet_id + " not found.");
+                        this.loading = false;
+                    });
         }
     },
 

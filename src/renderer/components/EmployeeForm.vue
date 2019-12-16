@@ -1,9 +1,6 @@
 <template>
     <v-flex xs12 sm6>
         <v-card>
-            <v-toolbar color="indigo" dark clipped-left flat>
-                <v-toolbar-title>Employees</v-toolbar-title>
-            </v-toolbar>
             <v-card-text>
                 <v-text-field label="Add Employee" v-model="currentEmployee.name" xs12></v-text-field>
                 <v-btn v-show="!currentEmployee.id" small color="primary" @click="createEmployee">Add</v-btn>

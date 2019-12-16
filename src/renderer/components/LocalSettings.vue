@@ -1,9 +1,6 @@
 <template>
-        <v-flex xs12 sm6>
-        <v-card>
-            <v-toolbar color="indigo" dark clipped-left flat>
-                <v-toolbar-title>Local Settings</v-toolbar-title>
-            </v-toolbar>
+        <v-flex xs12 sm6 mt-4>
+        <v-card class="pt-4">
             <v-card-text>
                 <v-text-field label="Server Address" v-model="serverURL" xs12></v-text-field>
                 <v-text-field label="Camera Width" v-model="cameraWidth" xs6></v-text-field>
@@ -45,7 +42,6 @@ const settings = require('electron-settings');
                 this.store.camera.height = settings.get('camera.height');
                 this.store.printers.job = settings.get('printers.job');
                 this.store.printers.credit = settings.get('printers.credit');
-
             }
         },
         mounted() {
@@ -70,7 +66,6 @@ const settings = require('electron-settings');
             this.printers.forEach((printer) =>{
                 this.printerNames.push(printer.name);
             })
-            // console.log(this.printerNames);
         },
         computed: {
             store() {
