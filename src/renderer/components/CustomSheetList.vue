@@ -10,9 +10,9 @@
                     <v-data-table v-bind:headers="customSheetHeaders" :items="customSheets" v-bind:pagination.sync="pagination" class="elevation-1" :loading="loading">
                         <template slot="items" slot-scope="props">
                             <tr @click="emitCustomSheetId(props.item.id)">
-                                <td class="text-xs-center">{{ props.item.id }}</td>
-                                <td class="text-xs-center">{{ props.item.customer.fname }} {{ props.item.customer.lname }}</td>
-                                <td class="text-xs-center">{{ props.item.name }}</td>
+                                <td class="text-xs-left">{{ props.item.id }}</td>
+                                <td class="text-xs-left">{{ props.item.customer.fname }} {{ props.item.customer.lname }}</td>
+                                <td class="text-xs-left">{{ props.item.name }}</td>
                                 <td class="text-xs-left hidden-sm-and-down">{{ props.item.created_at }}</td>                              
                             </tr>
                         </template>
@@ -32,11 +32,13 @@ export default {
             },
             {
                 text: 'Customer',
-                value: 'customer'
+                value: 'customer',
+                align: 'left'
             },
             {
                 text: 'Name',
-                value: 'name'
+                value: 'name',
+                align: 'left'
             },
             {
                 text: 'Date',

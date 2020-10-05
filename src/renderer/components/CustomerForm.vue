@@ -11,6 +11,7 @@
           :items="fuseList"
           item-text="name"
           item-value="id"
+          hide-details
           autofocus
           solo
           prepend-inner-icon="person"

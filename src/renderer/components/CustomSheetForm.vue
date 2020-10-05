@@ -5,27 +5,41 @@
             <customer-form :id.sync="customSheet.customer_id"></customer-form>
         </v-layout>  
         <!-- Metal Values -->
-        <v-layout row wrap>
-            <v-flex d-flex xs12 lg6 xl6>
-                    <v-card>
-                        <v-card-text>
+        <v-layout mt-3 row wrap>
+            <v-flex d-flex xs12 lg6 xl3>
+                    <v-card color="blue text--darken-10 white--text">
+                        <v-card-text class="pa-2 text-lg-left">
                         <v-layout row wrap>
-                            <v-flex row xs3>
+                            <v-flex v-if="editMetalPrices" row xs3>
                                 <v-text-field
                                     v-model="goldCAD"
                                     label="Gold (g)"
                                 ></v-text-field>
                             </v-flex>
-                            <v-flex row xs3>
+                            <v-flex v-if="editMetalPrices" row xs3>
                                 <v-text-field
                                     v-model="platCAD"
                                     label="Plat (g)"
                                 ></v-text-field>
                             </v-flex>
-                            <v-flex row xs6>
-                                <v-btn :class="{'warning': priceAgeWarn, 'primary': !priceAgeWarn}" @click="getNewGoldValue"><v-icon>refresh</v-icon>Update&nbsp;</v-btn>
-                                <p :class="{'vital-date': priceAgeWarn}" style="display: inline-block;">Prices set: {{metalPriceDate}}</p>
-                                <v-btn @click="updateExistingMetalPrices"><v-icon>refresh</v-icon>Update Quotes&nbsp;</v-btn>
+                            <v-flex row xs6 v-if="!editMetalPrices" class="subheading pt-2 font-weight-bold pl-2">
+                                Gold is ${{goldCAD}}g
+                                <br/>
+                                Platinum is ${{platCAD}}g</v-flex>
+                            <v-flex row xs6 class="pt-1 text-lg-center">
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on }">
+                                        <v-btn fab small color="indigo"  v-on="on" :class="{'warning': priceAgeWarn, 'primary': !priceAgeWarn}" @click="getNewGoldValue"><v-icon medium>refresh</v-icon></v-btn>
+                                    </template>
+                                    <span>Prices last updated at {{metalPriceDate}}</span>
+                                </v-tooltip>
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on }">
+                                        <v-btn fab small color="green" v-on="on" @click="updateExistingMetalPrices"><v-icon color="white" medium>cached</v-icon></v-btn>
+                                    </template>
+                                    <span>Update the prices of all metal values for this custom sheet</span>
+                                </v-tooltip>
+                                <v-btn fab small color="grey" v-on="on" @click="editMetalPrices = !editMetalPrices"><v-icon color="white" medium>edit</v-icon></v-btn>
                             </v-flex>
                         </v-layout>
                         </v-card-text>
@@ -33,23 +47,24 @@
             </v-flex>
         </v-layout>
         <!-- Name and note -->
-        <v-layout row wrap>
+        <v-layout mt-3 row wrap>
             <v-flex d-flex xs12 lg6 xl6>
+                        <!-- <v-card-title> -->
+                        <!-- </v-card-title> -->
                     <v-card>
-                        <v-card-title>
-                            <div class="headline">Custom Sheet</div>
-                        </v-card-title>
-                        <v-card-text>
-                        <v-layout row wrap>
-                            <v-text-field
-                                v-model="customSheet.name"
-                                label="Name"
-                            ></v-text-field>
+                        <v-layout pr-4 pb-4 pl-4 row wrap>
                             <v-flex row xs12>
-                                <v-textarea no-resize v-model="customSheet.note" class="" label="Custom Sheet Note"></v-textarea>
+                                <v-text-field
+                                    v-model="customSheet.name"
+                                    label="Name"
+                                    single-line
+                                    placeholder="Custom Sheet Name"
+                                ></v-text-field>
+                            </v-flex>
+                            <v-flex row xs12>
+                                <v-textarea auto-grow rows=1 v-model="customSheet.note" class="" label="Custom Sheet Note"></v-textarea>
                             </v-flex>
                         </v-layout>
-                        </v-card-text>
                     </v-card>
             </v-flex>
         </v-layout>
@@ -118,23 +133,33 @@
             </v-flex>
         </v-layout>
         <!-- Selected estimate -->
-        <v-layout row wrap>
+        <v-layout mt-3 row wrap>
             <v-flex d-flex xs12 lg6 xl6>
                     <v-card>
-                        <v-card-title>
-                            <div class="headline">Estimate</div>
-                        </v-card-title>
+                            <v-layout pr-4 pb-4 pl-4  row wrap>
+                                <v-flex row xs12>
+                                    <v-text-field
+                                        v-model="customSheet.selectedEstimate.name"
+                                        label="Name"
+                                        single-line
+                                        placeholder="Estimate Name"
+                                    ></v-text-field>
+                                </v-flex>
+                                <v-flex row xs12>
+                                    <v-textarea auto-grow rows=1 v-model="customSheet.selectedEstimate.note" class="" label="Estimate Note"></v-textarea>
+                                </v-flex>
+                            </v-layout>
                             <v-list>
                             <template v-for="(category, cat_index) in categories">
                                 <div v-bind:key="category">
-                                    <v-layout row wrap>
+                                    <v-layout pr-4 pl-2  row wrap>
                                     <v-flex xs2>
-                                        <v-card-text><h3 class="font-weight-black mb-0">{{category}}</h3></v-card-text>
+                                        <v-card-text class="title font-w">{{category}}</v-card-text>
                                     </v-flex>
                                     </v-layout>
                                     <template v-for="est_val in customSheet.selectedEstimate.estValues">
                                         <v-list-tile v-bind:key="est_val.id" v-if="est_val.type == category">
-                                            <v-layout row wrap>
+                                            <v-layout  pr-2 pl-2 row wrap>
                                                 <v-flex xs6 md3 >
                                                     <v-combobox
                                                         label="Type"
@@ -192,18 +217,24 @@
                                             </v-layout>
                                         </v-list-tile>
                                     </template>
-                                    <v-layout v-if="category != 'Extra'">
+                                    <v-layout pr-2 pb-3 pl-4  v-if="category != 'Extra'">
                                         <v-flex xs6>
-                                            <v-btn color="primary" @click="newEstVal(category)">
-                                                <v-icon>add</v-icon>
-                                                {{category}}
+                                            <v-btn class="text-none" round small outline color="primary" @click="newEstVal(category)">
+                                                Add {{category}}
                                             </v-btn>
                                         </v-flex>
                                     </v-layout>
                                 </div>
                             </template>
+                            <v-layout>
+                            <v-flex pl-4 pb-3 >
+                                <template v-for="(extra, index) in extras">
+                                        <v-btn v-bind:key="index" color=primary class="text-none" round outline @click="addNewExtra(extra)">Add {{extra.name}}</v-btn>
+                                </template>
+                            </v-flex>
+                            </v-layout>
                             <v-divider></v-divider>
-                            <h1 class="text-xs-right mr-3">Total: ${{customSheet.selectedEstimate.total.toLocaleString()}}</h1>
+                            <div class="title pt-3 pb-2 pr-4 text-xs-right">Total: ${{customSheet.selectedEstimate.total.toFixed(2)}}</div>
                         </v-list>
                         <!-- <v-divider></v-divider> -->
                         <v-layout>
@@ -347,6 +378,7 @@ class estimate {
         this.deleteModal = false;
         this.isPrimary = false;
         this.estValuesToDelete = [];
+        this.isSelected = false;
         this.created_at = null;
         this.updated_at = null;
     }
@@ -404,10 +436,10 @@ class customSheet {
         this.name = null;
         this.note = null;
         this.estimates = [];
-        this.selectedEstimate = new estimate;
         this.estimatesToDelete = [];
         this.created_at = null;
         this.updated_at = null;
+
     }
 
     set primaryEst(val) {
@@ -430,6 +462,33 @@ class customSheet {
         return id;
     }
 
+    get selectedEstimate() {
+        for (let i = 0; i < this.estimates.length; i++) {
+            if (this.estimates[i].isSelected) return this.estimates[i];
+        }
+
+        if (this.estimates.length > 0) {
+            this.estimates[0].isSelected = true;
+            return this.estimates[0];
+        }
+        //If estimates is empty, make an new one
+        var est = new estimate();
+        est.id = `clientId-${this.estimateIdCounter++}`;
+        est.isSelected = true;
+        est.name = "Estimate 1";
+        est.isPrimary = true;
+        this.estimates.push(est);
+        return this.estimates[0];
+    }
+
+    setSelected(est_index) {
+        this.estimates.forEach(e => {
+            e.isSelected = false;
+        })
+
+        this.estimates[est_index].isSelected = true;
+    }
+
     copy(customSheet) {
         this.customSheet_id = customSheet.customSheet_id;
         this.customer_id = customSheet.customer_id;
@@ -438,7 +497,7 @@ class customSheet {
         this.estimatesToDelete = customSheet.estimatesToDelete;
         this.created_at = customSheet.created_at;
         this.updated_at = customSheet.updated_at;
-        this.selectedEstimate = new estimate(customSheet.selectedEstimate);
+        // this.selectedEstimate = new estimate(customSheet.selectedEstimate);
         this.estimates = [];
 
         customSheet.estimates.forEach(e => {
@@ -473,12 +532,14 @@ export default {
         goldCAD: null,
         platCAD: null,
         metalPriceDate: null,
+        editMetalPrices: false,
         estimateIdCounter: 0,
         customSheet: new customSheet,
         valueList: {},
         categories: [],
         catOptions: [],
         extras: [],
+        on: null,
         loading: false,
         estPreviewHeaders: [
             {
@@ -486,12 +547,6 @@ export default {
                 align: 'left',
                 sortable: false,
                 value: 'name'
-            },
-            {
-                text: 'Weight(g)/Amount',
-                align: 'left',
-                sortable: false,
-                value: 'amt'
             },
             {
                 text: 'Total',
@@ -606,7 +661,7 @@ export default {
             this.customSheet.selectedEstimate.estValues.push(e);
         },
         //Makes a copy of the selectedEstimate into estimates and sets Ids
-        storeEstimate() {
+        copyEstimate() {
             //Set default name if there isn't one
             if(this.customSheet.selectedEstimate.name == null) this.customSheet.selectedEstimate.name = `Estimate ` + this.customSheet.estimates.length;
             
@@ -616,29 +671,23 @@ export default {
             
             //Set new Id
             est.id = `clientId-${this.estimateIdCounter++}`;
-            // this.customSheet.selectedEstimate.id = est.id;
+            est.name = `${est.name}-${this.customSheet.estimates.length+1}`
             
             //store estimate
             this.customSheet.estimates.push(est);
-            this.customSheet.selectedEstimate = est;
+            this.customSheet.setSelected(this.customSheet.estimates.length - 1);
         },
         //Sets the selectedEstimate to the estimate located at the passed index
         editEstimate(est_index) {
-            this.customSheet.selectedEstimate = this.customSheet.estimates[est_index];
-            // let est = new estimate();
-            // est.copy(this.customSheet.estimates[est_index]);
-            // this.customSheet.selectedEstimate = est;
+            this.customSheet.setSelected(est_index);
         },
         //Updates a stored estimate to the selectedEstimate where Ids match
-        updateEstimate() {
-            var update = new estimate();
-            update.copy(this.customSheet.selectedEstimate);
-            this.customSheet.estimates.forEach((est, index, arr) => {
-                if (est.id == update.id) {
-                    arr[index] = update;
-                }
-            })
-            this.$forceUpdate();
+        newEstimate() {
+            var est = new estimate();
+            est.id = `clientId-${this.estimateIdCounter++}`;
+            est.name = `Estimate ${this.customSheet.estimates.length + 1}`;
+            this.customSheet.estimates.push(est);
+            this.customSheet.setSelected(this.customSheet.estimates.length - 1);
         },
         //Deletes est_val with the passed id from the selectedEstimate
         deleteEstVal(id) {
@@ -669,6 +718,11 @@ export default {
                 this.store.setAlert(true, "error", "Please select a customer.");
                 return;
             }
+            if (this.customSheet.name == null) {
+                this.store.setAlert(true, "error", "Please set a name for this custom sheet");
+                return;
+            }
+            
             // if (!this.valid) {
             //     this.store.setAlert(true, "error", "Please fix required fields");
             //     return;
@@ -697,10 +751,10 @@ export default {
                 this.store.setAlert(true, "error", "Please select a customer.");
                 return;
             }
-            // if (!this.valid) {
-            //     this.store.setAlert(true, "error", "Please fix required fields");
-            //     return;
-            // }
+            if (this.customSheet.name == null) {
+                this.store.setAlert(true, "error", "Please set a name for this custom sheet");
+                return;
+            }
             this.loading = true;
             let upload = new customSheet();
             upload.copy(this.customSheet);
@@ -749,7 +803,7 @@ export default {
             })
 
             cs.estimates.forEach(e => {
-                if (e.isPrimary) cs.selectedEstimate = e;
+                if (e.isPrimary) e.isSelected = true;
             })
 
             return cs;
