@@ -107,6 +107,24 @@
 </template>
 
 <script>
+
+class customer {
+  constructor() {
+        this.fname = null;
+        this.lname = null;
+        this.phone = null;
+        this.email = null;
+        this.addr_st = null;
+        this.addr_city = null;
+        this.addr_prov = null;
+        this.addr_postal = null;
+        this.addr_country = null;
+        this.note = null;
+        this.id = null;
+  }
+}
+
+
   export default {
     data: () => ({
       isForm: false,
@@ -127,19 +145,7 @@
           minMatchCharLength: 1,
         keys: ["fname", "lname", "phone"]
       },
-      customer: {
-        fname: null,
-        lname: null,
-        phone: null,
-        email: null,
-        addr_st: null,
-        addr_city: null,
-        addr_prov: null,
-        addr_postal: null,
-        addr_country: null,
-        note: null,
-        id: null
-      },
+      customer: new customer(),
       startingNote: null,
       noteChanged: false,
       nameRules: [
@@ -169,13 +175,6 @@
         else {
           this.setFormState(false);
         }
-      },
-      '$route' (to, from) {
-                if (to.params.cus == 0) {
-                    this.search = [];
-                    this.fuseList = [];
-                    this.searchList = null;
-                }
       },
       startingNote(val) {
         this.noteChanged = false;
@@ -248,9 +247,7 @@
           this.isSearch = false;
           this.isInfo = false;
           if (this.customer.id) {
-            this.header = "Edit Customer Details";
           } else {
-            this.header = "Add New Customer";
             this.setBestFocus();
           }
         } else if (this.id == null || this.id == 0 || this.customer.id == 0){
@@ -260,24 +257,11 @@
           this.search = [];
           this.fuseList = [];
           this.searchList = null;
-          this.header = "Customer Lookup";
-          this.customer.fname = null;
-          this.customer.lname = null;
-          this.customer.phone = null;
-          this.customer.email = null;
-          this.customer.addr_st = null;
-          this.customer.addr_city = null;
-          this.customer.addr_prov = null;
-          this.customer.addr_postal = null;
-          this.customer.addr_country = null;
-          this.customer.note = null;
-          this.startingNote = null;
-          this.customer.id = null;
+          this.customer = new customer();
         } else {
           this.isForm = false;
           this.isSearch = false;
           this.isInfo = true;
-          this.header = "Customer Details";
         }
         
       },
@@ -356,18 +340,8 @@
       },
       clearForm() {
         if(this.customer.id == null) {
-          this.customer.fname = null;
-          this.customer.lname = null;
-          this.customer.phone = null;
-          this.customer.email = null;
-          this.customer.addr_st = null;
-          this.customer.addr_city = null;
-          this.customer.addr_prov = null;
-          this.customer.addr_postal = null;
-          this.customer.addr_country = null;
-          this.customer.note = null;
+          this.customer = new customer();
           this.startingNote = null;
-          this.customer.id = null;
           this.fuseList = [];
           this.searchSelect = null;
         }

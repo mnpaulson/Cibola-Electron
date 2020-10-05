@@ -53,6 +53,70 @@
                     </v-card>
             </v-flex>
         </v-layout>
+        <!-- Estimates -->
+        <v-layout row wrap>
+            <template v-for="(estimate, est_index) in customSheet.estimates">
+                <v-flex d-flex xs12 lg4 xl3 v-bind:key="estimate.id">
+                    <v-card class="cb-round-card" @click="editEstimate(est_index)">
+                        <v-card-title
+                        v-bind:class="{green: isSelectedEstimate(estimate.id)}"
+                        >
+                            <!-- <div class="headline"> -->
+                                <!-- {{estimate.name}} -->
+                                <v-text-field
+                                    v-model="estimate.name"
+                                    label="Name"
+                                ></v-text-field>
+                            <!-- </div> -->
+                            <v-btn class="close-btn" dark small right absolute fab color="grey" @click.stop="estimate.deleteModal = true"><v-icon class="fab-fix" dark>delete_outline</v-icon></v-btn>                    
+                        </v-card-title>
+                        <v-data-table
+                            :headers=estPreviewHeaders
+                            :items=customSheet.estimates[est_index].estValues
+                            hide-actions
+                        >
+                            <template v-slot:items="props">
+                                <td>{{props.item.name}}</td>
+                                <td>{{props.item.amt}}</td>
+                                <td class="text-xs-right">${{props.item.total.toLocaleString()}}</td>
+                            </template>
+                        </v-data-table>
+                        <v-divider></v-divider>
+                        <h2 class="text-xs-right mr-3">${{estimate.total.toLocaleString()}}</h2>
+                        <v-divider></v-divider>
+                        <v-flex row xs12>
+                            <v-textarea no-resize v-model="customSheet.selectedEstimate.note" class="" label="Estimate Note"></v-textarea>
+                        </v-flex>
+                        <v-checkbox
+                            v-model="customSheet.primaryEst"
+                            :value="estimate.id"
+                            label="Primary"
+                        ></v-checkbox>
+                    </v-card>
+                    <deleteModal 
+                    :modal="estimate.deleteModal" 
+                    :objectName="estimate.name"
+                    objectType="Estimate"
+                    v-on:close="estimate.deleteModal = false"
+                    v-on:delete="deleteEstimate(estimate.id)"></deleteModal>
+                </v-flex>
+            </template>
+        </v-layout>
+        <!-- estimate buttons -->
+        <v-layout row wrap>
+            <v-flex d-flex xs12 lg2>
+                <v-btn color="primary" @click="storeEstimate">
+                    <v-icon>add</v-icon>
+                    Store Estimate
+                </v-btn>
+            </v-flex>
+            <v-flex d-flex xs12 lg2>
+                <v-btn v-if="isUpdate" color="primary" @click="updateEstimate">
+                    <v-icon>add</v-icon>
+                    Update Estimate
+                </v-btn>
+            </v-flex>
+        </v-layout>
         <!-- Selected estimate -->
         <v-layout row wrap>
             <v-flex d-flex xs12 lg6 xl6>
@@ -82,21 +146,34 @@
                                                         :disabled="est_val.type == 'Extra'"
                                                     ></v-combobox>
                                                 </v-flex>
-                                                <v-flex xs6 md3 v-if="est_val.type != 'Extra'">
+                                                <v-flex xs6 md2 v-if="est_val.type != 'Extra'">
                                                     <v-text-field
                                                         v-model="est_val.amt"
                                                         label="Weight(g)/Amount"
                                                     ></v-text-field>
                                                 </v-flex>
-                                                <v-flex xs6 md3 v-if="est_val.type != 'Extra'">
+                                                <v-flex xs6 md2 v-if="est_val.type != 'Extra'">
                                                     <v-text-field
                                                         v-model="est_val.pricePer"
                                                         label="Price Per"
+                                                        :disabled="est_val.disabled"
+                                                    ></v-text-field>
+                                                </v-flex>
+                                                <v-flex xs6 md1 v-if="est_val.type != 'Extra'">
+                                                    <v-text-field
+                                                        v-model="est_val.markup"
+                                                        label="Markup"
+                                                    ></v-text-field>
+                                                </v-flex>
+                                                <v-flex xs6 md1 v-if="est_val.type != 'Extra'">
+                                                    <v-text-field
+                                                        v-model="est_val.discount"
+                                                        label="Discount"
                                                     ></v-text-field>
                                                 </v-flex>
                                                 <v-flex xs6 md6 v-if="est_val.type == 'Extra'">
                                                     <v-text-field
-                                                        v-model="est_val.pricePer"
+                                                        v-model="est_val.basePrice"
                                                         label="Price"
                                                     ></v-text-field>
                                                 </v-flex>
@@ -137,73 +214,20 @@
                             </template>
                         </v-layout>
                         <v-layout row wrap>
-                            <v-flex row xs12>
+                            <!-- <v-flex row xs12>
                                 <v-text-field
                                     v-model="customSheet.selectedEstimate.name"
-                                    label="Name"
+                                    label="Estimate Title"
                                 ></v-text-field>
-                            </v-flex>
-                            <v-flex row xs12>
-                                <v-textarea no-resize v-model="customSheet.selectedEstimate.note" class="" label="Custom Sheet Note"></v-textarea>
-                            </v-flex>
+                            </v-flex> -->
+                            <!-- <v-flex row xs12>
+                                <v-textarea no-resize v-model="customSheet.selectedEstimate.note" class="" label="Estimate Note"></v-textarea>
+                            </v-flex> -->
                         </v-layout>
                     </v-card>
             </v-flex>
         </v-layout>
-        <!-- estimate buttons -->
-        <v-layout row wrap>
-            <v-flex d-flex xs12 lg2>
-                <v-btn color="primary" @click="storeEstimate">
-                    <v-icon>add</v-icon>
-                    Store Estimate
-                </v-btn>
-            </v-flex>
-            <v-flex d-flex xs12 lg2>
-                <v-btn v-if="isUpdate" color="primary" @click="updateEstimate">
-                    <v-icon>add</v-icon>
-                    Update Estimate
-                </v-btn>
-            </v-flex>
-        </v-layout>
-        <v-layout row wrap>
-            <template v-for="(estimate, est_index) in customSheet.estimates">
-                <v-flex d-flex xs12 lg4 xl3 v-bind:key="estimate.id">
-                    <v-card class="cb-round-card" @click="editEstimate(est_index)">
-                        <v-card-title
-                        v-bind:class="{green: isSelectedEstimate(estimate.id)}"
-                        >
-                            <div class="headline">{{estimate.name}}</div>
-                            <v-btn class="close-btn" dark small right absolute fab color="grey" @click.stop="estimate.deleteModal = true"><v-icon class="fab-fix" dark>delete_outline</v-icon></v-btn>                    
-                        </v-card-title>
-                        <v-data-table
-                            :headers=estPreviewHeaders
-                            :items=customSheet.estimates[est_index].estValues
-                            hide-actions
-                        >
-                            <template v-slot:items="props">
-                                <td>{{props.item.name}}</td>
-                                <td>{{props.item.amt}}</td>
-                                <td class="text-xs-right">${{props.item.total.toLocaleString()}}</td>
-                            </template>
-                        </v-data-table>
-                        <v-divider></v-divider>
-                        <h2 class="text-xs-right mr-3">${{estimate.total.toLocaleString()}}</h2>
-                        <v-divider></v-divider>
-                        <v-checkbox
-                            v-model="customSheet.primaryEst"
-                            :value="estimate.id"
-                            label="Primary"
-                        ></v-checkbox>
-                    </v-card>
-                    <deleteModal 
-                    :modal="estimate.deleteModal" 
-                    :objectName="estimate.name"
-                    objectType="Estimate"
-                    v-on:close="estimate.deleteModal = false"
-                    v-on:delete="deleteEstimate(estimate.id)"></deleteModal>
-                </v-flex>
-            </template>
-        </v-layout>
+
         <v-flex xs12></v-flex>        
         <v-bottom-nav
             fixed
@@ -242,13 +266,28 @@
 var estValIdCounter = 1;
 
 class estValue {
-    constructor (category, id = `clientId-${estValIdCounter++}`, name = "", amt = null, pricePer = null, priceType = null) {
+    
+    constructor (
+        category,
+        id = `clientId-${estValIdCounter++}`,
+        name = "",
+        amt = null,
+        basePrice = null,
+        priceType = null,
+        markup = 1,
+        discount = 0,
+        priceModifier = null
+        ) {
         this.id = id
         this.type = category;
         this.name = name;
         this.amt = amt;
-        this.pricePer = pricePer;
+        this.basePrice = basePrice;
         this.priceType = priceType;
+        this.markup = markup;
+        this.discount = discount;
+        this.priceModifier = priceModifier;
+        if (this.priceModifier == null) this.priceModifier = 1;
     }
 
     //Sets estValue properties from an option value object
@@ -256,9 +295,12 @@ class estValue {
     set obj(o) {
         if (o !== null & o.hasOwnProperty('name')) {
             this.name = o.name;
-            this.pricePer = o.value2;
-            this.type = o.value1;
-            this.priceType = o.value3;
+            this.basePrice = o.basePrice;
+            this.type = o.type;
+            this.priceType = o.priceType;
+            this.markup = o.markup;
+            this.discount = o.discount;
+            this.priceModifier = o.priceModifier;
         } else {
             this.name = o;
         }
@@ -269,12 +311,30 @@ class estValue {
     }
 
     get total() {
-        if (isNaN(this.amt) || isNaN(this.pricePer)) return 0;
-        return this.amt * this.pricePer;
+        if (isNaN(this.amt) || isNaN(this.basePrice)) return 0;
+        return this.round(this.amt * this.pricePer * this.markup * (1 - (this.discount/100)), 2);
     }
     
     get isClientId() {
         return (isNaN(Number(this.id)));  
+    }
+
+    get pricePer() {
+        return this.round(this.basePrice * this.priceModifier, 3);
+    }
+
+    set pricePer(val) {
+        // if (this.priceType == 'Gold' || this.priceType == 'Plat') return;
+        this.priceModifier = 1;
+        this.basePrice = val;
+    }
+
+    get disabled() {
+        this.priceType == 'Gold' || this.priceType == 'Plat' ? true : false;
+    }
+
+    round(value, decimals) {
+        return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
     }
 }
 
@@ -300,7 +360,7 @@ class estimate {
         this.id = estimate.id;
         estimate.estValues.forEach(v => {
             this.estValues.push(
-                new estValue(v.type, v.id, v.name, v.amt, v.pricePer, v.priceType)
+                new estValue(v.type, v.id, v.name, v.amt, v.basePrice, v.priceType, v.markup, v.discount, v.priceModifier)
             )
         })
     }
@@ -308,8 +368,8 @@ class estimate {
     updateMetalPrices(gold, plat) {
         if(this.estValues.length > 0) {
             this.estValues.forEach(v => {
-                if (v.priceType == 'Gold') v.pricePer = gold;
-                if (v.priceType == 'Plat') v.pricePer = plat;
+                if (v.priceType == 'Gold') v.basePrice = gold;
+                if (v.priceType == 'Plat') v.basePrice = plat;
             })
         }
     }
@@ -469,42 +529,70 @@ export default {
         },
         //Round number to desired decimals
         round(value, decimals) {
-            return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
-        },
+                return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
+            },
         //Gets est val options and metal prices
         getValues() {
-                this.$http.get(this.store.serverURL +  '/values/gettype?type_id=3')
-                    .then((response) => {
-                        this.valueList = response.data;
-                        this.valueList.forEach(value => {
-                                if (!this.categories.includes(value.value1)) {
-                                    this.categories.push(value.value1);
+
+            this.$http.get(this.store.serverURL + '/values/gettype?type_id=2')
+                .then((response) => {
+                    response.data.forEach(function (v) {
+                        if (v.name === 'GoldCAD') {
+                            this.goldCAD = this.round(v.value1, 2);
+                            this.metalPriceDate = v.updated_at;
+                        } else if (v.name === 'PlatCAD') {
+                            this.platCAD = this.round(v.value1, 2);
+                        }
+                    }.bind(this));
+                    this.goldCAD
+
+                    this.$http.get(this.store.serverURL + '/values/gettype?type_id=3')
+                        .then((response) => {
+                            response.data.forEach(value => {
+                                let est = new estValue();
+                                est.type = value.value1;
+                                est.name = value.name;
+                                est.priceType = value.value3;
+                                est.markup = value.markup;
+                                est.discount = value.discount;
+                                est.basePrice = value.value2;
+
+
+                                if (!this.categories.includes(est.type) & est.type != 'Extra') {
+                                    this.categories.push(est.type);
                                     this.catOptions.push([]);
                                 }
-                                if (value.value3 === 'Gold') value.value2 = this.goldCAD;
-                                if (value.value3 === 'Plat') value.value2 = this.platCAD;
-                                this.catOptions[this.categories.indexOf(value.value1)].push(value);
-                                if (value.value1 == "Extra") this.extras.push(value);
+
+                                if (est.priceType === 'Gold') est.basePrice = this.goldCAD;
+                                if (est.priceType === 'Plat') est.basePrice = this.platCAD;
+                                if (est.priceType === 'Gold' || est.priceType === 'Plat') est.priceModifier = this.round(value.value2, 2);
+                                else est.priceModifier = 1;
+                                if (est.markup == null) est.markup = 1;
+                                if (est.discount == null) est.discount = 0;
+
+                                if (est.type == "Extra") {
+                                    this.extras.push(est);
+                                } else {
+                                    this.catOptions[this.categories.indexOf(est.type)].push(est);
+                                }
+                            })
+
+                            //Add extras on bottom always
+                            this.extras.forEach(extra => {
+                                if (!this.categories.includes(extra.type)) {
+                                    this.categories.push(extra.type);
+                                    this.catOptions.push([]);
+                                }
+                                this.catOptions[this.categories.indexOf(extra.type)].push(extra);
+                            })
                         })
-                    })
-                    .catch((error) => {
-                        console.log(error);
-                    });
-                this.$http.get(this.store.serverURL +  '/values/gettype?type_id=2')
-                    .then((response) => {
-                        response.data.forEach(function(v){
-                            if (v.name === 'GoldCAD') {
-                                this.goldCAD = this.round(v.value1, 2);
-                                this.metalPriceDate = v.updated_at;
-                            } else if (v.name === 'PlatCAD') {
-                                this.platCAD = this.round(v.value1, 2);
-                            }
-                        }.bind(this));
-                        this.goldCAD
-                    })
-                    .catch((error) => {
-                        console.log(error);
-                    });
+                        .catch((error) => {
+                            console.log(error);
+                        });
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
         },
         //Adds a new est_val for the passed category
         newEstVal(category) {
@@ -589,16 +677,16 @@ export default {
             let upload = new customSheet();
             upload.copy(this.customSheet);
             upload.cleanClientIds();
+            console.log(upload);
             this.$http.post(this.store.serverURL +  '/customsheet/create', upload)
                 .then((response) => {
-                    console.log(response);
                     this.customSheet = this.newCustomSheetFromResponse(response.data);
                     this.store.setAlert(true, "success", "Custom Sheet Created with ID: " + this.customSheet.customSheet_id);
                     this.loading = false;
                     // // this.$router.replace("/job/" + this.job.id);
                 })
                 .catch((error) => {
-                    // console.table(error);
+                    console.table(error);
                     this.loading = false;
                     this.store.setAlert(true, "error", error.message);                                                                    
                 });
@@ -617,9 +705,9 @@ export default {
             let upload = new customSheet();
             upload.copy(this.customSheet);
             upload.cleanClientIds();
+            console.log(upload);
             this.$http.post(this.store.serverURL +  '/customsheet/update', upload)
                 .then((response) => {
-                    console.log(response);
                     this.customSheet = this.newCustomSheetFromResponse(response.data);
                     this.store.setAlert(true, "success", "Custom Sheet Updated with ID: " + this.customSheet.customSheet_id);
                     this.loading = false;
@@ -636,7 +724,6 @@ export default {
             this.loading = true;
                 this.$http.post(this.store.serverURL +  '/customsheet/show', {id: id})
                     .then((response) => {
-                        console.log(response);
                         this.customSheet = this.newCustomSheetFromResponse(response.data);
                         this.loading = false;
                     })
@@ -685,7 +772,7 @@ export default {
         },
         //Creates new EstValue from DB response data
         newEstValueFromResponse(v) {
-            var val = new estValue(v.type, v.id, v.name, v.amt, v.pricePer, v.priceType);
+            var val = new estValue(v.type, v.id, v.name, v.amt, v.basePrice, v.priceType, v.markup, v.discount, v.priceModifier);
             return val;
         }
     },
@@ -696,6 +783,9 @@ export default {
     },
     mounted() {
         this.getValues();
+        if (!isNaN(this.customSheet_id) && this.customSheet_id !== null && this.customSheet_id !== 0 && this.customSheet.customSheet_id !== this.customSheet_id) {
+            this.getCustomSheet(this.customSheet_id);
+        }
     },
     computed: {
         store() {
@@ -735,7 +825,6 @@ export default {
     watch: {
         customSheet_id(val) {
             var id = this.customSheet_id;
-            console.log(id);
             if (!isNaN(id) && id !== null && id !== 0 && this.customSheet.customSheet_id !== val) {
                 this.getCustomSheet(val);
             }
@@ -746,14 +835,14 @@ export default {
         goldCAD(val) {
             if (this.valueList.length > 0) {
                 this.valueList.forEach(value => {
-                    if (value.value3 === 'Gold') value.value2 = this.goldCAD;
+                    if (value.priceType === 'Gold') value.basePrice = this.goldCAD;
                 })
             }
         },
         platCAD(val) {
             if (this.valueList.length > 0) {
                 this.valueList.forEach(value => {
-                    if (value.value3 === 'Plat') value.value2 = this.platCAD;
+                    if (value.priceType === 'Plat') value.basePrice = this.platCAD;
                 })
             }
         },

@@ -1,7 +1,7 @@
 <template>
     <div>
         <div v-show="idSet">
-            <custom-sheet-form :customSheet_id="customSheet_id" :customer_id="customer_id"></custom-sheet-form>
+            <custom-sheet-form :customSheet_id="customSheet_id" :customer_id="customer_id" :key="customSheet_id"></custom-sheet-form>
         </div>
         <v-btn v-show="!idSet" color="primary" :href="'#/customsheet/0'">
             <v-icon>add</v-icon>
@@ -35,11 +35,11 @@ export default {
     mounted() {
         this.customSheet_id = null;
         //If customsheet ID 0 then no customsheet, used for linking with customer ID set
-        //Only preset customer ID if customSheet is 0
         if (isNaN(Number(this.$route.params.id))); //Do Nothing
         else if (Number(this.$route.params.id) !== 0) {
             this.setCustomSheetId(Number(this.$route.params.id));
         }
+        //Check if customer is set
         if (!isNaN(Number(this.$route.params.cus))) {
             this.customer_id = Number(this.$route.params.cus);
         }
@@ -61,10 +61,6 @@ export default {
             } else {
                 this.setCustomSheetId(Number(to.params.id));
             }
-
-            // if (!isNaN(Number(to.params.cus))) {
-            //     this.customer_id = Number(to.params.cus);
-            // }
         },
     }
 };

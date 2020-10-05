@@ -1,16 +1,31 @@
 <template>
-    <v-flex xs12 sm8>
-        <v-card>
-            <v-toolbar color="indigo" dark clipped-left flat>
-                <v-toolbar-title>List Values</v-toolbar-title>
-            </v-toolbar>
-            <v-card-text>
+    <v-flex xs12 sm12>
+        <v-tabs centered color="indigo" dark>
+            <v-tabs-slider color="yellow"></v-tabs-slider>
+
+            <v-tab href="#tab-1"  @click="setGoldCreditHeaders()">
+                Gold Credit
+            </v-tab>
+
+            <v-tab href="#tab-2" @click="setCustomSheetHeaders()">
+                Custom Sheet
+            </v-tab>
+
+            <v-tab href="#tab-3" @click="setMetalPriceHeaders()">
+                Metal Prices
+            </v-tab>
+
+            <v-tab-item v-for="i in 3" :key="i" :value="'tab-' + i">
+                <v-card flat>
+                    <v-card-text>
                 <div v-show="currentValue.id != null">
-                    <v-text-field label="Value Type" v-model="currentValue.type_id" xs12></v-text-field>
+                    <!-- <v-text-field label="Value Type" v-model="currentValue.type_id" xs12></v-text-field> -->
                     <v-text-field label="Name" v-model="currentValue.name" xs12></v-text-field>
-                    <v-text-field label="Value 1" v-model="currentValue.value1" xs12></v-text-field>
-                    <v-text-field label="Value 2" v-model="currentValue.value2" xs12></v-text-field>
-                    <v-text-field label="Value 3" v-model="currentValue.value3" xs12></v-text-field>
+                    <v-text-field :label="headers[1].text" v-model="currentValue.value1" xs12></v-text-field>
+                    <v-text-field v-if="headers[2]" :label="headers[2].text" v-model="currentValue.value2" xs12></v-text-field>
+                    <v-text-field v-if="headers[3]" :label="headers[3].text" v-model="currentValue.value3" xs12></v-text-field>
+                    <v-text-field v-if="headers[4]" :label="headers[4].text" v-model="currentValue.discount" xs12></v-text-field>
+                    <v-text-field v-if="headers[5]" :label="headers[5].text" v-model="currentValue.markup" xs12></v-text-field>
                     <v-checkbox
                     :label="'Active'"
                     v-model="currentValue.active"
@@ -29,12 +44,13 @@
                 class="elevation-1"
                 v-bind:pagination.sync="paginationValues"
                 >
-                    <template slot="items" slot-scope="props">
-                        <td>{{ props.item.type_id }}</td>
+                    <template v-if="props.item.type_id == currentValueType" slot="items" slot-scope="props">
                         <td class="text-xs-left">{{ props.item.name }}</td>
                         <td class="text-xs-left">{{ props.item.value1 }}</td>
                         <td class="text-xs-left">{{ props.item.value2 }}</td>
                         <td class="text-xs-left">{{ props.item.value3 }}</td>
+                        <td class="text-xs-left">{{ props.item.discount }}</td>
+                        <td class="text-xs-left">{{ props.item.markup }}</td>
                         <td class="justify-center layout px-0">
                         <v-icon
                             medium
@@ -46,7 +62,9 @@
                     </template>
                 </v-data-table>
             </v-card-text>
-        </v-card>
+                </v-card>
+            </v-tab-item>
+        </v-tabs>
         <v-dialog v-model="deleteDialog" max-width="500px">
             <v-card>
                 <v-toolbar color="error" dark clipped-left flat>
@@ -79,12 +97,30 @@
   export default {
     data: () => ({
         values: [],
+        currentValueType: 1,
         headers: [
-            {text: "Value Type", value: 'type_id'},
             {text: "Name", value: 'Name'},
             {text: "Value 1", value: 'value1'},
             {text: "Value 2", value: 'value2'},
             {text: "Value 3", value: 'value3'}
+        ],
+        goldCreditHeaders: [
+            {text: "Name", value: 'Name'},
+            {text: "Base Modifier", value: 'value1'},
+            {text: "Markup", value: 'value2'},
+            {text: "Metal Type", value: 'value3'}
+        ],
+        customSheetHeaders: [
+            {text: "Name", value: 'Name'},
+            {text: "Category", value: 'value1'},
+            {text: "Default Value", value: 'value2'},
+            {text: "Metal Type", value: 'value3'},
+            {text: "Discount Percent", value: 'discount'},
+            {text: "Markup", value: 'markup'}
+        ],
+        metalPriceHeaders: [
+            {text: "Name", value: 'Name'},
+            {text: "Price (CAD)", value: 'value1'}
         ],
         paginationValues: {
             sortBy: 'type_id',
@@ -125,6 +161,7 @@
             this.currentValue = {id: -1};
         },
         createNewValue() {
+            this.currentValue.type_id = this.currentValueType;
             this.$http.post(this.store.serverURL +  '/values/create', this.currentValue)
                 .then((response) => {
                     this.currentValue = {};
@@ -144,11 +181,24 @@
                 .catch((error) => {
                     console.log(error);
                 })             
+        },
+        setCustomSheetHeaders() {
+            this.headers = this.customSheetHeaders;
+            this.currentValueType = 3;
+        },
+        setGoldCreditHeaders() {
+            this.headers = this.goldCreditHeaders;
+            this.currentValueType = 1;
+        },
+        setMetalPriceHeaders() {
+            this.headers = this.metalPriceHeaders;
+            this.currentValueType = 2;
         }
 
     },
     mounted() {
         this.getValues();
+        this.headers = this.goldCreditHeaders;
     },
     watch: {
 
