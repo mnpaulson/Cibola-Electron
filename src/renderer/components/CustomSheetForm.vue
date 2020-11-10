@@ -4,54 +4,12 @@
         <v-layout row wrap>
             <customer-form :id.sync="customSheet.customer_id"></customer-form>
         </v-layout>  
-        <!-- Metal Values -->
-        <v-layout mt-3 row wrap>
-            <v-flex d-flex xs12 lg6 xl3>
-                    <v-card color="blue text--darken-10 white--text">
-                        <v-card-text class="pa-2 text-lg-left">
-                        <v-layout row wrap>
-                            <v-flex v-if="editMetalPrices" row xs3>
-                                <v-text-field
-                                    v-model="goldCAD"
-                                    label="Gold (g)"
-                                ></v-text-field>
-                            </v-flex>
-                            <v-flex v-if="editMetalPrices" row xs3>
-                                <v-text-field
-                                    v-model="platCAD"
-                                    label="Plat (g)"
-                                ></v-text-field>
-                            </v-flex>
-                            <v-flex row xs6 v-if="!editMetalPrices" class="subheading pt-2 font-weight-bold pl-2">
-                                Gold is ${{goldCAD}}g
-                                <br/>
-                                Platinum is ${{platCAD}}g</v-flex>
-                            <v-flex row xs6 class="pt-1 text-lg-center">
-                                <v-tooltip bottom>
-                                    <template v-slot:activator="{ on }">
-                                        <v-btn fab small color="indigo"  v-on="on" :class="{'warning': priceAgeWarn, 'primary': !priceAgeWarn}" @click="getNewGoldValue"><v-icon medium>refresh</v-icon></v-btn>
-                                    </template>
-                                    <span>Prices last updated at {{metalPriceDate}}</span>
-                                </v-tooltip>
-                                <v-tooltip bottom>
-                                    <template v-slot:activator="{ on }">
-                                        <v-btn fab small color="green" v-on="on" @click="updateExistingMetalPrices"><v-icon color="white" medium>cached</v-icon></v-btn>
-                                    </template>
-                                    <span>Update the prices of all metal values for this custom sheet</span>
-                                </v-tooltip>
-                                <v-btn fab small color="grey" v-on="on" @click="editMetalPrices = !editMetalPrices"><v-icon color="white" medium>edit</v-icon></v-btn>
-                            </v-flex>
-                        </v-layout>
-                        </v-card-text>
-                    </v-card>
-            </v-flex>
-        </v-layout>
+        
         <!-- Name and note -->
         <v-layout mt-3 row wrap>
             <v-flex d-flex xs12 lg6 xl6>
-                        <!-- <v-card-title> -->
-                        <!-- </v-card-title> -->
                     <v-card>
+                        <v-card-text class="title font-w blue cb-white-text">Custom Sheet Details - Created: {{customSheet.created_at}}</v-card-text>
                         <v-layout pr-4 pb-4 pl-4 row wrap>
                             <v-flex row xs12>
                                 <v-text-field
@@ -71,19 +29,17 @@
         <!-- Estimates -->
         <v-layout row wrap>
             <template v-for="(estimate, est_index) in customSheet.estimates">
-                <v-flex d-flex xs12 lg4 xl3 v-bind:key="estimate.id">
+                <v-flex d-flex xs12 lg3 xl2 v-bind:key="estimate.id">
                     <v-card class="cb-round-card" @click="editEstimate(est_index)">
-                        <v-card-title
-                        v-bind:class="{green: isSelectedEstimate(estimate.id)}"
+                        <v-card-title class="cb-small-estimate-title"
+                        v-bind:class="{blue: isSelectedEstimate(estimate.id)}"
                         >
-                            <!-- <div class="headline"> -->
-                                <!-- {{estimate.name}} -->
                                 <v-text-field
                                     v-model="estimate.name"
                                     label="Name"
+                                    v-bind:dark="isSelectedEstimate(estimate.id)"
                                 ></v-text-field>
-                            <!-- </div> -->
-                            <v-btn class="close-btn" dark small right absolute fab color="grey" @click.stop="estimate.deleteModal = true"><v-icon class="fab-fix" dark>delete_outline</v-icon></v-btn>                    
+                            <v-btn class="close-btn" color="grey" small right absolute outline fab @click.stop="estimate.deleteModal = true"><v-icon class="fab-fix" dark>delete_outline</v-icon></v-btn>                    
                         </v-card-title>
                         <v-data-table
                             :headers=estPreviewHeaders
@@ -91,22 +47,16 @@
                             hide-actions
                         >
                             <template v-slot:items="props">
-                                <td>{{props.item.name}}</td>
-                                <td>{{props.item.amt}}</td>
-                                <td class="text-xs-right">${{props.item.total.toLocaleString()}}</td>
+                                <td class="cb-small-td">{{props.item.name}}</td>
+                                <td class="cb-small-td">{{props.item.amt}}</td>
+                                <td class="text-xs-right cb-small-td">${{props.item.total.toLocaleString()}}</td>
                             </template>
                         </v-data-table>
                         <v-divider></v-divider>
-                        <h2 class="text-xs-right mr-3">${{estimate.total.toLocaleString()}}</h2>
-                        <v-divider></v-divider>
+                        <h3 class="text-xs-right mr-4">${{estimate.total.toLocaleString()}}</h3>
                         <v-flex row xs12>
-                            <v-textarea no-resize v-model="customSheet.selectedEstimate.note" class="" label="Estimate Note"></v-textarea>
+                            <v-textarea auto-grow rows=1 no-resize v-model="estimate.note" class="" label="Estimate Note"></v-textarea>
                         </v-flex>
-                        <v-checkbox
-                            v-model="customSheet.primaryEst"
-                            :value="estimate.id"
-                            label="Primary"
-                        ></v-checkbox>
                     </v-card>
                     <deleteModal 
                     :modal="estimate.deleteModal" 
@@ -120,15 +70,14 @@
         <!-- estimate buttons -->
         <v-layout row wrap>
             <v-flex d-flex xs12 lg2>
-                <v-btn color="primary" @click="storeEstimate">
-                    <v-icon>add</v-icon>
-                    Store Estimate
+                <v-btn outline color="primary" @click="copyEstimate">
+                    Copy Estimate
                 </v-btn>
+
             </v-flex>
             <v-flex d-flex xs12 lg2>
-                <v-btn v-if="isUpdate" color="primary" @click="updateEstimate">
-                    <v-icon>add</v-icon>
-                    Update Estimate
+                <v-btn outline color="primary" @click="newEstimate">
+                    New Estimate
                 </v-btn>
             </v-flex>
         </v-layout>
@@ -136,25 +85,20 @@
         <v-layout mt-3 row wrap>
             <v-flex d-flex xs12 lg6 xl6>
                     <v-card>
-                            <v-layout pr-4 pb-4 pl-4  row wrap>
-                                <v-flex row xs12>
-                                    <v-text-field
-                                        v-model="customSheet.selectedEstimate.name"
-                                        label="Name"
-                                        single-line
-                                        placeholder="Estimate Name"
-                                    ></v-text-field>
-                                </v-flex>
-                                <v-flex row xs12>
-                                    <v-textarea auto-grow rows=1 v-model="customSheet.selectedEstimate.note" class="" label="Estimate Note"></v-textarea>
-                                </v-flex>
-                            </v-layout>
+                           <!-- <h3 class="cb-white-text blue pl-3">Estimate Details</h3> -->
+                           <v-card-text class="title font-w blue cb-white-text">Estimate Details</v-card-text>
                             <v-list>
                             <template v-for="(category, cat_index) in categories">
                                 <div v-bind:key="category">
                                     <v-layout pr-4 pl-2  row wrap>
                                     <v-flex xs2>
                                         <v-card-text class="title font-w">{{category}}</v-card-text>
+                                        
+                                    </v-flex>
+                                    <v-flex v-if="category != 'Extra'" xs2>
+                                        <v-btn class="text-none cb-small-btn" round small outline color="primary" @click="newEstVal(category)">
+                                            New
+                                        </v-btn>
                                     </v-flex>
                                     </v-layout>
                                     <template v-for="est_val in customSheet.selectedEstimate.estValues">
@@ -217,13 +161,6 @@
                                             </v-layout>
                                         </v-list-tile>
                                     </template>
-                                    <v-layout pr-2 pb-3 pl-4  v-if="category != 'Extra'">
-                                        <v-flex xs6>
-                                            <v-btn class="text-none" round small outline color="primary" @click="newEstVal(category)">
-                                                Add {{category}}
-                                            </v-btn>
-                                        </v-flex>
-                                    </v-layout>
                                 </div>
                             </template>
                             <v-layout>
@@ -236,30 +173,60 @@
                             <v-divider></v-divider>
                             <div class="title pt-3 pb-2 pr-4 text-xs-right">Total: ${{customSheet.selectedEstimate.total.toFixed(2)}}</div>
                         </v-list>
-                        <!-- <v-divider></v-divider> -->
-                        <v-layout>
-                            <template v-for="(extra, index) in extras">
-                                <v-flex xs4 v-bind:key="index">
-                                    <v-btn @click="addNewExtra(extra)"><v-icon>refresh</v-icon>{{extra.name}}</v-btn>
-                                </v-flex>
-                            </template>
-                        </v-layout>
-                        <v-layout row wrap>
-                            <!-- <v-flex row xs12>
-                                <v-text-field
-                                    v-model="customSheet.selectedEstimate.name"
-                                    label="Estimate Title"
-                                ></v-text-field>
-                            </v-flex> -->
-                            <!-- <v-flex row xs12>
-                                <v-textarea no-resize v-model="customSheet.selectedEstimate.note" class="" label="Estimate Note"></v-textarea>
-                            </v-flex> -->
-                        </v-layout>
                     </v-card>
             </v-flex>
         </v-layout>
-
-        <v-flex xs12></v-flex>        
+        <!-- Metal Values -->
+        <v-layout mt-3 row wrap>
+            <v-flex d-flex xs12 lg6 xl3>
+                    <v-card color="blue text--darken-10 white--text">
+                        <v-card-text class="pa-2 text-lg-left">
+                        <v-layout row wrap>
+                            <v-flex v-if="editMetalPrices" row xs3>
+                                <v-text-field
+                                    v-model="goldCAD"
+                                    label="Gold (g)"
+                                    dark
+                                ></v-text-field>
+                            </v-flex>
+                            <v-flex v-if="editMetalPrices" row xs3>
+                                <v-text-field
+                                    v-model="platCAD"
+                                    label="Plat (g)"
+                                    dark
+                                ></v-text-field>
+                            </v-flex>
+                            <v-flex row xs6 v-if="!editMetalPrices" class="subheading pt-2 font-weight-bold pl-2">
+                                Gold is ${{goldCAD}}/g
+                                <br/>
+                                Plat is ${{platCAD}}/g</v-flex>
+                            <v-flex row xs6 class="pt-1 text-lg-center">
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on }">
+                                        <v-btn fab small color="indigo"  v-on="on" :class="{'warning': priceAgeWarn, 'primary': !priceAgeWarn}" @click="getNewGoldValue"><v-icon medium>refresh</v-icon></v-btn>
+                                    </template>
+                                    <span>Prices last updated at {{metalPriceDate}}</span>
+                                </v-tooltip>
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on }">
+                                        <v-btn fab small color="green" v-on="on" @click="updateExistingMetalPrices"><v-icon color="white" medium>cached</v-icon></v-btn>
+                                    </template>
+                                    <span>Update the prices of the selected estimates metal values</span>
+                                </v-tooltip>
+                                <v-btn fab small color="grey" v-on="on" @click="editMetalPrices = !editMetalPrices"><v-icon color="white" medium>edit</v-icon></v-btn>
+                            </v-flex>
+                        </v-layout>
+                        </v-card-text>
+                    </v-card>
+            </v-flex>
+        </v-layout>
+        <v-flex xs12></v-flex> 
+        <deleteModal 
+        :modal="deleteModal" 
+        :objectName="customSheet.name"
+        objectType="Custom Sheet"
+        v-on:close="deleteModal = false"
+        v-on:delete="deleteCustomSheet()"></deleteModal>       
         <v-bottom-nav
             fixed
             :value="true"
@@ -276,13 +243,14 @@
             <v-icon>save</v-icon>
             </v-btn>
             <v-btn class="v-btn--active info--text" >
-            <span>Print</span>
+            <span>Print Selected</span>
             <v-icon>print</v-icon>
             </v-btn>
-            <!-- <v-btn v-show="job.id && job.id !== 0" @click="jobDeleteDialog = true" class="v-btn--active error--text">
-            <span>Delete Job</span>
+            <v-btn v-show="customSheet.customSheet_id && customSheet.customSheet_id !== 0" @click="deleteModal = true" class="v-btn--active error--text">
+            <span>Delete</span>
             <v-icon>delete</v-icon>
             </v-btn>
+            <!-- 
             <v-btn v-show="!job.id || job.id == 0" @click="$router.go(-1)" class="v-btn--active error--text">
             <span>Discard Job</span>
             <v-icon>delete</v-icon>
@@ -535,18 +503,24 @@ export default {
         editMetalPrices: false,
         estimateIdCounter: 0,
         customSheet: new customSheet,
-        valueList: {},
         categories: [],
         catOptions: [],
         extras: [],
         on: null,
         loading: false,
+        deleteModal: false,
         estPreviewHeaders: [
             {
                 text: 'Type',
                 align: 'left',
                 sortable: false,
                 value: 'name'
+            },
+            {
+                text: 'Amount',
+                align: 'left',
+                sortable: false,
+                value: 'amount'
             },
             {
                 text: 'Total',
@@ -601,7 +575,14 @@ export default {
                     }.bind(this));
                     this.goldCAD
 
-                    this.$http.get(this.store.serverURL + '/values/gettype?type_id=3')
+                    this.getCatValues();
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
+        },
+        getCatValues() {
+            this.$http.get(this.store.serverURL + '/values/gettype?type_id=3')
                         .then((response) => {
                             response.data.forEach(value => {
                                 let est = new estValue();
@@ -644,10 +625,6 @@ export default {
                         .catch((error) => {
                             console.log(error);
                         });
-                })
-                .catch((error) => {
-                    console.log(error);
-                });
         },
         //Adds a new est_val for the passed category
         newEstVal(category) {
@@ -680,6 +657,7 @@ export default {
         //Sets the selectedEstimate to the estimate located at the passed index
         editEstimate(est_index) {
             this.customSheet.setSelected(est_index);
+            this.customSheet.primaryEst = this.customSheet.estimates[est_index].id
         },
         //Updates a stored estimate to the selectedEstimate where Ids match
         newEstimate() {
@@ -698,6 +676,21 @@ export default {
         deleteEstimate(id) {
             this.customSheet.deleteEstimate(id);
         },
+        //Deletes the current custom sheet
+        deleteCustomSheet() {
+            this.loading = true;
+            this.$http.post(this.store.serverURL +  '/customsheet/delete', {id: this.customSheet.customSheet_id})
+                .then((response) => {
+                    this.store.setAlert(true, "success", "Custom Sheet Deleted with ID: " + this.customSheet.customSheet_id);
+                    this.loading = false;
+                    this.$router.go(-1);
+                })
+                .catch((error) => {
+                    console.table(error);
+                    this.loading = false;
+                    this.store.setAlert(true, "error", error.message);                                                                    
+                });  
+        },
         //Returns true if selectedEstimate has the passed id
         isSelectedEstimate(id) {
             return (id === this.customSheet.selectedEstimate.id);
@@ -705,15 +698,14 @@ export default {
         //Updates all existing plat or gold value based est_vals with new values
         updateExistingMetalPrices() {
             this.customSheet.selectedEstimate.updateMetalPrices(this.goldCAD, this.platCAD);
-            if (this.customSheet.estimates.length > 0) {
-                this.customSheet.estimates.forEach(e => {
-                    e.updateMetalPrices(this.goldCAD, this.platCAD);
-                })
-            }
+            // if (this.customSheet.estimates.length > 0) {
+            //     this.customSheet.estimates.forEach(e => {
+            //         e.updateMetalPrices(this.goldCAD, this.platCAD);
+            //     })
+            // }
         },
         //Saves Custom Sheet to DB
         createCustomSheet() {
-            // this.$refs.jobForm.validate();
             if (!this.customSheet.customer_id) {
                 this.store.setAlert(true, "error", "Please select a customer.");
                 return;
@@ -723,10 +715,7 @@ export default {
                 return;
             }
             
-            // if (!this.valid) {
-            //     this.store.setAlert(true, "error", "Please fix required fields");
-            //     return;
-            // }
+
             this.loading = true;
             let upload = new customSheet();
             upload.copy(this.customSheet);
@@ -887,16 +876,20 @@ export default {
             if (this.customSheet.customer_id == null) this.customSheet.customer_id = val;
         },
         goldCAD(val) {
-            if (this.valueList.length > 0) {
-                this.valueList.forEach(value => {
-                    if (value.priceType === 'Gold') value.basePrice = this.goldCAD;
+            if (this.catOptions.length > 0) {
+                this.catOptions.forEach(array => {
+                    array.forEach(value => {
+                        if (value.priceType === 'Gold') value.basePrice = this.goldCAD;
+                    })
                 })
             }
         },
         platCAD(val) {
-            if (this.valueList.length > 0) {
-                this.valueList.forEach(value => {
-                    if (value.priceType === 'Plat') value.basePrice = this.platCAD;
+            if (this.catOptions.length > 0) {
+                this.catOptions.forEach(array => {
+                    array.forEach(value => {
+                        if (value.priceType === 'Gold') value.basePrice = this.platCAD;
+                    })
                 })
             }
         },
