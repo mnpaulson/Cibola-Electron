@@ -5,6 +5,11 @@
                 <v-card-title>
                     <v-card-title primary-title>
                         <h3 class="headline mb-0">Custom Sheets</h3>
+                        <v-spacer></v-spacer>
+                        <v-btn color="primary" outline :href="'#/customsheet/0'">
+                            <v-icon>list_alt</v-icon>
+                            New Custom Sheet
+                        </v-btn>
                     </v-card-title>
                 </v-card-title>
                     <v-data-table v-bind:headers="customSheetHeaders" :items="customSheets" v-bind:pagination.sync="pagination" class="elevation-1" :loading="loading">

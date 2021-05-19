@@ -15,8 +15,8 @@
                     <v-card-title primary-title>
                         <h3 class="headline mb-0">Credits</h3>
                         <v-spacer></v-spacer>
-                        <v-btn color="primary" :href="'#/goldcredit/0/0'">
-                            <v-icon>add</v-icon>
+                        <v-btn outline color="primary" :href="'#/goldcredit/0/0'">
+                            <v-icon>credit_card</v-icon>
                             New Credit
                         </v-btn>
                     </v-card-title>

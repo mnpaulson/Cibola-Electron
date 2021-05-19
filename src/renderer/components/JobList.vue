@@ -5,7 +5,8 @@
             <!-- <v-toolbar color="indigo" dark clipped-left flat>
                 <v-toolbar-title>Recent Jobs</v-toolbar-title>
             </v-toolbar> -->
-        <v-card-title  class="headline justify-center mt-0">Recent Jobs</v-card-title>
+        <!-- <v-card-title  class="headline justify-center mt-0">Recent Jobs</v-card-title> -->
+        <v-card-text class="title font-w blue cb-white-text">Latest Jobs</v-card-text>
         <v-list dense class="padding-bottom-3px">
             <v-divider></v-divider>
             <template v-for="(job, index) in jobs">
@@ -20,10 +21,9 @@
                 </v-list-tile-avatar>
                 <v-list-tile-content>
                     <v-list-tile-title>
-                            Customer: {{job.customer.fname}} {{job.customer.lname}} Employee: {{employeeList[job.employee_id - 1]}}
+                            {{job.customer.fname}} {{job.customer.lname}} - {{employeeList[job.employee_id - 1]}}
                     </v-list-tile-title>
-                    <v-list-tile-sub-title class="text--primary">Job #{{ job.id }} Date: {{job.created_at}}</v-list-tile-sub-title>
-                    <v-list-tile-sub-title>Est: ${{ job.estimate.toLocaleString() }}</v-list-tile-sub-title>
+                    <v-list-tile-sub-title >${{ job.estimate.toLocaleString() }} - ID: {{ job.id }} - {{job.created_at}}</v-list-tile-sub-title>
                 </v-list-tile-content>
                 </v-list-tile>
                 <v-divider v-if="index + 1 < jobs.length" :key="job.id"></v-divider>

@@ -14,39 +14,44 @@
           hide-details
           autofocus
           solo
-          prepend-inner-icon="person"
+          prepend-inner-icon="account_circle"
           append-icon="add_circle"
           @click:append="newCustomerForm"
         ></v-autocomplete>
     </div>                           
     <v-card  v-show="!isSearch">      
-      <span v-show="isInfo" class="">          
-        <v-btn style="z-index:0" class="close-btn" dark small right absolute outline fab color="grey" @click="clearCustomer()"><v-icon class="fab-fix" dark>close</v-icon></v-btn>
-      </span>
-      <v-card-text>
-        <v-layout v-show="isInfo" row wrap>
-          <v-flex xs12 md6>
             <router-link :to="{ path: `/customer/${customer.id}` }">          
-              <h3 class="headline mb-0">
-                <!-- <v-icon large>person</v-icon> -->
+              <!-- <h3 class="headline mb-0">
                 <span>{{ customer.fname }}</span>
                 <span>{{ customer.lname }}</span>
-              </h3>
+              </h3> -->
+              <v-card-text class="title font-w blue cb-white-text"><v-icon color="white">account_circle</v-icon>
+                <span v-show="!isForm">{{ customer.fname }} {{ customer.lname }}</span>
+                <span v-show="isForm">Set Customer Information</span>
+              </v-card-text>
             </router-link>
+      <span v-show="isInfo" class="">          
+        <v-btn style="z-index:0" class="close-btn" dark small right absolute outline fab color="white" @click="clearCustomer()"><v-icon class="fab-fix" dark>close</v-icon></v-btn>
+      </span>
+        <v-layout v-show="isInfo" row wrap>
+          <v-flex xs12 md6 pl-4>
             <p>
-              <span v-show="customer.phone != null"><v-icon>phone</v-icon> {{ customer.phone }} <br></span>
-              <span v-show="customer.email != null"><v-icon>email</v-icon> {{ customer.email }} <br></span>
-              <span v-show="hasAddress"><v-icon>home</v-icon> {{ customer.addr_st }} <br>
+              <span v-show="customer.phone != null"> {{ customer.phone }} <br></span>
+              <span v-show="customer.phone == null" style="color:grey"> No phone number <br></span>
+              <span v-show="customer.email != null"> {{ customer.email }} <br></span>
+              <span v-show="customer.email == null" style="color:grey"> No email address <br></span>
+              <span v-show="hasAddress"> {{ customer.addr_st }} <br>
               {{ customer.addr_city }}<span v-show="customer.addr_city != null">,</span> {{ customer.addr_prov }} {{ customer.addr_postal }} <br>
               {{ customer.addr_country }}</span>
+              <span v-show="!hasAddress" style="color:grey">No Address</span>
             </p>
           </v-flex>
-          <v-flex xs12 md6>
+          <v-flex xs12 md6  pr-4>
             <v-textarea no-resize v-on:blur="noteBlur()" v-model.lazy="customer.note" class="" label="Customer Notes"></v-textarea>                                
           </v-flex>
         </v-layout>
         <v-form>
-          <v-layout row wrap v-show="isForm">
+          <v-layout row wrap v-show="isForm" ma-1>
             <v-flex xs12 sm6>
               <v-text-field  label="First Name" ref="firstName" :rules="nameRules" required v-model="customer.fname" xs12 ></v-text-field>
             </v-flex>
@@ -78,8 +83,7 @@
         </div>
         <!-- <v-btn style="z-index:0" v-show="isInfo" dark small bottom right absolute fab color="primary" @click="setFormState(true)" class="fab-up"><v-icon class="fab-fix" dark>edit</v-icon></v-btn> -->
         <v-btn v-show="isInfo"  :class="{success: noteChanged, shake: noteChanged, 'blue--text': !noteChanged}" flat small right absolute class="cus-save-btn" @click="updateCustomer()">Save Note</v-btn>
-        <v-btn v-show="isInfo" color="grey" flat small right absolute class="cus-edit-btn" @click="setFormState(true)">Edit</v-btn>
-      </v-card-text>
+        <v-btn v-show="isInfo" color="grey" flat small left absolute class="cus-edit-btn" @click="setFormState(true)">Edit</v-btn>
             <v-progress-linear v-show="loading" :indeterminate="true" class="mb-0"></v-progress-linear>      
     </v-card>
     <span class="cb-print" v-if="checkPage() == 'job'">
@@ -96,12 +100,12 @@
         </div>
           <div class="cb-print-element cb-print-customer-name">Name: {{ customer.fname }} {{ customer.lname }}</div>        
     </span>
-    <span class="cb-print" v-if="checkPage() == 'credit'">
+    <span class="cb-print" v-if="checkPage() == 'credit' || checkPage() == 'custom'">
         <div class="cb-print-element cb-print-customercredit-info">
           Name: <span class="cb-print-element">{{ customer.fname }} {{ customer.lname }}</span><br>
-          Phone: <span class="cb-print-element">{{ customer.phone }}</span><br>
-          E-mail: <span class="cb-print-element">{{ customer.email }}</span><br>
-          Address: <span class="cb-print-element">{{ customer.addr_st }} {{ customer.addr_city }}, {{ customer.addr_prov }} {{ customer.addr_postal }}</span>
+          <span v-if="customer.hasPhone">Phone: <span class="cb-print-element">{{ customer.phone }}</span><br></span>
+          <span v-if="customer.hasEmail">E-mail: <span class="cb-print-element">{{ customer.email }}</span><br></span>
+          <span v-if="customer.hasAddress">Address: <span class="cb-print-element">{{ customer.addr_st }} {{ customer.addr_city }}, {{ customer.addr_prov }} {{ customer.addr_postal }}</span></span>
         </div>
     </span>
   </v-flex>
@@ -111,17 +115,38 @@
 
 class customer {
   constructor() {
-        this.fname = null;
-        this.lname = null;
-        this.phone = null;
-        this.email = null;
-        this.addr_st = null;
-        this.addr_city = null;
-        this.addr_prov = null;
-        this.addr_postal = null;
-        this.addr_country = null;
-        this.note = null;
-        this.id = null;
+    this.fname = null;
+    this.lname = null;
+    this.phone = null;
+    this.email = null;
+    this.addr_st = null;
+    this.addr_city = null;
+    this.addr_prov = null;
+    this.addr_postal = null;
+    this.addr_country = null;
+    this.note = null;
+    this.id = null;
+  }
+
+  get hasPhone() {
+    if (this.phone == null || this.phone.length == 0) return false;
+    return true;
+  }
+
+  get hasEmail() {
+    if (this.email == null || this.email.length == 0) return false;
+    return true;
+  }
+
+  get hasAddress() {
+    if (
+      this.addr_st == null && 
+      this.addr_city == null &&
+      this.addr_prov == null &&
+      this.addr_postal == null &&
+      this.addr_country == null
+    ) return false;
+    return true;
   }
 }
 
@@ -380,6 +405,9 @@ class customer {
         }
         if (this.$route.name.toLowerCase().includes("credit")) {
           return 'credit';
+        }
+        if (this.$route.name.toLowerCase().includes("custom")) {
+          return 'custom';
         }
       },
       noteBlur() {

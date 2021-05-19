@@ -3,10 +3,9 @@
         <div v-show="idSet">
             <custom-sheet-form :customSheet_id="customSheet_id" :customer_id="customer_id" :key="customSheet_id"></custom-sheet-form>
         </div>
-        <v-btn @click="key++" v-show="!idSet" color="primary" :href="'#/customsheet/0'">
-            <!-- <v-icon>add</v-icon> -->
+        <!-- <v-btn @click="key++" v-show="!idSet" color="primary" :href="'#/customsheet/0'">
             New Custom Sheet
-        </v-btn>
+        </v-btn> -->
         <div v-if="!idSet">
             <custom-sheet-list v-on:select="updateRoute($event)"></custom-sheet-list>
         </div>

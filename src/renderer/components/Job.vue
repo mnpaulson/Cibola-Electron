@@ -15,8 +15,8 @@
                     <v-card-title primary-title>
                         <h3 class="headline mb-0">Jobs</h3>
                         <v-spacer></v-spacer>
-                        <v-btn color="primary" :href="'#/job/0/0'">
-                            <v-icon>add</v-icon>
+                        <v-btn color="primary" outline :href="'#/job/0/0'">
+                            <v-icon>work_outline</v-icon>
                             New Job
                         </v-btn>
                     </v-card-title>

@@ -4,28 +4,28 @@
         <v-fade-transition>                  
         <!-- <v-flex d-flex class=""> -->
             <div v-show="id" >
-                <v-layout>
+                <v-layout  mt-2>
                 <v-flex d-flex class="xs6 sm2">
-                    <v-btn color="primary" :href="'#/job/0/' + id">
-                        <v-icon>add</v-icon>
+                    <v-btn outline color="primary" :href="'#/job/0/' + id">
+                        <v-icon style="margin-right: 0.25em;">work_outline</v-icon>
                         New Job
                     </v-btn>
                 </v-flex>
                 <v-flex d-flex class="xs6 sm2">
-                    <v-btn color="primary" :href="'#/goldcredit/0/' + id">
-                        <v-icon>add</v-icon>
+                    <v-btn outline color="primary" :href="'#/goldcredit/0/' + id">
+                        <v-icon style="margin-right: 0.25em;">credit_card</v-icon> 
                         New Gold Credit
                     </v-btn>
                 </v-flex>
                 <v-flex d-flex class="xs6 sm2">
-                    <v-btn color="primary" :href="'#/customsheet/0/' + id">
-                        <v-icon>add</v-icon>
+                    <v-btn outline color="primary" :href="'#/customsheet/0/' + id">
+                        <v-icon style="margin-right: 0.25em;">list_alt</v-icon>
                         New Custom Sheet
                     </v-btn>
                 </v-flex>
                 <v-flex d-flex class="xs6 sm2">
-                    <v-btn color="error" @click="deleteDialog = true" :style="{'font-size': '0.75em'}">
-                        <v-icon>delete</v-icon>
+                    <v-btn outline color="error" @click="deleteDialog = true" :style="{'font-size': '1em'}">
+                        <v-icon style="margin-right: 0.25em;">delete_outline</v-icon>
                         Delete Customer
                     </v-btn>
                 </v-flex>

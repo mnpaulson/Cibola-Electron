@@ -1,50 +1,60 @@
 <template>
     <v-layout row wrap>
-        <v-flex d-flex xs12 lg8 xl6>
+        <v-flex d-flex xs12 lg6 xl6>
             <transition name="component-fade" appear>
             <v-card>
+                <v-card-text class="title font-w blue cb-white-text"><v-icon color="white">work_outline</v-icon> Job {{job.id}} -
+                    <span v-show="job.created_at == null"> New Job</span> 
+                    <span v-show="job.created_at != null"> Created {{createddateMMDDYYHHMM}}</span>
+                </v-card-text>
                 <v-card-text>
                     <v-form ref="jobForm" v-model="valid" lazy-validation>                    
                     <v-layout row wrap>
-                        <v-flex row xs12 md6>
-                            <v-text-field ref="estimateField" required :rules="estimateRules" v-model="job.estimate" label="Estimate" prepend-icon="attach_money"></v-text-field>
-                            <v-autocomplete
-                            label="Employee Select"
-                            cache-items
-                            required
-                            :rules="employeeRules"
-                            prepend-icon="person_pin"
-                            :items="employeeList"
-                            v-model="job.employee_id"
-                            item-text="name"
-                            item-value="id"
-                            ></v-autocomplete>
-                            <v-menu
-                            ref="dateMenu"
-                            
-                            :close-on-content-click="true"
-                            v-model="dateMenu"
-                            transition="scale-transition"
-                            offset-y
-                            full-width
-                            :nudge-right="40"
-                            min-width="290px"
-                            :return-value.sync="date"                    
-                            >
-                                <v-text-field
+                            <v-flex xs12 md6>
+                                <v-text-field ref="estimateField" required :rules="estimateRules" v-model="job.estimate" label="Estimate" prepend-icon="attach_money"></v-text-field>
+                            </v-flex>
+                            <v-flex xs12 md6>
+                                <v-autocomplete
+                                label="Employee Select"
+                                cache-items
+                                required
+                                :rules="employeeRules"
+                                prepend-icon="person_pin"
+                                :items="employeeList"
+                                v-model="job.employee_id"
+                                item-text="name"
+                                item-value="id"
+                                ></v-autocomplete>
+                            </v-flex>
+                            <v-flex xs12 md6>
+                                <v-menu
+                                ref="dateMenu"
+                                
+                                :close-on-content-click="true"
+                                v-model="dateMenu"
+                                transition="scale-transition"
+                                offset-y
+                                full-width
+                                :nudge-right="40"
+                                min-width="290px"
+                                :return-value.sync="date"                    
+                                >
+                                
+                            <v-text-field
                                 slot="activator"
                                 label="Due Date"
                                 v-model="job.due_date"
                                 prepend-icon="event"
                                 readonly
                                 :class="{redText: job.vital_date}"                        
-                                ></v-text-field>
+                            ></v-text-field>
                                 <v-date-picker v-model="job.due_date" no-title scrollable>
                                 <v-spacer></v-spacer>
                                 <v-btn flat color="primary" @click="dateMenu = false">Cancel</v-btn>
                                 <v-btn flat color="primary" @click="$refs.dateMenu.save(date)">OK</v-btn>
                                 </v-date-picker>
                             </v-menu>
+                            </v-flex>
                             <v-menu
                             ref="completeMenu"
                             
@@ -72,12 +82,9 @@
                                 </v-date-picker>
                             </v-menu>
                             <v-text-field required :rules="estimateRules" v-model="job.deposit" label="Deposit" prepend-icon="attach_money"></v-text-field>
-                        </v-flex>
-                        <v-flex row xs12 md6>
+                        <!-- <v-flex row xs12 md6>
                             <v-layout row wrap>   
-                            <v-flex xs12>                 
-                                <v-textarea  no-resize rows="3" v-model="job.est_note" class="mt-2 est-note-align" label="Estimate Details"></v-textarea>
-                            </v-flex>
+
 
                             <v-flex xs5>                                     
                                 <v-checkbox
@@ -98,9 +105,12 @@
                                 ></v-checkbox>
                             </v-flex>
                             </v-layout>             
+                        </v-flex> -->
+                        <v-flex xs12 md6>                 
+                                <v-textarea  no-resize rows="3" v-model="job.est_note" label="Estimate Details"></v-textarea>
                         </v-flex>
-                        <v-flex xs12>
-                                <v-textarea counter=230 no-resize v-model="job.note" class="" label="Job Note"></v-textarea>                    
+                        <v-flex xs12 md6>
+                                <v-textarea counter=230 rows="3" no-resize v-model="job.note" class="" label="Job Note"></v-textarea>                    
                         </v-flex>
                     </v-layout>
                     </v-form>

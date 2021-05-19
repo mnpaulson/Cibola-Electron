@@ -35,7 +35,7 @@
         </v-list-tile>
         <v-list-tile :to="{ name: 'customers' }">
           <v-list-tile-action>
-            <v-icon>person</v-icon>
+            <v-icon>account_circle</v-icon>
           </v-list-tile-action>
           <v-list-tile-content>
             <v-list-tile-title>Customers</v-list-tile-title>

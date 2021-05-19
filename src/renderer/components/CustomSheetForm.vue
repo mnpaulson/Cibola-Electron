@@ -9,7 +9,7 @@
         <v-layout mt-3 row wrap>
             <v-flex d-flex xs12 lg6 xl6>
                     <v-card>
-                        <v-card-text class="title font-w blue cb-white-text">Custom Sheet Details - Created: {{customSheet.created_at}}</v-card-text>
+                        <v-card-text class="title font-w blue cb-white-text"><v-icon color="white">list_alt</v-icon> Sheet Details - Created: {{customSheet.created_at}}</v-card-text>
                         <v-layout pr-4 pb-4 pl-4 row wrap>
                             <v-flex row xs12>
                                 <v-text-field
@@ -68,7 +68,7 @@
             </template>
         </v-layout>
         <!-- estimate buttons -->
-        <v-layout row wrap>
+        <v-layout row wrap mt-2>
             <v-flex d-flex xs12 lg2>
                 <v-btn outline color="primary" @click="copyEstimate">
                     Copy Estimate
@@ -82,7 +82,7 @@
             </v-flex>
         </v-layout>
         <!-- Selected estimate -->
-        <v-layout mt-3 row wrap>
+        <v-layout mt-2 row wrap>
             <v-flex d-flex xs12 lg6 xl6>
                     <v-card>
                            <!-- <h3 class="cb-white-text blue pl-3">Estimate Details</h3> -->
@@ -242,7 +242,7 @@
             <span>Update Custom Sheet</span>
             <v-icon>save</v-icon>
             </v-btn>
-            <v-btn class="v-btn--active info--text" >
+            <v-btn class="v-btn--active info--text" @click="printEstimate()">
             <span>Print Selected</span>
             <v-icon>print</v-icon>
             </v-btn>
@@ -250,17 +250,45 @@
             <span>Delete</span>
             <v-icon>delete</v-icon>
             </v-btn>
-            <!-- 
-            <v-btn v-show="!job.id || job.id == 0" @click="$router.go(-1)" class="v-btn--active error--text">
-            <span>Discard Job</span>
-            <v-icon>delete</v-icon>
-            </v-btn> -->
         </v-bottom-nav>
+            <div class="cb-print">
+                <div class="cb-print-element cb-print-credit-header">
+                    Custom Sheet Estimate
+                </div>
+                <div class="cb-print-element cb-print-credit-date">Date: {{customSheet.selectedEstimate.created_at}}</div>
+                <div class="cb-print-element cb-print-credit-total">Total: ${{customSheet.selectedEstimate.total}}</div>
+
+                <div class="cb-print-element cb-print-credit-images-cont">
+                    <table class="cb-print-element cb-print-credit-table">
+                        <tr class="cb-print-visible">
+                            <th class="cb-print-visible">Type</th>
+                            <th class="cb-print-visible">Amount</th>
+                            <th class="cb-print-visible">Total</th>
+                        </tr>
+                    <template v-for="estValues in customSheet.selectedEstimate.estValues">
+                        <tr :key="estValues.id" class="cb-print-visible">
+                            <td class="cb-print-visible">{{estValues.name}}</td>
+                            <td class="cb-print-visible">{{estValues.amt}}</td>
+                            <td class="cb-print-visible">${{estValues.total}}</td>
+                        </tr>
+                    </template>
+                    <tfoot class="cb-print-visible">
+                        <tr class="cb-print-visible">
+                            <td class="cb-print-visible"></td>
+                            <td class="cb-print-visible"></td>
+                            <td class="cb-print-visible">Grand Total:</td>
+                            <td class="cb-print-visible">${{customSheet.selectedEstimate.total}}</td>
+                        </tr>
+                    </tfoot>
+                    </table>
+                </div>
+            </div>
         </div>
     </transition>
 </template>
 
 <script>
+const { remote, BrowserWindow } = require('electron')
 
 var estValIdCounter = 1;
 
@@ -392,9 +420,12 @@ class estimate {
         this.estValues.forEach(v => {
             total += v.total;
         })
-        return total;
+        return this.round(total,2);
     }
 
+    round(value, decimals) {
+        return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
+    }
 }
 
 class customSheet {
@@ -817,7 +848,11 @@ export default {
         newEstValueFromResponse(v) {
             var val = new estValue(v.type, v.id, v.name, v.amt, v.basePrice, v.priceType, v.markup, v.discount, v.priceModifier);
             return val;
-        }
+        },
+        printEstimate() {
+            var currentWindow = remote.getCurrentWindow()
+            currentWindow.webContents.print({silent: true, printBackground: false, deviceName: this.store.printers.credit});
+        },
     },
 
     props: {

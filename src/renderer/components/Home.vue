@@ -7,16 +7,22 @@
     <job-lookup ></job-lookup>
 </v-layout>
 <v-layout>
-<v-flex d-flex class="xs6 sm2">
-    <v-btn color="primary" :href="'#/job/0/0'">
-        <v-icon>work</v-icon>
+<v-flex d-flex class="xs6 sm2" pl-0>
+    <v-btn outline color="primary" :href="'#/job/0/0'">
+        <v-icon>work_outline</v-icon>
         New Job
     </v-btn>
 </v-flex>
 <v-flex d-flex class="xs6 sm2">
-    <v-btn color="primary" :href="'#/goldcredit/0/0'">
+    <v-btn outline color="primary" :href="'#/goldcredit/0/0'">
         <v-icon>credit_card</v-icon>
         New Gold Credit
+    </v-btn>
+</v-flex>
+<v-flex d-flex class="xs6 sm2">
+    <v-btn outline color="primary" :href="'#/goldcredit/0/0'">
+        <v-icon>list_alt</v-icon>
+        New Customsheet
     </v-btn>
 </v-flex>
 </v-layout>

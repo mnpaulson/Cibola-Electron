@@ -695,33 +695,50 @@ const sharp = require('sharp')
                 if (type === this.typeHistory) return;
 
                 var change;
-                if (type == 'credit' && this.typeHistory === 'split') change = 0.1;
-                if (type == 'credit' && this.typeHistory === 'cash') change = 0.2;
-                if (type == 'split' && this.typeHistory === 'credit') change = -0.1;
-                if (type == 'split' && this.typeHistory === 'cash') change = 0.1;
-                if (type == 'cash' && this.typeHistory === 'credit') change = -0.2;
-                if (type == 'cash' && this.typeHistory === 'split') change = -0.1;
+                change = 0;
+                if (type == 'credit' && this.typeHistory === 'split') change = 0.6;
+                if (type == 'credit' && this.typeHistory === 'cash') change = 0.6;
+                if (type == 'split' && this.typeHistory === 'credit') change = 0.5;
+                if (type == 'split' && this.typeHistory === 'cash') change = 0.5;
+                if (type == 'cash' && this.typeHistory === 'credit') change = 0.4;
+                if (type == 'cash' && this.typeHistory === 'split') change = 0.4;
 
                 this.typeHistory = type;
 
                 this.valueList.forEach(element => {
-                    if (element.name === "8k") element.value2 = this.round(Number(element.value2) + Number(change), 2);
-                    if (element.name === "9k") element.value2 = this.round(Number(element.value2) + Number(change), 2);
-                    if (element.name === "10k") element.value2 = this.round(Number(element.value2) + Number(change), 2);
-                    if (element.name === "12k") element.value2 = this.round(Number(element.value2) + Number(change), 2);
-                    if (element.name === "14k") element.value2 = this.round(Number(element.value2) + Number(change), 2);
-                    if (element.name === "18k") element.value2 = this.round(Number(element.value2) + Number(change), 2);
+                    if (element.name === "8k") element.value2 = this.round(change, 2);
+                    if (element.name === "9k") element.value2 = this.round(change, 2);
+                    if (element.name === "10k") element.value2 = this.round(change, 2);
+                    if (element.name === "12k") element.value2 = this.round(change, 2);
+                    if (element.name === "14k") element.value2 = this.round(change, 2);
+                    if (element.name === "18k") element.value2 = this.round(change, 2);
+                    if (element.name === "20k") element.value2 = this.round(change, 2);
+                    if (element.name === "22k") element.value2 = this.round(change, 2);
+                    // if (element.name === "8k") element.value2 = this.round(Number(element.value2) + Number(change), 2);
+                    // if (element.name === "9k") element.value2 = this.round(Number(element.value2) + Number(change), 2);
+                    // if (element.name === "10k") element.value2 = this.round(Number(element.value2) + Number(change), 2);
+                    // if (element.name === "12k") element.value2 = this.round(Number(element.value2) + Number(change), 2);
+                    // if (element.name === "14k") element.value2 = this.round(Number(element.value2) + Number(change), 2);
+                    // if (element.name === "18k") element.value2 = this.round(Number(element.value2) + Number(change), 2);
                     // if (element.name === "20k") element.value2 = Number(element.value2) + Number(change);
                     // if (element.name === "22k") element.value2 = Number(element.value2) + Number(change);
                     // if (element.name === "24k") element.value2 = Number(element.value2) + Number(change);
                 });
                 this.itemList.forEach(element => {
-                    if (element.itemObj.name === "8k") element.markup = this.round(Number(element.markup) + Number(change), 2);
-                    if (element.itemObj.name === "9k") element.markup = this.round(Number(element.markup) + Number(change), 2);
-                    if (element.itemObj.name === "10k") element.markup = this.round(Number(element.markup) + Number(change), 2);
-                    if (element.itemObj.name === "12k") element.markup = this.round(Number(element.markup) + Number(change), 2);
-                    if (element.itemObj.name === "14k") element.markup = this.round(Number(element.markup) + Number(change), 2);
-                    if (element.itemObj.name === "18k") element.markup = this.round(Number(element.markup) + Number(change), 2);
+                    if (element.itemObj.name === "8k") element.markup = this.round(change, 2);
+                    if (element.itemObj.name === "9k") element.markup = this.round(change, 2);
+                    if (element.itemObj.name === "10k") element.markup = this.round(change, 2);
+                    if (element.itemObj.name === "12k") element.markup = this.round(change, 2);
+                    if (element.itemObj.name === "14k") element.markup = this.round(change, 2);
+                    if (element.itemObj.name === "18k") element.markup = this.round(change, 2);
+                    if (element.itemObj.name === "20k") element.markup = this.round(change, 2);
+                    if (element.itemObj.name === "22k") element.markup = this.round(change, 2);
+                    // if (element.itemObj.name === "8k") element.markup = this.round(Number(element.markup) + Number(change), 2);
+                    // if (element.itemObj.name === "9k") element.markup = this.round(Number(element.markup) + Number(change), 2);
+                    // if (element.itemObj.name === "10k") element.markup = this.round(Number(element.markup) + Number(change), 2);
+                    // if (element.itemObj.name === "12k") element.markup = this.round(Number(element.markup) + Number(change), 2);
+                    // if (element.itemObj.name === "14k") element.markup = this.round(Number(element.markup) + Number(change), 2);
+                    // if (element.itemObj.name === "18k") element.markup = this.round(Number(element.markup) + Number(change), 2);
                 });
             }
         },

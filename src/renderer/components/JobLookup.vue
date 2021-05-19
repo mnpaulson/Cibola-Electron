@@ -1,5 +1,5 @@
 <template>
-  <v-flex d-flex xs12 sm12 md4>
+  <v-flex d-flex xs12 sm12 md6>
     <transition name="component-fade" appear>    
         <v-form v-model="valid" @submit="searchJob">
               <v-text-field :rules="jobRules" hide-details prepend-inner-icon="work" solo append-icon="add_circle" label="Enter Job Number" v-model="job" xs12 @click:append="newJob"></v-text-field>
