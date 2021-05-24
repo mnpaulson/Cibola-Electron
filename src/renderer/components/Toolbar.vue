@@ -1,7 +1,7 @@
 <template>
-    <v-toolbar color="indigo" dark fixed app clipped-left>
+    <v-toolbar color="blue" dark fixed app clipped-left>
     <v-btn icon @click.stop="browserBack()">
-      <v-icon>arrow_back</v-icon>
+      <v-icon large>arrow_back</v-icon>
     </v-btn>
       <v-toolbar-title>{{ store.toolbarText }}</v-toolbar-title>
     </v-toolbar>

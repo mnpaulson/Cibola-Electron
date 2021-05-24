@@ -1,17 +1,28 @@
 <template>
   <v-app id="inspire">
-    <toolbar></toolbar>
+    <!-- <toolbar></toolbar> -->
     <v-navigation-drawer
       fixed
       v-model="drawer"
       app
+      dark
       clipped
+      :mini-variant=navmini
       width="200"
+      class="blue lighten-2"
     >
-      <v-list dense class="cdb-app-drawer">
+      <v-list dense class="cdb-app-drawer" style="padding-top: 0px">
+        <v-list-tile style="background-color: #2196f3; box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23); cursor:pointer" dark >
+            <v-list-tile-action @click.stop="browserBack()">
+                <v-icon large>arrow_back</v-icon>
+            </v-list-tile-action>
+            <v-list-tile-content>
+                <v-list-tile-title style="color: white">Back</v-list-tile-title>
+            </v-list-tile-content>
+        </v-list-tile>
         <v-list-tile :to="{ name: 'home' }" :exact="true">
             <v-list-tile-action>
-                <v-icon>dashboard</v-icon>
+                <v-icon>home</v-icon>
             </v-list-tile-action>
             <v-list-tile-content>
                 <v-list-tile-title>Home</v-list-tile-title>
@@ -33,20 +44,20 @@
             <v-list-tile-title>Gold Credits</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
+          <v-list-tile :to="{ name: 'customsheets' }">
+          <v-list-tile-action>
+            <v-icon>list_alt</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>Custom Sheets</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
         <v-list-tile :to="{ name: 'customers' }">
           <v-list-tile-action>
             <v-icon>account_circle</v-icon>
           </v-list-tile-action>
           <v-list-tile-content>
             <v-list-tile-title>Customers</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
-        <v-list-tile :to="{ name: 'customsheets' }">
-          <v-list-tile-action>
-            <v-icon>list_alt</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title>Custom Sheets</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
         <!-- <v-list-tile :to="{ name: 'employee' }">
@@ -59,16 +70,25 @@
         </v-list-tile> -->
         <v-list-tile :to="{ name: 'admin' }">
           <v-list-tile-action>
-            <v-icon>list</v-icon>
+            <v-icon>settings</v-icon>
           </v-list-tile-action>
           <v-list-tile-content>
             <v-list-tile-title>Admin</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
+        <v-list-tile style="cursor:pointer" @click=toggleNavmini>
+          <v-list-tile-action>
+            <v-icon v-if=navmini>chevron_right</v-icon>
+            <v-icon v-if=!navmini>chevron_left</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>Collapse Navbar</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
       </v-list>
     </v-navigation-drawer>
-    <v-content>
-      <v-container fluid grid-list-md>
+    <v-content style="padding-top: 0px;">
+      <v-container fluid grid-list-md pt-2 pl-3>
           <alert></alert>                                
           <router-view></router-view>
       </v-container>
@@ -84,13 +104,19 @@ const settings = require('electron-settings');
 
   export default {
     data: () => ({
-      drawer: null
+      drawer: null,
+      navmini: true
     }),
     props: {
       source: String
     },
     methods: {
-
+        browserBack() {
+            window.history.back();
+        },
+        toggleNavmini() {
+          this.navmini = !this.navmini;
+        }
     },
     created() {
 

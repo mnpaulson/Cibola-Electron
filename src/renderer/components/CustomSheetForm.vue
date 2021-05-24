@@ -9,7 +9,7 @@
         <v-layout mt-3 row wrap>
             <v-flex d-flex xs12 lg6 xl6>
                     <v-card>
-                        <v-card-text class="title font-w blue cb-white-text"><v-icon color="white">list_alt</v-icon> Sheet Details - Created: {{customSheet.created_at}}</v-card-text>
+                        <v-card-text class="title font-w blue cb-white-text"><v-icon color="white">list_alt</v-icon> Sheet Details - Created: {{createddateMMDDYYHHMM}}</v-card-text>
                         <v-layout pr-4 pb-4 pl-4 row wrap>
                             <v-flex row xs12>
                                 <v-text-field
@@ -27,7 +27,7 @@
             </v-flex>
         </v-layout>
         <!-- Estimates -->
-        <v-layout row wrap>
+        <v-layout row wrap mt-3>
             <template v-for="(estimate, est_index) in customSheet.estimates">
                 <v-flex d-flex xs12 lg3 xl2 v-bind:key="estimate.id">
                     <v-card class="cb-round-card" @click="editEstimate(est_index)">
@@ -253,15 +253,25 @@
         </v-bottom-nav>
             <div class="cb-print">
                 <div class="cb-print-element cb-print-credit-header">
-                    Custom Sheet Estimate
+                    Custom Work Estimate
                 </div>
-                <div class="cb-print-element cb-print-credit-date">Date: {{customSheet.selectedEstimate.created_at}}</div>
-                <div class="cb-print-element cb-print-credit-total">Total: ${{customSheet.selectedEstimate.total}}</div>
+                <div class="cb-print-element cb-print-credit-sub-header">
+                    {{todayMMDDYY}} - Id: {{customSheet_id}} - {{customSheet.selectedEstimate.name}}
+                </div>
+                <!-- <div class="cb-print-element cb-print-credit-date">Date: {{customSheet.selectedEstimate.created_at}}</div> -->
+                <!-- <div class="cb-print-element cb-print-credit-total">Total: ${{customSheet.selectedEstimate.total}}</div> -->
 
-                <div class="cb-print-element cb-print-credit-images-cont">
-                    <table class="cb-print-element cb-print-credit-table">
+                <img class="cb-print-custom-logo cb-print-element" src="static/logo.png" alt="">
+
+                <div class="cb-print-element cb-print-custom-note">
+                    Note: 
+                    {{customSheet.selectedEstimate.note}}
+                </div>
+
+                <div class="cb-print-element cb-print-custom-estimate">
+                    <table class="cb-print-element cb-print-credit-table" style="width: 100%">
                         <tr class="cb-print-visible">
-                            <th class="cb-print-visible">Type</th>
+                            <th class="cb-print-visible">Item</th>
                             <th class="cb-print-visible">Amount</th>
                             <th class="cb-print-visible">Total</th>
                         </tr>
@@ -269,18 +279,30 @@
                         <tr :key="estValues.id" class="cb-print-visible">
                             <td class="cb-print-visible">{{estValues.name}}</td>
                             <td class="cb-print-visible">{{estValues.amt}}</td>
-                            <td class="cb-print-visible">${{estValues.total}}</td>
+                            <td class="cb-print-visible cb-align-right">${{estValues.formattedTotal}}</td>
                         </tr>
                     </template>
                     <tfoot class="cb-print-visible">
                         <tr class="cb-print-visible">
                             <td class="cb-print-visible"></td>
-                            <td class="cb-print-visible"></td>
                             <td class="cb-print-visible">Grand Total:</td>
-                            <td class="cb-print-visible">${{customSheet.selectedEstimate.total}}</td>
+                            <td class="cb-print-visible cb-align-right">${{customSheet.selectedEstimate.formattedTotal}}</td>
                         </tr>
                     </tfoot>
                     </table>
+
+                </div>
+                <div class="cb-print-custom-contact-info cb-print-element">
+                    Ph. 403-320-0846 - info@thegoldworks.com <br />
+                    412 13th Street Noth - Lethbridge, AB T1H 2S2
+                </div>
+                <div class="cb-print-custom-signature cb-print-element">
+                    <div class="cb-print-underline cb-print-visible">Signature</div>
+                    <br />
+                    <div class="cb-print-underline cb-print-visible">Date</div>
+                </div>
+                <div class="cb-print-custom-warning cb-print-element">
+                    Prices are based on the daily gold price per ounze. Gold price for your item may change and the price will be adjusted accordingly. The final cost of a custom job will change if the customer deviates from the specifications listed on this document. Please sign the form above if you agree to this estimate.
                 </div>
             </div>
         </div>
@@ -360,6 +382,10 @@ class estValue {
         this.priceType == 'Gold' || this.priceType == 'Plat' ? true : false;
     }
 
+    get formattedTotal() {
+        return this.total.toLocaleString("en-US", { maximumFractionDigits: 2, minimumFractionDigits: 2 });
+    }
+
     round(value, decimals) {
         return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
     }
@@ -423,9 +449,41 @@ class estimate {
         return this.round(total,2);
     }
 
+    get formattedTotal() {
+        return this.total.toLocaleString("en-US", { maximumFractionDigits: 2, minimumFractionDigits: 2 });
+    }
+
+
     round(value, decimals) {
         return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
     }
+
+    sortValues() {
+        this.estValues.sort((a,b) => {
+            var x,y;
+
+            x = a.name.toLowerCase();
+            y = b.name.toLowerCase();
+
+            if (x < y) return -1;
+            if (x > y) return 1;
+            return 0;
+        });
+
+        this.estValues.sort((a,b) => {
+            var x,y;
+
+            x = a.type.toLowerCase();
+            y = b.type.toLowerCase();
+
+            if (x < y) return -1;
+            if (x > y) return 1;
+            return 0;
+        });
+
+        this.estValues = [...this.estValues];
+    }
+
 }
 
 class customSheet {
@@ -660,6 +718,7 @@ export default {
         //Adds a new est_val for the passed category
         newEstVal(category) {
             this.customSheet.selectedEstimate.estValues.push(new estValue(category));
+            this.customSheet.selectedEstimate.sortValues();
         },
         //Adds new est val of extra type
         addNewExtra(extra){
@@ -667,6 +726,7 @@ export default {
             e.obj = extra;
             e.amt = 1;
             this.customSheet.selectedEstimate.estValues.push(e);
+            this.customSheet.selectedEstimate.sortValues();
         },
         //Makes a copy of the selectedEstimate into estimates and sets Ids
         copyEstimate() {
@@ -841,6 +901,7 @@ export default {
             // est.estValues = [];
             for (let i = 0; i < e.est_values.length; i++) {
                 est.estValues.push(this.newEstValueFromResponse(e.est_values[i]));
+                est.sortValues();
             }
             return est;
         },
@@ -871,8 +932,8 @@ export default {
             // this.$emit('customerId', this.job.customer_id);
         },
         priceAgeWarn() {
-            var age = new Date - Date.parse(this.metalPriceDate);
-            if (age > 8640000) return true;
+            var age = Date.parse(new Date) - Date.parse(this.metalPriceDate);
+            if (age > 86400000) return true;
             else return false;
         },
         today() {
@@ -898,7 +959,50 @@ export default {
         isUpdate() {
             if (this.customSheet.selectedEstimate.id !== null) return true;
             else return false;
+        },
+        createddateMMDDYYHHMM() {
+            var today = new Date(this.customSheet.created_at);
+            var hh = today.getHours();
+            var mm = today.getMinutes();
+            if (mm < 10 ) {
+                mm = "0" + mm;
+            }
+            if (hh < 10 ) {
+                hh = "0" + hh;
+            }
+            return this.createdDateMMDDYY + " " + hh + ":" + mm;
+        },
+        createdDateMMDDYY() {
+            var today = new Date(this.customSheet.created_at);
+            var yyyy = today.getFullYear();
+            var mm = (1+today.getMonth());
+            var dd = today.getDate();
+
+            if (mm < 10 ) {
+                mm = "0" + mm;
+            }
+            if (dd < 10 ) {
+                dd = "0" + dd;
+            }
+
+            return mm + "-" + dd + "-" + yyyy
+        },
+        todayMMDDYY() {
+            var today = new Date(this.today);
+            var yyyy = today.getFullYear();
+            var mm = (1+today.getMonth());
+            var dd = today.getDate();
+
+            if (mm < 10 ) {
+                mm = "0" + mm;
+            }
+            if (dd < 10 ) {
+                dd = "0" + dd;
+            }
+
+            return mm + "-" + dd + "-" + yyyy
         }
+
     },
     watch: {
         customSheet_id(val) {

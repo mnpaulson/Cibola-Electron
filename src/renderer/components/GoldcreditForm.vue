@@ -1,9 +1,16 @@
 <template>
     <transition name="component-fade" appear>
         <div>
+        <v-layout row wrap>
+            <customer-form :id.sync="credit.customer_id"></customer-form>
+        </v-layout>
     <v-layout row wrap>
-        <v-flex d-flex xs12 lg6 xl6>
+        <v-flex d-flex xs12 lg6 xl6 mt-2>
                 <v-card>
+                    <v-card-text class="title font-w blue cb-white-text"><v-icon color="white">credit_card</v-icon> Gold Credit -
+                        <span v-show="credit.created_at == null"> New Gold Credit</span> 
+                        <span v-show="credit.created_at != null"> Created {{createdDateMMDDYYHHMM}}</span>
+                    </v-card-text>
                     <v-card-text>
                     <v-form ref="goldcreditForm" v-model="valid" lazy-validation>                    
                     <v-layout row wrap>
@@ -41,13 +48,13 @@
                                     <v-text-field
                                     slot="activator"
                                     label="Date"
-                                    v-model="credit.creditDate"
+                                    v-model="credit.created_at"
                                     prepend-icon="event"
                                     readonly
                                     :placeholder="today"
-                                    :disabled="disabled"
+                                    disabled
                                     ></v-text-field>
-                                    <v-date-picker v-model="credit.creditDate" no-title scrollable>
+                                    <v-date-picker v-model="credit.created_at" no-title scrollable>
                                     <v-spacer></v-spacer>
                                     <v-btn flat color="primary" @click="dateMenu = false">Cancel</v-btn>
                                     <v-btn flat color="primary" @click="$refs.dateMenu.save(dateMenu)">OK</v-btn>
@@ -56,7 +63,7 @@
 
                         </v-flex>
                         <v-flex row xs12 md2>
-                                <v-text-field
+                                <!-- <v-text-field
                                     v-model="credit.goldCAD"
                                     label="Gold (g)"
                                     :disabled="disabled"
@@ -66,7 +73,7 @@
                                     label="Platinum (g)"
                                     :disabled="disabled"
                                 ></v-text-field>
-                                <!-- <v-text-field
+                                <v-text-field
                                     v-model="credit.exchange"
                                     label="Exchange"
                                 ></v-text-field> -->
@@ -93,8 +100,8 @@
                                 </v-radio-group>
                         </v-flex>
                         <v-flex row xs12 md12>
-                            <v-btn v-show="credit.id == null" :class="{'warning': priceAgeWarn, 'primary': !priceAgeWarn}" @click="getNewGoldValue"><v-icon>refresh</v-icon>Update&nbsp;</v-btn>
-                            <p :class="{'vital-date': priceAgeWarn}" style="display: inline-block;">Prices set: {{credit.metalPriceDate}}</p>
+                            <!-- <v-btn v-show="credit.id == null" :class="{'warning': priceAgeWarn, 'primary': !priceAgeWarn}" @click="getNewGoldValue"><v-icon>refresh</v-icon>Update&nbsp;</v-btn> -->
+                            <!-- <p :class="{'vital-date': priceAgeWarn}" style="display: inline-block;">Prices set: {{credit.metalPriceDate}}</p> -->
                             <v-textarea no-resize v-model="credit.note" class="" label="Credit Note"></v-textarea>                    
                         </v-flex>
                     </v-layout>
@@ -103,6 +110,52 @@
                 </v-card>
         </v-flex>
     </v-layout>
+    <v-layout mt-2 mb-2 row wrap>
+            <v-flex d-flex xs12 lg6 xl3>
+                    <v-card color="blue text--darken-10 white--text">
+                        <v-card-text class="pa-2 text-lg-left">
+                        <v-layout row wrap>
+                            <v-flex v-if="editMetalPrices" row xs3>
+                                <v-text-field
+                                    v-model="credit.goldCAD"
+                                    label="Gold (g)"
+                                    dark
+                                ></v-text-field>
+                            </v-flex>
+                            <v-flex v-if="editMetalPrices" row xs3>
+                                <v-text-field
+                                    v-model="credit.platCAD"
+                                    label="Plat (g)"
+                                    dark
+                                ></v-text-field>
+                            </v-flex>
+                            <v-flex row xs3 v-if="!editMetalPrices" class="subheading pt-2 font-weight-bold pl-2">
+                                Gold - ${{credit.goldCAD}}/g
+                                <br/>
+                                Plat - ${{credit.platCAD}}/g</v-flex>
+                            <v-flex row xs5 mt-2 v-if="!editMetalPrices" class="subheading pt-2 font-weight-bold pl-2">
+                                Set at - {{creditDateMMDDYY}}
+                            </v-flex>
+                            <v-flex row xs4 class="pt-1 text-lg-center">
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on }">
+                                        <v-btn :disabled=disabled fab small color="indigo"  v-on="on" :class="{'warning': priceAgeWarn, 'primary': !priceAgeWarn}" @click="getNewGoldValue"><v-icon medium>refresh</v-icon></v-btn>
+                                    </template>
+                                    <span>Prices last updated at {{creditDateMMDDYY}}</span>
+                                </v-tooltip>
+                                <!-- <v-tooltip bottom>
+                                    <template v-slot:activator="{ on }">
+                                        <v-btn fab small color="green" v-on="on" @click="updateExistingMetalPrices"><v-icon color="white" medium>cached</v-icon></v-btn>
+                                    </template>
+                                    <span>Update the prices of the selected estimates metal values</span>
+                                </v-tooltip> -->
+                                <v-btn :disabled=disabled fab small color="grey" @click="editMetalPrices = !editMetalPrices"><v-icon color="white" medium>edit</v-icon></v-btn>
+                            </v-flex>
+                        </v-layout>
+                        </v-card-text>
+                    </v-card>
+            </v-flex>
+        </v-layout>
         <template v-for="(item, index) in itemList">
             <v-layout row wrap v-bind:key="item.id">
                 <v-flex d-flex xs12 lg8 xl6>
@@ -165,9 +218,10 @@
                 </v-flex>
             </v-layout>
         </template>
+        
          <v-layout row wrap>
-            <v-flex d-flex xs12 lg2 xl2>
-                <v-btn v-show="credit.id == null" color="primary" @click="newItem">Add Item</v-btn>
+            <v-flex d-flex xs12 lg2 xl2 ml-0>
+                <v-btn outline v-show="credit.id == null" color="primary" @click="newItem">Add Item</v-btn>
             </v-flex>
         </v-layout>
         <template v-for="(image, index) in credit.credit_images" >
@@ -298,7 +352,7 @@
                 Scrap Gold Credit Record
             </div>
             <div class="cb-print-element cb-print-credit-employee">Employee: {{ employeeName }}</div>
-            <div class="cb-print-element cb-print-credit-date">Date: {{credit.creditDate}}</div>
+            <div class="cb-print-element cb-print-credit-date">Date: {{creditDateMMDDYY}}</div>
             <div class="cb-print-element cb-print-credit-total">Total Credit: ${{credit.total}}</div>
             <div class="cb-print-element cb-print-credit-warning">
                 ALL PURCHASES ARE FINAL - NO EXCEPTIONS
@@ -366,23 +420,25 @@ const sharp = require('sharp')
             itemList: [],
             date: false,
             dateMenu: false,
+            editMetalPrices: false,
             creditDeleteDialog: false,
             disabled: false,
             multiplierDisable: true,
             credit: {
                 id: null,
                 employee_id: null,
-                customer_id: null,
+                redit: null,
                 goldCAD: null,
                 platCAD: null,
                 metalPriceDate: "",
-                creditDate: null,
+                // creditDate: null,
                 creditValue: null,
                 used: false,
                 note: null,
                 credit_type: "credit",
                 credit_items: [],
-                credit_images: []
+                credit_images: [],
+                created_at: null
             },
             typeHistory: "credit",
             items: [],
@@ -418,6 +474,11 @@ const sharp = require('sharp')
                     .then((response) => {
                         this.valueList = response.data;
                         if (!this.credit.id) this.credit.credit_type = 'cash';
+                        //Don't get the credit until after we have the values
+                        if (!isNaN(this.goldcredit_id) && this.goldcredit_id !== null && this.goldcredit_id !== 0 && this.credit.goldcredit_id !== this.goldcredit_id) {
+                            this.getCredit(this.goldcredit_id);
+                            this.disabled = true;
+                        }
                     })
                     .catch((error) => {
                         console.log(error);
@@ -460,7 +521,6 @@ const sharp = require('sharp')
                     .then((response) => {
                         // console.log(response);
                         var goldG = response.data[0];
-                        // this.credit.exchange = this.round(response.data[1], 2);
                         this.credit.goldCAD = this.round(goldG, 2);
                         this.getNewPlatValue();
                     })
@@ -487,7 +547,7 @@ const sharp = require('sharp')
             //Create new gold credit
             createCredit() {
                 this.$refs.goldcreditForm.validate();
-                if (!this.customer_id) {
+                if (!this.credit.customer_id) {
                     this.store.setAlert(true, "error", "Please select a customer.");
                     return;
                 }
@@ -555,10 +615,11 @@ const sharp = require('sharp')
                         this.credit.note = response.data.note;
                         this.credit.goldCAD = response.data.gold_cad;
                         this.credit.platCAD = response.data.plat_cad;
-                        this.credit.metalPriceDate = response.data.metalPriceDate;
-                        this.credit.creditDate = response.data.gold_date;
+                        this.credit.metalPriceDate = response.data.gold_date;
+                        // this.credit.creditDate = response.data.gold_date;
                         this.credit.used = response.data.used;
                         this.credit.credit_type = response.data.credit_type;
+                        this.credit.created_at = response.data.created_at;
 
                         response.data.credit_images.forEach(element => {
                             element.image = this.store.serverURL + element.image;
@@ -586,7 +647,7 @@ const sharp = require('sharp')
 
                         this.itemList = this.credit.credit_items;
 
-                        this.$emit('customerId', this.credit.customer_id);
+                        // this.$emit('customerId', this.credit.customer_id);
 
                         this.loading = false;
                     })
@@ -669,26 +730,6 @@ const sharp = require('sharp')
                     return "loading...";
                 }
 
-            },
-            //Sets all values to defaults
-            clearCredit() {
-                this.employee = null;
-                this.itemList = [];
-                this.date = false;
-                this.dateMenu = false;
-                this.disabled = false;
-                this.credit.id = null;
-                this.credit.employee_id = null;
-                this.credit.customer_id = null;
-                this.credit.creditDate = null;
-                this.credit.creditValue = null;
-                this.credit.used = false;
-                this.credit.note = null;
-                this.credit.credit_type = 'credit';
-                this.credit.credit_items = [];
-                this.credit.credit_images = []
-                this.items = [];
-                this.img = {};
             },
             updateValuesOnType() {
                 var type = this.credit.credit_type;
@@ -784,28 +825,27 @@ const sharp = require('sharp')
         },
         watch: {
             customer_id (val) {
-                if (!isNaN(this.customer_id) && this.customer_id !== null) {
-                    this.credit.customer_id = val;
-                    if (val === 0) this.clearCredit();
-                }
+                if (this.credit.customer_id == null) this.credit.customer_id = val;
             },
             goldcredit_id (val) {
-                this.credit.id = null;
-                this.credit.employee_id = null;
-                this.credit.goldCAD = null;
-                this.credit.platCAD = null;
-                this.credit.metalPriceDate = "";
-                this.credit.creditDate = null;
-                this.credit.creditValue = null;
-                this.credit.used = false;
-                this.credit.note = null;
-                this.credit.note = 'credit';
-                this.credit.credit_items = [];
-                this.credit.credit_images = [];
-                this.itemList = [];
-                this.disabled = false;
-                if (!isNaN(this.goldcredit_id) && this.goldcredit_id !== null && this.goldcredit_id) {
-                    this.getCredit(this.goldcredit_id);
+                // this.credit.id = null;
+                // this.credit.employee_id = null;
+                // this.credit.goldCAD = null;
+                // this.credit.platCAD = null;
+                // this.credit.metalPriceDate = "";
+                // // this.credit.creditDate = null;
+                // this.credit.created_at = null;
+                // this.credit.creditValue = null;
+                // this.credit.used = false;
+                // this.credit.note = null;
+                // this.credit.note = 'credit';
+                // this.credit.credit_items = [];
+                // this.credit.credit_images = [];
+                // this.itemList = [];
+                // this.disabled = false;
+                var id = this.goldcredit_id;
+                if (!isNaN(id) && id !== null && id !== 0 && this.customSheet.goldcredit_id !== val) {
+                    this.getCustomSheet(val);
                     this.disabled = true;
                 }
                 else {
@@ -880,8 +920,8 @@ const sharp = require('sharp')
                 return now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
             },
             priceAgeWarn() {
-                var age = new Date - Date.parse(this.credit.metalPriceDate);
-                if (age > 8640000) return true;
+                var age = Date.parse(new Date) - Date.parse(this.metalPriceDate);
+                if (age > 86400000) return true;
                 else return false;
             },
             store() {
@@ -902,6 +942,52 @@ const sharp = require('sharp')
                 } else {
                     return null;
                 }
+            },
+            createdDateMMDDYYHHMM() {
+                var today = new Date(this.credit.created_at);
+                var hh = today.getHours();
+                var mm = today.getMinutes();
+                if (mm < 10 ) {
+                    mm = "0" + mm;
+                }
+                if (hh < 10 ) {
+                    hh = "0" + hh;
+                }
+                return this.createdDateMMDDYY + " " + hh + ":" + mm;
+            },
+            createdDateMMDDYY() {
+                var today = new Date(this.credit.created_at);
+                var yyyy = today.getFullYear();
+                var mm = (1+today.getMonth());
+                var dd = today.getDate();
+
+                if (mm < 10 ) {
+                    mm = "0" + mm;
+                }
+                if (dd < 10 ) {
+                    dd = "0" + dd;
+                }
+
+                return mm + "-" + dd + "-" + yyyy
+            },
+            creditDateMMDDYY() {
+                console.log(this.credit.metalPriceDate.length);
+                var time = this.credit.metalPriceDate;
+                console.log(time);
+                if (this.credit.metalPriceDate.length == 10) time += "T00:00:00";
+                var today = new Date(time);
+                var yyyy = today.getFullYear();
+                var mm = (1+today.getMonth());
+                var dd = today.getDate();
+
+                if (mm < 10 ) {
+                    mm = "0" + mm;
+                }
+                if (dd < 10 ) {
+                    dd = "0" + dd;
+                }
+
+                return mm + "-" + dd + "-" + yyyy
             }
         },
         beforeDestroy() {

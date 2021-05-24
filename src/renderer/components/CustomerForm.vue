@@ -100,12 +100,20 @@
         </div>
           <div class="cb-print-element cb-print-customer-name">Name: {{ customer.fname }} {{ customer.lname }}</div>        
     </span>
-    <span class="cb-print" v-if="checkPage() == 'credit' || checkPage() == 'custom'">
+    <span class="cb-print" v-if="checkPage() == 'credit'">
         <div class="cb-print-element cb-print-customercredit-info">
           Name: <span class="cb-print-element">{{ customer.fname }} {{ customer.lname }}</span><br>
           <span v-if="customer.hasPhone">Phone: <span class="cb-print-element">{{ customer.phone }}</span><br></span>
           <span v-if="customer.hasEmail">E-mail: <span class="cb-print-element">{{ customer.email }}</span><br></span>
           <span v-if="customer.hasAddress">Address: <span class="cb-print-element">{{ customer.addr_st }} {{ customer.addr_city }}, {{ customer.addr_prov }} {{ customer.addr_postal }}</span></span>
+        </div>
+    </span>
+    <span class="cb-print" v-if=" checkPage() == 'custom'">
+        <div class="cb-print-element cb-print-customercustom-info">
+          <span class="cb-print-element">{{ customer.fname }} {{ customer.lname }}</span><br>
+          <span v-if="customer.hasPhone"><span class="cb-print-element">{{ customer.phone }}</span><br></span>
+          <span v-if="customer.hasEmail"><span class="cb-print-element">{{ customer.email }}</span><br></span>
+          <span v-if="customer.hasAddress"><span class="cb-print-element">{{ customer.addr_st }} {{ customer.addr_city }}, {{ customer.addr_prov }} {{ customer.addr_postal }}</span></span>
         </div>
     </span>
   </v-flex>
@@ -418,7 +426,8 @@ class customer {
     },
 
     mounted() {
-      if (this.id !== null) {
+      if (this.id !== null && this.id !== undefined) {
+        console.log(this.id);
         this.getCustomer(this.id);
       }
       else {

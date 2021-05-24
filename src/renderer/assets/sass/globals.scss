@@ -222,6 +222,10 @@
         box-shadow: 0 2px 1px -1px rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.14), 0 1px 3px 0 rgba(0,0,0,.12);        
     }
 
+    .box-shadow {
+        box-shadow: 0 2px 1px -1px rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.14), 0 1px 3px 0 rgba(0,0,0,.12);        
+    }
+
     .cb-print {
         // display: block !important;
         visibility: visible !important;
@@ -521,6 +525,12 @@
         font-weight: bold;
     }
 
+    .cb-print-credit-sub-header {
+        top: 0.4in;
+        font-size: 1.5em;
+        left: 0in;
+    }
+
     .cb-print-customercredit-info {
         top: 0.5in;
         width: 50%;
@@ -632,6 +642,70 @@
         width: 4in;
     }
 
+    .cb-print-customercustom-info {
+        top: 1in;
+        width: 50%;
+        padding-left: .5cm;
+        padding-top: .25cm;
+        padding-bottom: .25cm;
+        height: 1.1in;
+        @include box-shadow;
+    }
+
+    .cb-print-custom-estimate {
+        top: 3.4in;
+        width: 50%;
+        @include box-shadow;
+    }
+
+    .cb-print-custom-logo {
+        width: 3.5in;
+        top: 0in;
+        left: 55%;
+    }
+
+    .cb-print-custom-contact-info {
+        position: absolute !important;
+        width: 45%;
+        left: 55%;
+        text-align: center;
+        top: 1.5in;
+        font-size: 0.75em;
+    }
+
+    .cb-print-custom-warning {
+        position: absolute !important;
+        left: 55%;
+        top: 2.9in;
+        font-size: 0.75em;
+    }
+
+    .cb-print-custom-signature {
+        position: absolute !important;
+        left: 55%;
+        top: 2in;
+        font-size: 1em;
+    }
+
+    .cb-print-underline {
+        border-bottom: 1px solid black;
+        width: 3.5in;
+    }
+
+    .cb-align-right {
+        text-align: right;
+    }
+
+    .cb-print-custom-note {
+        padding-top: 0.25cm;
+        padding-left: .5cm;
+        padding-right: .5cm;
+        padding-bottom: 0.25cm;
+        top: 2.25in;
+        min-height: 1in;
+        width: 50%;
+        @include box-shadow;
+    }
 
 }
 

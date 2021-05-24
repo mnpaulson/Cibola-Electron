@@ -45,6 +45,7 @@ Vue.component('EmployeeJobs', require('./components/EmployeeJobs.vue').default);
 Vue.component('EmployeeStats', require('./components/EmployeeStats.vue').default);
 Vue.component('Alert', require('./components/Alert.vue').default);
 Vue.component('GoldcreditForm', require('./components/GoldcreditForm.vue').default);
+Vue.component('GoldCreditList', require('./components/GoldCreditList.vue').default);
 Vue.component('PageNotFound', require('./components/PageNotFound.vue').default);
 Vue.component('Toolbar', require('./components/Toolbar.vue').default);
 Vue.component('ValueConfig', require('./components/ValueConfig.vue').default);

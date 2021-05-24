@@ -710,8 +710,8 @@ const sharp = require('sharp')
             },
             createddateMMDDYYHHMM() {
                 var today = new Date(this.job.created_at);
-                var hh = today.getHours() + 1;
-                var mm = today.getMinutes() + 1;
+                var hh = today.getHours();
+                var mm = today.getMinutes();
                 if (mm < 10 ) {
                     mm = "0" + mm;
                 }
