@@ -1,5 +1,7 @@
 <template>
     <v-flex xs12 sm12>
+        <v-card>
+
         <v-tabs centered color="blue" dark>
             <v-tabs-slider color="yellow"></v-tabs-slider>
 
@@ -88,6 +90,7 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+        </v-card>
     </v-flex>
     
 </template>
