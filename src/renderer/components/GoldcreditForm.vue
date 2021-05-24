@@ -473,6 +473,7 @@ const sharp = require('sharp')
                 this.$http.get(this.store.serverURL +  '/values/gettype?type_id=1')
                     .then((response) => {
                         this.valueList = response.data;
+                        this.sortValues();
                         if (!this.credit.id) this.credit.credit_type = 'cash';
                         //Don't get the credit until after we have the values
                         if (!isNaN(this.goldcredit_id) && this.goldcredit_id !== null && this.goldcredit_id !== 0 && this.credit.goldcredit_id !== this.goldcredit_id) {
@@ -498,6 +499,25 @@ const sharp = require('sharp')
                     .catch((error) => {
                         console.log(error);
                     });
+            },
+            sortValues() {
+                this.valueList.sort((a,b) => {
+                    var x,y;
+
+                    x = Number(a.value1);
+                    y = Number(b.value1);
+
+                    // console.log(a);
+                    // console.log(b);
+                    // console.log(x);
+                    // console.log(y);
+
+                    if (x < y) return -1;
+                    if (x > y) return 1;
+                    return 0;
+                });
+
+                this.valueList = [...this.valueList];
             },
             // Adds a new blank item to list
             newItem() {
