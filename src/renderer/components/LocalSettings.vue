@@ -1,7 +1,7 @@
 <template>
         <v-flex xs12 sm6>
         <v-card>
-            <v-toolbar color="indigo" dark clipped-left flat>
+            <v-toolbar color="blue" dark clipped-left flat>
                 <v-toolbar-title>Local Settings</v-toolbar-title>
             </v-toolbar>
             <v-card-text>
@@ -12,7 +12,7 @@
                 <v-select :items="printerNames" label="Gold Credit Printer" v-model="creditPrinter"></v-select>
             </v-card-text>
             <v-card-text>
-                <v-btn small color="primary" @click="saveSettings">Save</v-btn>
+                <v-btn outline small color="primary" @click="saveSettings">Save</v-btn>
             </v-card-text>
         </v-card>
     </v-flex>

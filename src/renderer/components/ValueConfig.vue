@@ -1,6 +1,6 @@
 <template>
     <v-flex xs12 sm12>
-        <v-tabs centered color="indigo" dark>
+        <v-tabs centered color="blue" dark>
             <v-tabs-slider color="yellow"></v-tabs-slider>
 
             <v-tab href="#tab-1"  @click="setGoldCreditHeaders()">
@@ -30,13 +30,13 @@
                     :label="'Active'"
                     v-model="currentValue.active"
                     ></v-checkbox>
-                    <v-btn v-show="currentValue.id != -1" small color="primary" @click="updateValue()">Update</v-btn>
-                    <v-btn v-show="currentValue.id == -1" small color="primary" @click="createNewValue()">Create</v-btn>
-                    <v-btn small color="" @click="cancel()">Cancel</v-btn>
-                    <v-btn v-show="currentValue.id != -1" small color="error" @click="deleteDialog = true">Delete</v-btn>
+                    <v-btn outline v-show="currentValue.id != -1" small color="primary" @click="updateValue()">Update</v-btn>
+                    <v-btn outline v-show="currentValue.id == -1" small color="primary" @click="createNewValue()">Create</v-btn>
+                    <v-btn outline small color="" @click="cancel()">Cancel</v-btn>
+                    <v-btn outline v-show="currentValue.id != -1" small color="error" @click="deleteDialog = true">Delete</v-btn>
                 </div>
                 <div v-show="currentValue.id == null">
-                    <v-btn small color="primary" @click="enterNewValue()">New</v-btn>
+                    <v-btn outline small color="primary" @click="enterNewValue()">New</v-btn>
                 </div>
                 <v-data-table
                 :headers="headers"
@@ -108,7 +108,10 @@
             {text: "Name", value: 'Name'},
             {text: "Base Modifier", value: 'value1'},
             {text: "Markup", value: 'value2'},
-            {text: "Metal Type", value: 'value3'}
+            {text: "Metal Type", value: 'value3'},
+            {text: "", value: ''},
+            {text: "", value: ''},
+            {text: "", value: ''}
         ],
         customSheetHeaders: [
             {text: "Name", value: 'Name'},
@@ -120,7 +123,12 @@
         ],
         metalPriceHeaders: [
             {text: "Name", value: 'Name'},
-            {text: "Price (CAD)", value: 'value1'}
+            {text: "Price (CAD)", value: 'value1'},
+            {text: "", value: ''},
+            {text: "", value: ''},
+            {text: "", value: ''},
+            {text: "", value: ''},
+            {text: "", value: ''}
         ],
         paginationValues: {
             sortBy: 'type_id',
