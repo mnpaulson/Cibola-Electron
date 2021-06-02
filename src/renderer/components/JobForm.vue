@@ -107,35 +107,30 @@
                             </v-layout>             
                         </v-flex> -->
                         <v-flex xs12 md6>                 
-                                <v-textarea  no-resize rows="3" v-model="job.est_note" label="Estimate Details"></v-textarea>
+                            <v-textarea  no-resize rows="3" v-model="job.est_note" label="Estimate Details"></v-textarea>
                         </v-flex>
                         <v-flex xs12 md6>
-                                <v-textarea counter=230 rows="3" no-resize v-model="job.note" class="" label="Job Note"></v-textarea>                    
+                            <v-textarea counter=230 rows="3" no-resize v-model="job.note" class="" label="Job Note"></v-textarea>                    
                         </v-flex>
                     </v-layout>
                     </v-form>
                 </v-card-text>
+                    <v-flex xs12 ma-0 pl-0 pt-0 pr-0>
+                        <drag-drop v-on:imageUpload="handleDragDrop($event)" v-on:capture="captureDialog = true"></drag-drop>
+                    </v-flex>
                 <v-progress-linear v-show="loading" :indeterminate="true" class="mb-0"></v-progress-linear>                      
             </v-card>
             </transition>
         </v-flex>
         <v-flex v-if="job.id != null" xs12></v-flex>
-        <!-- <v-flex lg8 xl6 v-if="job.id != null">
-            <transition name="component-fade" appear>
-                <v-card>
-                    <v-card-text ><b>Created at:</b> {{job.created_at}} <b>Job:</b> {{job.id}} </v-card-text>
-                </v-card>
-            </transition>
-        </v-flex> -->
-        <v-flex xs12></v-flex>
         <template v-for="(image, index) in job.job_images" >
-            <v-flex d-flex class="xs12 sm12 md6 lg3 xl3" :key="image.id">
+            <v-flex pt-0 d-flex class="xs12 sm12 md6 lg3 xl3" :key="image.id">
                 <transition name="component-fade" appear>                    
                 <v-card>
                     <v-btn class="close-btn" dark small right absolute outline fab color="grey" @click="removeImage(index)"><v-icon class="fab-fix" dark>delete</v-icon></v-btn>                    
                     <v-img :src="image.image" height="200px" @click="showLightBox(image.image)">
                     </v-img>
-                    <v-textarea v-model="image.note" name="input-1" label=" Note" multi-line rows="5" no-resize></v-textarea>
+                    <v-textarea style="padding-top: 0px; padding-left:5px; padding-right:5px;" single-line hide-details v-model="image.note" name="input-1" label=" Note" multi-line rows="1" no-resize auto-grow></v-textarea>
                 </v-card>
                 </transition>
             </v-flex>
@@ -165,10 +160,10 @@
                 <span>Print</span>
                 <v-icon>print</v-icon>
                 </v-btn>
-                <v-btn @click="captureDialog = true" class="v-btn--active accent--text">
+                <!-- <v-btn @click="captureDialog = true" class="v-btn--active accent--text">
                 <span>Capture</span>
                 <v-icon>camera_alt</v-icon>
-                </v-btn>
+                </v-btn> -->
                 <v-btn v-show="job.id && job.id !== 0" @click="jobDeleteDialog = true" class="v-btn--active error--text">
                 <span>Delete Job</span>
                 <v-icon>delete</v-icon>
@@ -603,6 +598,9 @@ const sharp = require('sharp')
                         this.$refs.estimateField.focus();
                     });
                 }
+            },
+            handleDragDrop(image) {
+                this.job.job_images.push(image);
             }
         },
         mounted() {

@@ -31,6 +31,7 @@ import CustomSheetForm from './components/CustomSheetForm'
 import CustomSheetList from './components/CustomSheetList'
 import PageNotFound from './components/PageNotFound'
 import deleteModal from './components/deleteModal'
+import DragDrop from './components/DragDrop'
 
 
 Vue.component('CustomerForm', require('./components/CustomerForm.vue').default);
@@ -54,8 +55,11 @@ Vue.component('CustomSheetForm', require('./components/CustomSheetForm.vue').def
 Vue.component('CustomSheetList', require('./components/CustomSheetList.vue').default);
 Vue.component('Stats', require('./components/Stats.vue').default);
 Vue.component('deleteModal', require('./components/deleteModal.vue').default);
+Vue.component('DragDrop', require('./components/DragDrop.vue').default);
 
-
+//Prevent opening files on drag and drop
+document.addEventListener('dragover', event => event.preventDefault());
+document.addEventListener('drop', event => event.preventDefault());
 
 Vue.use(VueRouter)
 Vue.use(Vuetify)

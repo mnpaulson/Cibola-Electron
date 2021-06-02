@@ -46,8 +46,8 @@
               <span v-show="!hasAddress" style="color:grey">No Address</span>
             </p>
           </v-flex>
-          <v-flex xs12 md6  pr-4>
-            <v-textarea no-resize v-on:blur="noteBlur()" v-model.lazy="customer.note" class="" label="Customer Notes"></v-textarea>                                
+          <v-flex xs12 md6  pr-2>
+            <v-textarea hide-details no-resize v-on:blur="noteBlur()" v-model.lazy="customer.note" class="" label="Customer Notes"></v-textarea>                                
           </v-flex>
         </v-layout>
         <v-form>

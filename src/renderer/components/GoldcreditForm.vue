@@ -100,13 +100,14 @@
                                 </v-radio-group>
                         </v-flex>
                         <v-flex row xs12 md12>
-                            <!-- <v-btn v-show="credit.id == null" :class="{'warning': priceAgeWarn, 'primary': !priceAgeWarn}" @click="getNewGoldValue"><v-icon>refresh</v-icon>Update&nbsp;</v-btn> -->
-                            <!-- <p :class="{'vital-date': priceAgeWarn}" style="display: inline-block;">Prices set: {{credit.metalPriceDate}}</p> -->
                             <v-textarea no-resize v-model="credit.note" class="" label="Credit Note"></v-textarea>                    
                         </v-flex>
                     </v-layout>
                     </v-form>
                     </v-card-text>
+                    <v-flex xs12 ma-0 pl-0 pt-0 pr-0 v-show="credit.id == null">
+                        <drag-drop v-on:imageUpload="handleDragDrop($event)" v-on:capture="captureDialog = true"></drag-drop>
+                    </v-flex>
                 </v-card>
         </v-flex>
     </v-layout>
@@ -231,7 +232,8 @@
                     <v-btn v-show="credit.id == null" class="close-btn" dark small right absolute outline fab color="grey" @click="removeImage(index)"><v-icon class="fab-fix" dark>delete</v-icon></v-btn>                    
                     <v-img :src="image.image" height="200px" @click="showLightBox(image.image)">
                     </v-img>
-                    <v-textarea v-model="image.note" name="input-1" label=" Note" multi-line rows="5" no-resize></v-textarea>
+                    <v-textarea style="padding-top: 0px; padding-left:5px; padding-right:5px;" single-line hide-details v-model="image.note" name="input-1" label=" Note" multi-line rows="1" no-resize auto-grow></v-textarea>
+
                 </v-card>
                 </transition>
             </v-flex>
@@ -255,10 +257,10 @@
                 <span>Print</span>
                 <v-icon>print</v-icon>
                 </v-btn>
-                <v-btn v-show="credit.id == null" @click="captureDialog = true" class="v-btn--active accent--text">
+                <!-- <v-btn v-show="credit.id == null" @click="captureDialog = true" class="v-btn--active accent--text">
                 <span>Capture</span>
                 <v-icon>camera_alt</v-icon>
-                </v-btn>
+                </v-btn> -->
                 <v-btn v-show="credit.id && credit.id !== 0" @click="creditDeleteDialog = true" class="v-btn--active error--text">
                 <span>Delete Credit</span>
                 <v-icon>delete</v-icon>
@@ -801,6 +803,9 @@ const sharp = require('sharp')
                     // if (element.itemObj.name === "14k") element.markup = this.round(Number(element.markup) + Number(change), 2);
                     // if (element.itemObj.name === "18k") element.markup = this.round(Number(element.markup) + Number(change), 2);
                 });
+            },
+            handleDragDrop(image) {
+                this.credit.credit_images.push(image);
             }
         },
         mounted() {
