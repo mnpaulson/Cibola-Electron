@@ -2,15 +2,26 @@
     <v-flex xs12 sm12>
         <v-card color="blue" v-cloak @drop.prevent="addFile" @dragover.prevent>
 			<v-layout  mt-2>
+
 				<v-flex d-flex class="xs6">
-					<v-btn outline dark @click="emitCapture">
-					<v-icon>camera_alt</v-icon>
-					</v-btn>
+					<v-tooltip bottom>
+						<template v-slot:activator="{ on }">
+							<v-btn v-on="on" @click="emitCapture" outline dark style="width:100%">
+								<v-icon>camera_alt</v-icon>
+							</v-btn>
+						</template>
+						<span>Capture image from webcam</span>
+					</v-tooltip>
 				</v-flex>
 				<v-flex d-flex class="xs6">
-					<v-btn @click="fileSelect" outline dark style="border-style: dashed">
-					<v-icon>file_upload</v-icon>
-					</v-btn>
+					<v-tooltip bottom>
+						<template v-slot:activator="{ on }">
+							<v-btn v-on="on" @click="fileSelect" outline dark style="border-style: dashed; width:100%">
+								<v-icon>file_upload</v-icon>
+							</v-btn>
+						</template>
+						<span>Drag image file here</span>
+					</v-tooltip>
 				</v-flex>
 			</v-layout>
 			<input ref="fileInput" id="fileInput" type="file" style="display: none" @change="addFile($event)">
