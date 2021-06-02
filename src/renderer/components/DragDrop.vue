@@ -8,11 +8,12 @@
 					</v-btn>
 				</v-flex>
 				<v-flex d-flex class="xs6">
-					<v-btn outline dark style="border-style: dashed">
+					<v-btn @click="fileSelect" outline dark style="border-style: dashed">
 					<v-icon>file_upload</v-icon>
 					</v-btn>
 				</v-flex>
 			</v-layout>
+			<input ref="fileInput" id="fileInput" type="file" style="display: none" @change="addFile($event)">
         </v-card>
     </v-flex>
 </template>
@@ -34,10 +35,17 @@ export default {
 	methods: {
 		addFile(e) {
 			var buffer;
-			let droppedFile = e.dataTransfer.files[0];
+			let droppedFile;
+			let selectedFile;
+			console.log(e);
+			if (e.dataTransfer) droppedFile = e.dataTransfer.files[0];
+			else if (e.target) droppedFile = e.target.files[0];
+
 			
-			if (!droppedFile) return;
-			this.img = droppedFile;
+			if (!droppedFile && !selectedFile) return;
+			if (droppedFile) this.img = droppedFile;
+
+			console.log(this.img);
 			
 			var fileReader = new FileReader();
 
@@ -72,6 +80,9 @@ export default {
 		},
 		emitCapture() {
 			this.$emit('capture');
+		},
+		fileSelect() {
+			this.$refs["fileInput"].click();
 		}
 	},
 	computed: {}

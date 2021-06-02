@@ -122,7 +122,7 @@
             </v-card>
             </transition>
         </v-flex>
-        <v-flex v-if="job.id != null" xs12></v-flex>
+        <v-flex xs12></v-flex>
         <template v-for="(image, index) in job.job_images" >
             <v-flex pt-0 d-flex class="xs12 sm12 md6 lg3 xl3" :key="image.id">
                 <transition name="component-fade" appear>                    
@@ -130,7 +130,7 @@
                     <v-btn class="close-btn" dark small right absolute outline fab color="grey" @click="removeImage(index)"><v-icon class="fab-fix" dark>delete</v-icon></v-btn>                    
                     <v-img :src="image.image" height="200px" @click="showLightBox(image.image)">
                     </v-img>
-                    <v-textarea style="padding-top: 0px; padding-left:5px; padding-right:5px;" single-line hide-details v-model="image.note" name="input-1" label=" Note" multi-line rows="1" no-resize auto-grow></v-textarea>
+                    <v-textarea style="padding-top: 0px; padding-left:5px; padding-right:5px;" single-line hide-details v-model="image.note" name="input-1" label=" Note" multi-line rows="1" auto-grow></v-textarea>
                 </v-card>
                 </transition>
             </v-flex>
