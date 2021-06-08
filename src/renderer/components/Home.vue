@@ -20,7 +20,7 @@
     </v-btn>
 </v-flex>
 <v-flex d-flex class="xs6 sm2">
-    <v-btn outline color="primary" :href="'#/goldcredit/0/0'">
+    <v-btn outline color="primary" :href="'#/customsheet/0/0'">
         <v-icon>list_alt</v-icon>
         New Customsheet
     </v-btn>

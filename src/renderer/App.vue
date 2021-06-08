@@ -132,13 +132,14 @@ const settings = require('electron-settings');
       }
 
       if(!settings.has('printers')) {
-          settings.set('printers', {job: '', credit: ''});
+          settings.set('printers', {job: '', credit: '', custom: ''});
       }
 
       this.store.camera.width = settings.get('camera.width');
       this.store.camera.height = settings.get('camera.height');
       this.store.printers.job = settings.get('printers.job');
       this.store.printers.credit = settings.get('printers.credit');
+      this.store.printers.custom = settings.get('printers.custom');
 
     },
     computed: {

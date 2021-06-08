@@ -10,6 +10,7 @@
                 <v-text-field label="Camera Height" v-model="cameraHeight" xs6></v-text-field>
                 <v-select :items="printerNames" label="Job Printer" v-model="jobPrinter"></v-select>
                 <v-select :items="printerNames" label="Gold Credit Printer" v-model="creditPrinter"></v-select>
+                <v-select :items="printerNames" label="Custom Sheet Printer" v-model="customPrinter"></v-select>
             </v-card-text>
             <v-card-text>
                 <v-btn outline small color="primary" @click="saveSettings">Save</v-btn>
@@ -30,6 +31,7 @@ const settings = require('electron-settings');
             cameraHeight: null,
             jobPrinter: null,
             creditPrinter: null,
+            customPrinter: null,
             printers: [],
             printerNames: []
         }),
@@ -40,11 +42,13 @@ const settings = require('electron-settings');
                 settings.set('camera.height', this.cameraHeight);
                 settings.set('printers.job', this.jobPrinter);
                 settings.set('printers.credit', this.creditPrinter);
+                settings.set('printers.custom', this.customPrinter);
                 this.store.serverURL = settings.get('serverURL');
                 this.store.camera.width = settings.get('camera.width');
                 this.store.camera.height = settings.get('camera.height');
                 this.store.printers.job = settings.get('printers.job');
                 this.store.printers.credit = settings.get('printers.credit');
+                this.store.printers.custom = settings.get('printers.custom');
 
             }
         },
@@ -63,6 +67,7 @@ const settings = require('electron-settings');
             this.cameraHeight = settings.get('camera.height');
             this.jobPrinter = settings.get('printers.job');
             this.creditPrinter = settings.get('printers.credit');
+            this.customPrinter = settings.get('printers.custom');
             
             var currentWindow = remote.getCurrentWindow()
 

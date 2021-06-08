@@ -83,95 +83,95 @@
         </v-layout>
         <!-- Selected estimate -->
         <v-layout mt-2 row wrap>
-            <v-flex d-flex xs12 lg6 xl6>
+            <v-flex d-flex xs12 lg8 xl8>
                     <v-card>
                            <!-- <h3 class="cb-white-text blue pl-3">Estimate Details</h3> -->
                            <v-card-text class="title font-w blue cb-white-text">Estimate Details</v-card-text>
-                            <v-list>
-                            <template v-for="(category, cat_index) in categories">
-                                <div v-bind:key="category">
-                                    <v-layout pr-4 pl-2  row wrap>
-                                    <v-flex xs2>
-                                        <v-card-text class="title font-w">{{category}}</v-card-text>
-                                        
-                                    </v-flex>
-                                    <v-flex v-if="category != 'Extra'" xs2>
-                                        <v-btn class="text-none cb-small-btn" round small outline color="primary" @click="newEstVal(category)">
-                                            New
-                                        </v-btn>
-                                    </v-flex>
-                                    </v-layout>
-                                    <template v-for="est_val in customSheet.selectedEstimate.estValues">
-                                        <v-list-tile v-bind:key="est_val.id" v-if="est_val.type == category">
-                                            <v-layout  pr-2 pl-2 row wrap>
-                                                <v-flex xs6 md3 >
-                                                    <v-combobox
-                                                        label="Type"
-                                                        cache-items
-                                                        :items="catOptions[cat_index]"
-                                                        :return-object=true
-                                                        item-text="name"
-                                                        v-model="est_val.obj"
-                                                        :disabled="est_val.type == 'Extra'"
-                                                    ></v-combobox>
-                                                </v-flex>
-                                                <v-flex xs6 md2 v-if="est_val.type != 'Extra'">
-                                                    <v-text-field
-                                                        v-model="est_val.amt"
-                                                        label="Weight(g)/Amount"
-                                                    ></v-text-field>
-                                                </v-flex>
-                                                <v-flex xs6 md2 v-if="est_val.type != 'Extra'">
-                                                    <v-text-field
-                                                        v-model="est_val.pricePer"
-                                                        label="Price Per"
-                                                        :disabled="est_val.disabled"
-                                                    ></v-text-field>
-                                                </v-flex>
-                                                <v-flex xs6 md1 v-if="est_val.type != 'Extra'">
-                                                    <v-text-field
-                                                        v-model="est_val.markup"
-                                                        label="Markup"
-                                                    ></v-text-field>
-                                                </v-flex>
-                                                <v-flex xs6 md1 v-if="est_val.type != 'Extra'">
-                                                    <v-text-field
-                                                        v-model="est_val.discount"
-                                                        label="Discount"
-                                                    ></v-text-field>
-                                                </v-flex>
-                                                <v-flex xs6 md6 v-if="est_val.type == 'Extra'">
-                                                    <v-text-field
-                                                        v-model="est_val.basePrice"
-                                                        label="Price"
-                                                    ></v-text-field>
-                                                </v-flex>
-                                                <v-flex xs6 md2>
-                                                    <v-text-field
-                                                        v-model="est_val.total"
-                                                        disabled
-                                                        label="Total"
-                                                    ></v-text-field>
-                                                </v-flex>
-                                                <v-flex xs6 md1 >
-                                                    <v-btn flat icon color="grey" @click="deleteEstVal(est_val.id)">
-                                                        <v-icon>delete_outline</v-icon>
-                                                    </v-btn>
-                                                </v-flex>
-                                            </v-layout>
-                                        </v-list-tile>
-                                    </template>
-                                </div>
-                            </template>
                             <v-layout>
-                            <v-flex pl-4 pb-3 >
-                                <template v-for="(extra, index) in extras">
-                                        <v-btn v-bind:key="index" color=primary class="text-none" round outline @click="addNewExtra(extra)">Add {{extra.name}}</v-btn>
-                                </template>
-                            </v-flex>
+                                <v-flex pl-4 pb-3 >
+                                    <template v-for="(extra, index) in extras">
+                                            <v-btn v-bind:key="index" color=primary class="text-none" round outline @click="addNewExtra(extra)">{{extra.name}}</v-btn>
+                                    </template>
+                                </v-flex>
                             </v-layout>
+                            <v-list>
+                                <template v-for="(category, cat_index) in categories">
+                                    <div v-bind:key="category">
+                                        <v-layout pr-4 pl-2  row wrap>
+                                        <v-flex xs2>
+                                            <v-card-text class="title font-w">{{category}}</v-card-text>
+                                        </v-flex>
+                                        <v-flex v-if="category != 'Extra'" xs2>
+                                            <v-btn class="text-none cb-small-btn" round small outline color="primary" @click="newEstVal(category)">
+                                                New
+                                            </v-btn>
+                                        </v-flex>
+                                        </v-layout>
+                                        <template v-for="est_val in customSheet.selectedEstimate.estValues">
+                                            <v-list-tile v-bind:key="est_val.id" v-if="est_val.type == category">
+                                                <v-layout  pr-2 pl-2 row wrap>
+                                                    <v-flex xs6 md4 >
+                                                        <v-combobox
+                                                            label="Type"
+                                                            cache-items
+                                                            :items="catOptions[cat_index]"
+                                                            :return-object=true
+                                                            item-text="name"
+                                                            v-model="est_val.obj"
+                                                            :disabled="est_val.type == 'Extra'"
+                                                        ></v-combobox>
+                                                    </v-flex>
+                                                    <v-flex xs6 md1 v-if="est_val.type != 'Extra'">
+                                                        <v-text-field
+                                                            v-model="est_val.amt"
+                                                            label="Weight(g)/Amount"
+                                                        ></v-text-field>
+                                                    </v-flex>
+                                                    <v-flex xs6 md2 v-if="est_val.type != 'Extra'">
+                                                        <v-text-field
+                                                            v-model="est_val.pricePer"
+                                                            label="Price Per"
+                                                            :disabled="est_val.disabled"
+                                                        ></v-text-field>
+                                                    </v-flex>
+                                                    <v-flex xs6 md1 v-if="est_val.type != 'Extra'">
+                                                        <v-text-field
+                                                            v-model="est_val.markup"
+                                                            label="Markup"
+                                                        ></v-text-field>
+                                                    </v-flex>
+                                                    <v-flex xs6 md1 v-if="est_val.type != 'Extra'">
+                                                        <v-text-field
+                                                            v-model="est_val.discount"
+                                                            label="Discount"
+                                                        ></v-text-field>
+                                                    </v-flex>
+                                                    <v-flex xs5 md5 v-if="est_val.type == 'Extra'">
+                                                        <v-text-field
+                                                            v-model="est_val.basePrice"
+                                                            label="Price"
+                                                        ></v-text-field>
+                                                    </v-flex>
+                                                    <v-flex xs6 md2>
+                                                        <v-text-field
+                                                            v-model="est_val.total"
+                                                            disabled
+                                                            label="Total"
+                                                        ></v-text-field>
+                                                    </v-flex>
+                                                    <v-flex xs6 md1 >
+                                                        <v-btn flat icon color="grey" @click="deleteEstVal(est_val.id)">
+                                                            <v-icon>delete_outline</v-icon>
+                                                        </v-btn>
+                                                    </v-flex>
+                                                </v-layout>
+                                            </v-list-tile>
+                                        </template>
+                                    </div>
+                                </template>
+
                             <v-divider></v-divider>
-                            <div class="title pt-3 pb-2 pr-4 text-xs-right">Total: ${{customSheet.selectedEstimate.total.toFixed(2)}}</div>
+                            <div class="title pt-3 pb-2 pr-4 text-xs-right">Total: ${{customSheet.selectedEstimate.total.toLocaleString()}}</div>
                         </v-list>
                     </v-card>
             </v-flex>
@@ -378,6 +378,11 @@ class estValue {
         this.basePrice = val;
     }
 
+    get validAmount() {
+        if (this.amt == null || this.amt == undefined) return false;
+        return true;
+    }
+
     get disabled() {
         this.priceType == 'Gold' || this.priceType == 'Plat' ? true : false;
     }
@@ -451,6 +456,14 @@ class estimate {
 
     get formattedTotal() {
         return this.total.toLocaleString("en-US", { maximumFractionDigits: 2, minimumFractionDigits: 2 });
+    }
+
+    get validAmounts() {
+        let result = true;
+        this.estValues.forEach(v => {
+            if (!v.validAmount) result = false;
+        })
+        return result;
     }
 
 
@@ -536,6 +549,14 @@ class customSheet {
         est.isPrimary = true;
         this.estimates.push(est);
         return this.estimates[0];
+    }
+
+    get validAmounts() {
+        let result = true;
+        this.estimates.forEach(e => {
+            if (!e.validAmounts) result = false;
+        })
+        return result;
     }
 
     setSelected(est_index) {
@@ -805,6 +826,10 @@ export default {
                 this.store.setAlert(true, "error", "Please set a name for this custom sheet");
                 return;
             }
+            if (!this.customSheet.validAmounts) {
+                this.store.setAlert(true, "error", "Please set an amount on all items");
+                return;
+            }
             
 
             this.loading = true;
@@ -833,6 +858,10 @@ export default {
             }
             if (this.customSheet.name == null) {
                 this.store.setAlert(true, "error", "Please set a name for this custom sheet");
+                return;
+            }
+            if (!this.customSheet.validAmounts) {
+                this.store.setAlert(true, "error", "Please set an amount on all items");
                 return;
             }
             this.loading = true;
@@ -912,7 +941,7 @@ export default {
         },
         printEstimate() {
             var currentWindow = remote.getCurrentWindow()
-            currentWindow.webContents.print({silent: true, printBackground: false, deviceName: this.store.printers.credit});
+            currentWindow.webContents.print({silent: true, printBackground: false, deviceName: this.store.printers.custom});
         },
     },
 

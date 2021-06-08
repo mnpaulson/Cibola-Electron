@@ -251,6 +251,21 @@ class customer {
           for (var i = 0; i < length; i++) {
             this.fuseList.push({name: results[i].fname + " " + results[i].lname  + " - " + results[i].phone, id: results[i].id});
           }
+          console.table(this.fuseList);
+          this.fuseList.sort((a,b) => {
+            var x,y;
+
+            x = a.name.toLowerCase();
+            y = b.name.toLowerCase();
+
+            if (x < y) return -1;
+            if (x > y) return 1;
+            return 0;
+        });
+
+          this.fuseList = [...this.fuseList];
+          console.table(this.fuseList);
+
         })
       },
 
