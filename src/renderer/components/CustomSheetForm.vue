@@ -55,7 +55,7 @@
                         <v-divider></v-divider>
                         <h3 class="text-xs-right mr-4">${{estimate.total.toLocaleString()}}</h3>
                         <v-flex row xs12>
-                            <v-textarea auto-grow rows=1 no-resize v-model="estimate.note" class="" label="Estimate Note"></v-textarea>
+                            <v-textarea auto-grow rows=1 v-model="estimate.note" class="" label="Estimate Note"></v-textarea>
                         </v-flex>
                     </v-card>
                     <deleteModal 
@@ -350,6 +350,7 @@ class estValue {
             this.markup = o.markup;
             this.discount = o.discount;
             this.priceModifier = o.priceModifier;
+            this.amt = o.amt;
         } else {
             this.name = o;
         }
@@ -685,6 +686,23 @@ export default {
                     }.bind(this));
                     this.goldCAD
 
+                    this.getOrderValues();
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
+        },
+        getOrderValues() {
+            this.$http.get(this.store.serverURL + '/values/gettype?type_id=4')
+                .then((response) => {
+                    response.data.forEach(function (v) {
+                        console.log(v.order);
+                        if (!this.categories.includes(v.name)) {
+                            this.categories.push(v.name);
+                            this.catOptions.push([]);
+                        }
+                    }.bind(this));
+
                     this.getCatValues();
                 })
                 .catch((error) => {
@@ -702,9 +720,14 @@ export default {
                                 est.markup = value.markup;
                                 est.discount = value.discount;
                                 est.basePrice = value.value2;
+                                est.amt = value.default;
 
+                                if (est.markup == null) est.markup = 1;
+                                if (est.discount == null) est.discount = 0;
+                                if (est.amt == null) est.amt = 1;
 
-                                if (!this.categories.includes(est.type) & est.type != 'Extra') {
+                                //Add any categories not assigned an order
+                                if (!this.categories.includes(est.type)) {
                                     this.categories.push(est.type);
                                     this.catOptions.push([]);
                                 }
@@ -713,23 +736,12 @@ export default {
                                 if (est.priceType === 'Plat') est.basePrice = this.platCAD;
                                 if (est.priceType === 'Gold' || est.priceType === 'Plat') est.priceModifier = this.round(value.value2, 2);
                                 else est.priceModifier = 1;
-                                if (est.markup == null) est.markup = 1;
-                                if (est.discount == null) est.discount = 0;
 
                                 if (est.type == "Extra") {
                                     this.extras.push(est);
                                 } else {
                                     this.catOptions[this.categories.indexOf(est.type)].push(est);
                                 }
-                            })
-
-                            //Add extras on bottom always
-                            this.extras.forEach(extra => {
-                                if (!this.categories.includes(extra.type)) {
-                                    this.categories.push(extra.type);
-                                    this.catOptions.push([]);
-                                }
-                                this.catOptions[this.categories.indexOf(extra.type)].push(extra);
                             })
                         })
                         .catch((error) => {

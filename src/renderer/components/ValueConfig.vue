@@ -10,10 +10,14 @@
             </v-tab>
 
             <v-tab href="#tab-2" @click="setCustomSheetHeaders()">
-                Custom Sheet
+                Custom Sheet Items
             </v-tab>
 
-            <v-tab href="#tab-3" @click="setMetalPriceHeaders()">
+            <v-tab href="#tab-3" @click="setCategoryHeaders()">
+                Custom Sheet Categories
+            </v-tab>
+
+            <v-tab href="#tab-4" @click="setMetalPriceHeaders()">
                 Metal Prices
             </v-tab>
 
@@ -23,11 +27,19 @@
                 <div v-show="currentValue.id != null">
                     <!-- <v-text-field label="Value Type" v-model="currentValue.type_id" xs12></v-text-field> -->
                     <v-text-field label="Name" v-model="currentValue.name" xs12></v-text-field>
-                    <v-text-field :label="headers[1].text" v-model="currentValue.value1" xs12></v-text-field>
-                    <v-text-field v-if="headers[2]" :label="headers[2].text" v-model="currentValue.value2" xs12></v-text-field>
-                    <v-text-field v-if="headers[3]" :label="headers[3].text" v-model="currentValue.value3" xs12></v-text-field>
-                    <v-text-field v-if="headers[4]" :label="headers[4].text" v-model="currentValue.discount" xs12></v-text-field>
-                    <v-text-field v-if="headers[5]" :label="headers[5].text" v-model="currentValue.markup" xs12></v-text-field>
+                    <v-text-field v-if="showValue1" :label="headers[1].text" v-model="currentValue.value1" xs12></v-text-field>
+                    <v-select
+                        v-if="currentValueType == 3"
+                        :items="categoryList"
+                        label="Category"
+                        v-model="currentValue.value1"
+                    ></v-select>
+                    <v-text-field v-if="showValue2" :label="headers[2].text" v-model="currentValue.value2" xs12></v-text-field>
+                    <v-text-field v-if="showValue3" :label="headers[3].text" v-model="currentValue.value3" xs12></v-text-field>
+                    <v-text-field v-if="showDiscount" label="Discount" v-model="currentValue.discount" xs12></v-text-field>
+                    <v-text-field v-if="showMarkup" label="Markup" v-model="currentValue.markup" xs12></v-text-field>
+                    <v-text-field v-if="showDefault" label="Default Quantity" v-model="currentValue.default" xs12></v-text-field>
+                    <v-text-field v-if="showOrder" label="Order" v-model="currentValue.order" xs12></v-text-field>
                     <v-checkbox
                     :label="'Active'"
                     v-model="currentValue.active"
@@ -48,11 +60,13 @@
                 >
                     <template v-if="props.item.type_id == currentValueType" slot="items" slot-scope="props">
                         <td class="text-xs-left">{{ props.item.name }}</td>
-                        <td class="text-xs-left">{{ props.item.value1 }}</td>
-                        <td class="text-xs-left">{{ props.item.value2 }}</td>
-                        <td class="text-xs-left">{{ props.item.value3 }}</td>
-                        <td class="text-xs-left">{{ props.item.discount }}</td>
-                        <td class="text-xs-left">{{ props.item.markup }}</td>
+                        <td v-if="showValue1 || currentValueType == 3" class="text-xs-left">{{ props.item.value1 }}</td>
+                        <td v-if="showValue2" class="text-xs-left">{{ props.item.value2 }}</td>
+                        <td v-if="showValue3" class="text-xs-left">{{ props.item.value3 }}</td>
+                        <td v-if="showDiscount" class="text-xs-left">{{ props.item.discount }}</td>
+                        <td v-if="showMarkup" class="text-xs-left">{{ props.item.markup }}</td>
+                        <td v-if="showDefault" class="text-xs-left">{{ props.item.default }}</td>
+                        <td v-if="showOrder" class="text-xs-left">{{ props.item.order }}</td>
                         <td class="justify-center layout px-0">
                         <v-icon
                             medium
@@ -100,20 +114,20 @@
   export default {
     data: () => ({
         values: [],
+        categoryList: [],
         currentValueType: 1,
         headers: [
             {text: "Name", value: 'Name'},
             {text: "Value 1", value: 'value1'},
             {text: "Value 2", value: 'value2'},
-            {text: "Value 3", value: 'value3'}
+            {text: "Value 3", value: 'value3'},
+            {text: "", value: ''}
         ],
         goldCreditHeaders: [
             {text: "Name", value: 'Name'},
             {text: "Base Modifier", value: 'value1'},
             {text: "Markup", value: 'value2'},
             {text: "Metal Type", value: 'value3'},
-            {text: "", value: ''},
-            {text: "", value: ''},
             {text: "", value: ''}
         ],
         customSheetHeaders: [
@@ -122,15 +136,18 @@
             {text: "Default Value", value: 'value2'},
             {text: "Metal Type", value: 'value3'},
             {text: "Discount Percent", value: 'discount'},
-            {text: "Markup", value: 'markup'}
+            {text: "Markup", value: 'markup'},
+            {text: "Default Quantity", value: 'default'},
+            {text: "", value: ''}
         ],
         metalPriceHeaders: [
             {text: "Name", value: 'Name'},
             {text: "Price (CAD)", value: 'value1'},
-            {text: "", value: ''},
-            {text: "", value: ''},
-            {text: "", value: ''},
-            {text: "", value: ''},
+            {text: "", value: ''}
+        ],
+        categoryHeaders: [
+            {text: "Name", value: 'Name'},
+            {text: "Order", value: 'order'},
             {text: "", value: ''}
         ],
         paginationValues: {
@@ -148,6 +165,7 @@
             this.$http.get(this.store.serverURL +  '/values/index')
                 .then((response) => {
                     this.values = response.data;
+                    this.updateCategories();
                 })
                 .catch((error) => {
                     console.log(error);
@@ -162,6 +180,7 @@
         updateValue() {
             this.$http.post(this.store.serverURL +  '/values/update', this.currentValue)
                 .then((response) => {
+                    this.updateCategories();
                     this.currentValue = {};
                 })
                 .catch((error) => {
@@ -173,6 +192,7 @@
         },
         createNewValue() {
             this.currentValue.type_id = this.currentValueType;
+            console.log(this.currentValue);
             this.$http.post(this.store.serverURL +  '/values/create', this.currentValue)
                 .then((response) => {
                     this.currentValue = {};
@@ -195,15 +215,29 @@
         },
         setCustomSheetHeaders() {
             this.headers = this.customSheetHeaders;
+            this.currentValue = {}
             this.currentValueType = 3;
         },
         setGoldCreditHeaders() {
             this.headers = this.goldCreditHeaders;
+            this.currentValue = {}
             this.currentValueType = 1;
+        },
+        setCategoryHeaders() {
+            this.headers = this.categoryHeaders;
+            this.currentValue = {}
+            this.currentValueType = 4;
         },
         setMetalPriceHeaders() {
             this.headers = this.metalPriceHeaders;
+            this.currentValue = {}
             this.currentValueType = 2;
+        },
+        updateCategories() {
+            this.categoryList = [];
+            this.values.forEach(v => {
+                if (v.type_id == 4) this.categoryList.push(v.name);
+            })
         }
 
     },
@@ -217,7 +251,105 @@
     computed: {
         store() {
             return this.$root.$data.store;
-        }
+        },
+        showValue1() {
+            switch (this.currentValueType) {
+                case 1:
+                    return true;
+                case 2:
+                    return true;
+                case 3:
+                    return false;
+                case 4:
+                    return false;
+                default:
+                    return false;
+            }
+        },
+        showValue2() {
+            switch (this.currentValueType) {
+                case 1:
+                    return true;
+                case 2:
+                    return true;
+                case 3:
+                    return true;
+                case 4:
+                    return false;
+                default:
+                    return false;
+            }
+        },
+        showValue3() {
+            switch (this.currentValueType) {
+                case 1:
+                    return true;
+                case 2:
+                    return false;
+                case 3:
+                    return true;
+                case 4:
+                    return false;
+                default:
+                    return false;
+            }
+        },
+        showDiscount() {
+            switch (this.currentValueType) {
+                case 1:
+                    return false;
+                case 2:
+                    return false;
+                case 3:
+                    return true;
+                case 4:
+                    return false;
+                default:
+                    return false;
+            }
+        },
+        showMarkup() {
+            switch (this.currentValueType) {
+                case 1:
+                    return false;
+                case 2:
+                    return false;
+                case 3:
+                    return true;
+                case 4:
+                    return false;
+                default:
+                    return false;
+            }
+        },
+        showDefault() {
+            switch (this.currentValueType) {
+                case 1:
+                    return false;
+                case 2:
+                    return false;
+                case 3:
+                    return true;
+                case 4:
+                    return false;
+                default:
+                    return false;
+            }
+        },
+        showOrder() {
+            switch (this.currentValueType) {
+                case 1:
+                    return false;
+                case 2:
+                    return false;
+                case 3:
+                    return false;
+                case 4:
+                    return true;
+                default:
+                    return false;
+            }
+        },
     }   
   }
 </script>
