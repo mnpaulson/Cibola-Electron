@@ -174,37 +174,6 @@
                 </v-btn>
             </v-bottom-nav>
 
-
-        <v-dialog v-model="captureDialog" transition="dialog-transition" fullscreen >
-            <v-card>
-                <!-- <v-flex d-flex xs12> -->
-                <div class="catpure-cont">
-                    <video ref="videoDisplay" id="videoDisplay" autoplay></video>
-                    <video v-show="false" ref="video" id="video" :width="store.camera.width + 'px'" :height="store.camera.height + 'px'" autoplay></video>
-                    <!-- <img class="capture-error" v-show="img" :src="img">                             -->
-                    <canvas v-show="false" ref="img" id="img" :width="store.camera.width" :height="store.camera.height"></canvas>
-                </div>
-                <!-- </v-flex> -->
-                <v-layout row wrap>
-                    <v-flex d-flex xs12>                    
-                        <v-btn color="primary" @click="saveImage()">Capture</v-btn>
-                        <v-btn color="error" @click="discardCapture()">discard</v-btn>
-                    </v-flex>
-                </v-layout>
-                <v-layout row wrap justify-center=true>
-                    <v-flex xs4>
-                        <v-card-title  class="headline justify-center mt-0">Image Quality</v-card-title>
-                        <v-slider
-                            v-model="imageQuality"
-                            :step="5"
-                            thumb-color="blue"
-                            thumb-label="always"
-                        ></v-slider>
-                    </v-flex>
-                </v-layout>
-            </v-card>
-        </v-dialog>
-
         <v-dialog v-model="imageDeleteDialog" max-width="500px">
             <v-card>
                 <v-toolbar color="error" dark clipped-left flat>
@@ -315,7 +284,6 @@
 
 <script>
 const { remote, BrowserWindow } = require('electron')
-const sharp = require('sharp')
 
     export default {
         data: () => ({
@@ -326,7 +294,6 @@ const sharp = require('sharp')
             dateMenu: false,
             completeMenu: false,
             complete: false,
-            captureDialog: false,
             imageDeleteDialog: false,
             jobDeleteDialog: false,
             lightBoxDialog: false,
@@ -336,8 +303,6 @@ const sharp = require('sharp')
             employee: null,
             employeeList: [],
             img: {},
-            video: {},
-            videoDisplay: {},
             job: {
                 id: null,
                 customer_id: null,
@@ -353,7 +318,6 @@ const sharp = require('sharp')
                 deposit: null,
                 job_images: []
             },
-            imageQuality: 75,
             test: null,
             estimateRules: [
                 // v => !!v || 'Estimate is required',
@@ -367,32 +331,6 @@ const sharp = require('sharp')
             ]
         }),
         methods: {
-            saveImage() {
-                this.img = this.$refs.img;
-                var context = this.img.getContext("2d").drawImage(this.video, 0, 0, this.store.camera.width, this.store.camera.height);
-                var buffer = this.img.toDataURL("image/png");
-                var meta = buffer.substr(0, buffer.indexOf(',') + 1);
-                let imgBuffer = Buffer.from(buffer.substr(buffer.indexOf(',') + 1), 'base64');
-                sharp(imgBuffer)
-                    // .png()
-                    .jpeg({quality: this.imageQuality})
-                    .toBuffer()
-                    .then(data => {
-                        this.job.job_images.push({
-                            // image: this.img.toDataURL("image/png"),
-                            image: meta + data.toString("base64"),
-                            note: null,
-                            id: null
-                        });
-                    });
-                // this.job.job_images.push({
-                //     image: this.img.toDataURL("image/png"),
-                //     note: null,
-                //     id: null
-                // });
-                this.img = null;
-                this.captureDialog = false;
-            },
             discardCapture() {
                 this.captureDialog = false;
             },
@@ -581,16 +519,6 @@ const sharp = require('sharp')
                     
                 }
 
-            },   
-            stopStreamedVideo(videoElem) {
-                let stream = videoElem.srcObject;
-                let tracks = stream.getTracks();
-
-                tracks.forEach(function(track) {
-                    track.stop();
-                });
-
-                videoElem.srcObject = null;
             },
             setBestFocus() {
                 if (this.job.customer_id != 0 && this.job_id < 1) {
@@ -600,42 +528,12 @@ const sharp = require('sharp')
                 }
             },
             handleDragDrop(image) {
+                console.log(image);
                 this.job.job_images.push(image);
             }
         },
         mounted() {
             this.getEmployees();
-            this.video = this.$refs.video;
-
-            if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
-                    try {
-                        this.video.srcObject = stream;
-                    } catch (error) {
-                        this.video.src = URL.createObjectURL(stream);
-                        console.log('Could not create video stream');
-                        this.img = "img/webcamError.png";
-
-                    }                   
-                    this.video.play();
-                });
-            }
-
-            this.videoDisplay = this.$refs.videoDisplay;
-
-            if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
-                    try {
-                        this.videoDisplay.srcObject = stream;
-                    } catch (error) {
-                        this.videoDisplay.src = URL.createObjectURL(stream);
-                        console.log('Could not create video stream');
-                        this.img = "img/webcamError.png";
-
-                    }                   
-                    this.videoDisplay.play();
-                });
-            }
         },
         props: {
             customer_id: Number,
@@ -749,20 +647,10 @@ const sharp = require('sharp')
                 } else {
                     return null;
                 }
-                // if (this.employeeList[this.job.employee_id - 1]) {
-                //     return this.employeeList[this.job.employee_id - 1].name;
-                // } else {
-                //     return null;
-                // }
             },
             routeName() {
                 return this.$route.name.charAt(0).toUpperCase() + this.$route.name.slice(1)
             }
-        },
-        beforeDestroy() {
-            //Close webcam Streams when navigating away
-            this.stopStreamedVideo(this.videoDisplay);
-            this.stopStreamedVideo(this.video);
-        },
+        }
     }
 </script>

@@ -172,12 +172,29 @@
 
                             <v-divider></v-divider>
                             <div class="title pt-3 pb-2 pr-4 text-xs-right">Total: ${{customSheet.selectedEstimate.total.toLocaleString()}}</div>
+            <drag-drop v-on:imageUpload="handleDragDrop($event)" v-on:capture="captureDialog = true"></drag-drop>
                         </v-list>
                     </v-card>
             </v-flex>
         </v-layout>
+        <v-flex xs12></v-flex>
+        <v-layout row wrap>
+        <template v-for="(image, index) in customSheet.custom_images" >
+            <v-flex pt-2 d-flex xs12 sm12 md6 lg3 xl3 :key="image.id">
+                <transition name="component-fade" appear>                    
+                <v-card>
+                    <v-btn class="close-btn" dark small right absolute outline fab color="grey" @click="removeImage(index)"><v-icon class="fab-fix" dark>delete</v-icon></v-btn>                    
+                    <v-img :src="image.image" height="200px" @click="showLightBox(image.image)">
+                    </v-img>
+                    <v-textarea style="padding-top: 0px; padding-left:5px; padding-right:5px;" single-line hide-details v-model="image.note" name="input-1" label=" Note" multi-line rows="1" auto-grow></v-textarea>
+                </v-card>
+                </transition>
+            </v-flex>
+        </template>
+        </v-layout>
+        <v-flex xs12></v-flex>        
         <!-- Metal Values -->
-        <v-layout mt-3 row wrap>
+        <v-layout mt-2 row wrap>
             <v-flex d-flex xs12 lg6 xl3>
                     <v-card color="blue text--darken-10 white--text">
                         <v-card-text class="pa-2 text-lg-left">
@@ -220,7 +237,30 @@
                     </v-card>
             </v-flex>
         </v-layout>
-        <v-flex xs12></v-flex> 
+        
+        <v-flex xs12></v-flex>
+        <v-dialog v-model="imageDeleteDialog" max-width="500px">
+            <v-card>
+                <v-toolbar color="error" dark clipped-left flat>
+                    <v-toolbar-title><v-icon>warning</v-icon> Delete Custom Sheet Image</v-toolbar-title>
+                </v-toolbar>
+                <v-card-text>
+                    Are you sure you want to delete this image? <br>
+                    This image was previously saved to this custom sheet. <br>
+                    This action is not reversable
+                </v-card-text>
+                <v-card-actions>
+                    <v-btn color="error"  @click.stop="deleteImage()">
+                        <v-icon>delete</v-icon>
+                        Delete
+                    </v-btn>                    
+                    <v-btn color="primary" right absolute @click.stop="imageDeleteDialog=false">
+                        <v-icon>cancel</v-icon>
+                        Cancel
+                        </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
         <deleteModal 
         :modal="deleteModal" 
         :objectName="customSheet.name"
@@ -508,6 +548,7 @@ class customSheet {
         this.note = null;
         this.estimates = [];
         this.estimatesToDelete = [];
+        this.custom_images = [];
         this.created_at = null;
         this.updated_at = null;
 
@@ -574,6 +615,7 @@ class customSheet {
         this.name = customSheet.name;
         this.note = customSheet.note;
         this.estimatesToDelete = customSheet.estimatesToDelete;
+        this.custom_images = customSheet.custom_images;
         this.created_at = customSheet.created_at;
         this.updated_at = customSheet.updated_at;
         // this.selectedEstimate = new estimate(customSheet.selectedEstimate);
@@ -620,6 +662,9 @@ export default {
         on: null,
         loading: false,
         deleteModal: false,
+        imageDeleteDialog: false,
+        deleteImageIndex: null,
+        deleteImageId: null,
         estPreviewHeaders: [
             {
                 text: 'Type',
@@ -696,7 +741,6 @@ export default {
             this.$http.get(this.store.serverURL + '/values/gettype?type_id=4')
                 .then((response) => {
                     response.data.forEach(function (v) {
-                        console.log(v.order);
                         if (!this.categories.includes(v.name)) {
                             this.categories.push(v.name);
                             this.catOptions.push([]);
@@ -848,16 +892,14 @@ export default {
             let upload = new customSheet();
             upload.copy(this.customSheet);
             upload.cleanClientIds();
-            console.log(upload);
             this.$http.post(this.store.serverURL +  '/customsheet/create', upload)
                 .then((response) => {
                     this.customSheet = this.newCustomSheetFromResponse(response.data);
                     this.store.setAlert(true, "success", "Custom Sheet Created with ID: " + this.customSheet.customSheet_id);
                     this.loading = false;
-                    // // this.$router.replace("/job/" + this.job.id);
                 })
                 .catch((error) => {
-                    console.table(error);
+                    console.log(error);
                     this.loading = false;
                     this.store.setAlert(true, "error", error.message);                                                                    
                 });
@@ -880,7 +922,6 @@ export default {
             let upload = new customSheet();
             upload.copy(this.customSheet);
             upload.cleanClientIds();
-            console.log(upload);
             this.$http.post(this.store.serverURL +  '/customsheet/update', upload)
                 .then((response) => {
                     this.customSheet = this.newCustomSheetFromResponse(response.data);
@@ -910,6 +951,7 @@ export default {
         },
         //Creates new custom sheet from DB response data
         newCustomSheetFromResponse(c) {
+
             var cs = new customSheet();
 
             cs.customSheet_id = c.id;
@@ -919,6 +961,7 @@ export default {
             cs.customer_id = c.customer_id;
             cs.created_at = c.created_at;
             cs.updated_at = c.updated_at;
+            cs.custom_images = c.custom_images;
             c.estimates_with_values.forEach(e => {
                 cs.estimates.push(this.newEstimateFromResponse(e));
             })
@@ -926,6 +969,11 @@ export default {
             cs.estimates.forEach(e => {
                 if (e.isPrimary) e.isSelected = true;
             })
+
+            cs.custom_images.forEach(e => {
+                e.image = this.store.serverURL + e.image;
+            });
+
 
             return cs;
         },
@@ -954,6 +1002,30 @@ export default {
         printEstimate() {
             var currentWindow = remote.getCurrentWindow()
             currentWindow.webContents.print({silent: true, printBackground: false, deviceName: this.store.printers.custom});
+        },
+        handleDragDrop(image) {
+            this.customSheet.custom_images.push(image);
+        },
+        removeImage(index) {
+            if (this.customSheet.custom_images[index].id !== null) {
+                this.deleteImageId = this.customSheet.custom_images[index].id;
+                this.deleteImageIndex = index;
+                this.imageDeleteDialog = true;
+            } else {
+                this.customSheet.custom_images.splice(index, 1);                
+            }
+        },
+        deleteImage() {
+            this.$http.post(this.store.serverURL +  '/custom_images/delete', {id: this.deleteImageId})
+                .then((response) => {
+                    this.customSheet.custom_images.splice(this.deleteImageIndex, 1);
+                    this.deleteImageId = null;
+                    this.deleteImageIndex = null;
+                    this.imageDeleteDialog = false;                                                                                       
+                })
+                .catch((error) => {
+                    console.log(error);
+                })
         },
     },
 

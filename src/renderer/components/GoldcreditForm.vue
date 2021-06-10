@@ -225,6 +225,8 @@
                 <v-btn outline v-show="credit.id == null" color="primary" @click="newItem">Add Item</v-btn>
             </v-flex>
         </v-layout>
+        <v-flex xs12></v-flex>
+        <v-layout row wrap>
         <template v-for="(image, index) in credit.credit_images" >
             <v-flex d-flex class="xs12 sm12 md6 lg3 xl3" :key="image.id">
                 <transition name="component-fade" appear>                    
@@ -238,6 +240,8 @@
                 </transition>
             </v-flex>
         </template>
+        </v-layout>
+        <v-flex xs12></v-flex>    
             <v-bottom-nav
                 fixed
                 :value="true"
@@ -313,35 +317,6 @@
                         Cancel
                         </v-btn>
                 </v-card-actions>
-            </v-card>
-        </v-dialog>
-        <v-dialog v-model="captureDialog" transition="dialog-transition" fullscreen >
-            <v-card>
-                <!-- <v-flex d-flex xs12> -->
-                <div class="catpure-cont">
-                    <video ref="videoDisplay" id="videoDisplay" autoplay></video>
-                    <video v-show="false" ref="video" id="video" :width="store.camera.width + 'px'" :height="store.camera.height + 'px'" autoplay></video>
-                    <!-- <img class="capture-error" v-show="img" :src="img">                             -->
-                    <canvas v-show="false" ref="img" id="img" :width="store.camera.width" :height="store.camera.height"></canvas>
-                </div>
-                <!-- </v-flex> -->
-                <v-layout row wrap>
-                    <v-flex d-flex xs12>                    
-                        <v-btn color="primary" @click="saveImage()">Capture</v-btn>
-                        <v-btn color="error" @click="discardCapture()">discard</v-btn>
-                    </v-flex>
-                </v-layout>
-                <v-layout row wrap justify-center=true>
-                    <v-flex xs4>
-                        <v-card-title  class="headline justify-center mt-0">Image Quality</v-card-title>
-                        <v-slider
-                            v-model="imageQuality"
-                            :step="5"
-                            thumb-color="blue"
-                            thumb-label="always"
-                        ></v-slider>
-                    </v-flex>
-                </v-layout>
             </v-card>
         </v-dialog>
         <transition name="component-lightbox" appear>                            
@@ -447,7 +422,6 @@ const sharp = require('sharp')
             img: {},
             video: {},
             videoDisplay: {},
-            captureDialog: false,
             imageDeleteDialog: false,
             creditDeleteDialog: false,
             lightBoxDialog: false,
@@ -683,35 +657,6 @@ const sharp = require('sharp')
             removeItem(index) {
                         this.itemList.splice(index, 1);                
             },
-            saveImage() {
-                this.img = this.$refs.img;
-                var context = this.img.getContext("2d").drawImage(this.video, 0, 0, this.store.camera.width, this.store.camera.height);
-                var buffer = this.img.toDataURL("image/png");
-                var meta = buffer.substr(0, buffer.indexOf(',') + 1);
-                let imgBuffer = Buffer.from(buffer.substr(buffer.indexOf(',') + 1), 'base64');
-                sharp(imgBuffer)
-                    // .png()
-                    .jpeg({quality: this.imageQuality})
-                    .toBuffer()
-                    .then(data => {
-                        this.credit.credit_images.push({
-                            // image: this.img.toDataURL("image/png"),
-                            image: meta + data.toString("base64"),
-                            note: null,
-                            id: null
-                        });
-                    });
-                // this.job.job_images.push({
-                //     image: this.img.toDataURL("image/png"),
-                //     note: null,
-                //     id: null
-                // });
-                this.img = null;
-                this.captureDialog = false;
-            },
-            discardCapture() {
-                this.captureDialog = false;
-            },
             showLightBox(image) {
                 this.lightBoxImage = image;
                 this.lightBoxDialog = true;
@@ -811,38 +756,6 @@ const sharp = require('sharp')
         mounted() {
             this.getEmployees();
             this.getValues();
-
-            this.video = this.$refs.video;
-
-            if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
-                    try {
-                        this.video.srcObject = stream;
-                    } catch (error) {
-                        this.video.src = URL.createObjectURL(stream);
-                        console.log('Could not create video stream');
-                        this.img = "img/webcamError.png";
-
-                    }                   
-                    this.video.play();
-                });
-            }
-
-            this.videoDisplay = this.$refs.videoDisplay;
-
-            if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
-                    try {
-                        this.videoDisplay.srcObject = stream;
-                    } catch (error) {
-                        this.videoDisplay.src = URL.createObjectURL(stream);
-                        console.log('Could not create video stream');
-                        this.img = "img/webcamError.png";
-
-                    }                   
-                    this.videoDisplay.play();
-                });
-            }
         },
         props: {
             customer_id: Number,
@@ -1014,11 +927,6 @@ const sharp = require('sharp')
 
                 return mm + "-" + dd + "-" + yyyy
             }
-        },
-        beforeDestroy() {
-            //Close webcam Streams when navigating away
-            this.stopStreamedVideo(this.videoDisplay);
-            this.stopStreamedVideo(this.video);
-        },
+        }
     }
 </script>
