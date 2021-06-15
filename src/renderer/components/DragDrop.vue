@@ -2,11 +2,9 @@
     <v-flex xs12 sm12>
         <v-card color="blue" v-cloak @drop.prevent="addFile" @dragover.prevent>
 			<v-layout  mt-2>
-
 				<v-flex d-flex class="xs6">
 					<v-tooltip bottom>
 						<template v-slot:activator="{ on }">
-							<!-- <v-btn v-on="on" @click="emitCapture" outline dark style="width:100%"> -->
 							<v-btn v-on="on" @click="captureDialog = !captureDialog" outline dark style="width:100%">
 								<v-icon>camera_alt</v-icon>
 							</v-btn>
@@ -29,24 +27,31 @@
         </v-card>
 		<v-dialog v-model="captureDialog" transition="dialog-transition" fullscreen >
             <v-card>
-                <div class="catpure-cont">
+                <div class="capture-cont">
                     <video ref="videoDisplay" id="videoDisplay" autoplay playsinline :width="store.camera.width" :height="store.camera.height"></video>
                     <canvas v-show="false" ref="img" id="img" :width="store.camera.width" :height="store.camera.height"></canvas>
                 </div>
                 <v-layout row wrap>
-                    <v-flex d-flex xs12>                    
-                        <v-btn color="primary" @click="saveImage()">Capture</v-btn>
-                        <v-btn color="error" @click="captureDialog = !captureDialog">discard</v-btn>
-                    </v-flex>
+                    	<v-flex xs2></v-flex>
+                    	<v-flex d-flex xs4>
+                        	<v-btn outline color="primary" @click="saveImage()">Capture</v-btn>
+						</v-flex>
+                    	<v-flex d-flex xs4>
+	                        <v-btn outline color="error" @click="captureDialog = !captureDialog">discard</v-btn>
+						</v-flex>
+                    	<v-flex xs2></v-flex>
                 </v-layout>
                 <v-layout row wrap justify-center=true>
-					<v-select
-                        :items="deviceList"
-                        label="Category"
-                        v-model="videoDeviceId"
-                    ></v-select>
+                    <v-flex xs4 mr-1>
+                        <v-card-title class="justify-center mb-0 pb-0">Camera Select</v-card-title>
+						<v-select
+							:items="deviceList"
+							label="Category"
+							v-model="videoDeviceId"
+						></v-select>
+					</v-flex>
                     <v-flex xs4>
-                        <v-card-title  class="headline justify-center mt-0">Image Quality</v-card-title>
+                        <v-card-title class="justify-center">Image Quality</v-card-title>
                         <v-slider
                             v-model="imageQuality"
                             :step="5"
@@ -159,13 +164,17 @@ export default {
 					tracks[i].stop();
 				}
 			}
+			console.log(this.videoDeviceId);
+			//This one works with at leat one camera
 			// var constraints = {
-			// 	audio: false,
-			// 	video: {deviceId: this.videoDeviceId ? {exact: this.videoDeviceId} : undefined}
+			// 	video: { video: { deviceId: { exact: this.videoDeviceId } } }
 			// };
 			var constraints = {
-				video: { video: { deviceId: { exact: this.videoDeviceId } } }
-			};
+				'audio': false,
+				'video': {
+					'deviceId': this.videoDeviceId
+					}
+        		}
 			// var constraints = {video: true};
 
 			navigator.mediaDevices.getUserMedia(constraints).then(stream => {

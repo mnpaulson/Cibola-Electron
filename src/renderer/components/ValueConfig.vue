@@ -74,6 +74,20 @@
                         >
                             edit
                         </v-icon>
+                        <v-icon
+                            medium
+                            v-if="showOrder"
+                            @click="orderChange(props.item, -1)"
+                        >
+                            arrow_drop_up
+                        </v-icon>
+                        <v-icon
+                            medium
+                            v-if="showOrder"
+                            @click="orderChange(props.item, 1)"
+                        >
+                            arrow_drop_down
+                        </v-icon>
                         </td>
                     </template>
                 </v-data-table>
@@ -217,29 +231,56 @@
             this.headers = this.customSheetHeaders;
             this.currentValue = {}
             this.currentValueType = 3;
+            this.paginationValues.sortBy = 'value1';
         },
         setGoldCreditHeaders() {
             this.headers = this.goldCreditHeaders;
             this.currentValue = {}
             this.currentValueType = 1;
+            this.paginationValues.sortBy = 'Name';
         },
         setCategoryHeaders() {
             this.headers = this.categoryHeaders;
             this.currentValue = {}
             this.currentValueType = 4;
+            this.paginationValues.sortBy = 'order';
         },
         setMetalPriceHeaders() {
             this.headers = this.metalPriceHeaders;
             this.currentValue = {}
             this.currentValueType = 2;
+            this.paginationValues.sortBy = 'Name';
         },
         updateCategories() {
             this.categoryList = [];
             this.values.forEach(v => {
                 if (v.type_id == 4) this.categoryList.push(v.name);
             })
-        }
-
+        },
+        orderChange(value, direction) {
+            value.order = Number(value.order) + Number(direction);
+            this.updateValue(value);
+            this.values.forEach(v => {
+                if (v.type_id == 4) {
+                    if (v.id !== value.id)  {
+                        if (v.order == value.order)  {
+                            v.order = Number(v.order) - Number(direction);
+                            this.updateValue(v);
+                        }
+                    }
+                }
+            });
+        },
+        updateValue(value) {
+            this.$http.post(this.store.serverURL +  '/values/update', value)
+            .then((response) => {
+                // this.updateCategories();
+                // this.currentValue = {};
+            })
+            .catch((error) => {
+                console.log(error);
+            })
+        },
     },
     mounted() {
         this.getValues();

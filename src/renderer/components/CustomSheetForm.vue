@@ -7,7 +7,7 @@
         
         <!-- Name and note -->
         <v-layout mt-3 row wrap>
-            <v-flex d-flex xs12 lg6 xl6>
+            <v-flex d-flex xs12 lg8 xl8>
                     <v-card>
                         <v-card-text class="title font-w blue cb-white-text"><v-icon color="white">list_alt</v-icon> Sheet Details - Created: {{createddateMMDDYYHHMM}}</v-card-text>
                         <v-layout pr-4 pb-4 pl-4 row wrap>
@@ -23,9 +23,28 @@
                                 <v-textarea auto-grow rows=1 v-model="customSheet.note" class="" label="Custom Sheet Note"></v-textarea>
                             </v-flex>
                         </v-layout>
+                            <v-flex xs12 ma-0 pl-0 pt-0 pr-0>
+                                <drag-drop v-on:imageUpload="handleDragDrop($event)" v-on:capture="captureDialog = true"></drag-drop>
+                            </v-flex>
                     </v-card>
             </v-flex>
         </v-layout>
+                <v-flex xs12></v-flex>
+        <v-layout row wrap>
+        <template v-for="(image, index) in customSheet.custom_images" >
+            <v-flex pt-2 d-flex xs12 sm12 md6 lg3 xl3 :key="image.id">
+                <transition name="component-fade" appear>                    
+                <v-card>
+                    <v-btn class="close-btn" dark small right absolute outline fab color="grey" @click="removeImage(index)"><v-icon class="fab-fix" dark>delete</v-icon></v-btn>                    
+                    <v-img :src="image.image" height="200px" @click="showLightBox(image.image)">
+                    </v-img>
+                    <v-textarea style="padding-top: 0px; padding-left:5px; padding-right:5px;" single-line hide-details v-model="image.note" name="input-1" label=" Note" multi-line rows="1" auto-grow></v-textarea>
+                </v-card>
+                </transition>
+            </v-flex>
+        </template>
+        </v-layout>
+        <v-flex xs12></v-flex> 
         <!-- Estimates -->
         <v-layout row wrap mt-3>
             <template v-for="(estimate, est_index) in customSheet.estimates">
@@ -172,30 +191,14 @@
 
                             <v-divider></v-divider>
                             <div class="title pt-3 pb-2 pr-4 text-xs-right">Total: ${{customSheet.selectedEstimate.total.toLocaleString()}}</div>
-            <drag-drop v-on:imageUpload="handleDragDrop($event)" v-on:capture="captureDialog = true"></drag-drop>
                         </v-list>
                     </v-card>
             </v-flex>
         </v-layout>
-        <v-flex xs12></v-flex>
-        <v-layout row wrap>
-        <template v-for="(image, index) in customSheet.custom_images" >
-            <v-flex pt-2 d-flex xs12 sm12 md6 lg3 xl3 :key="image.id">
-                <transition name="component-fade" appear>                    
-                <v-card>
-                    <v-btn class="close-btn" dark small right absolute outline fab color="grey" @click="removeImage(index)"><v-icon class="fab-fix" dark>delete</v-icon></v-btn>                    
-                    <v-img :src="image.image" height="200px" @click="showLightBox(image.image)">
-                    </v-img>
-                    <v-textarea style="padding-top: 0px; padding-left:5px; padding-right:5px;" single-line hide-details v-model="image.note" name="input-1" label=" Note" multi-line rows="1" auto-grow></v-textarea>
-                </v-card>
-                </transition>
-            </v-flex>
-        </template>
-        </v-layout>
-        <v-flex xs12></v-flex>        
+       
         <!-- Metal Values -->
         <v-layout mt-2 row wrap>
-            <v-flex d-flex xs12 lg6 xl3>
+            <v-flex d-flex xs12 lg8 xl8>
                     <v-card color="blue text--darken-10 white--text">
                         <v-card-text class="pa-2 text-lg-left">
                         <v-layout row wrap>
