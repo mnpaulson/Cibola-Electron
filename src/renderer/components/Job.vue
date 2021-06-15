@@ -11,24 +11,12 @@
     <v-layout v-if="job_id == null && customer_id == null">    
         <v-flex row wrap xs12>
             <v-card>
-                <v-card-title>
-                    <v-card-title primary-title>
-                        <h3 class="headline mb-0">Jobs</h3>
-                        <v-spacer></v-spacer>
-                        <v-btn color="primary" outline :href="'#/job/0/0'">
-                            <v-icon>work_outline</v-icon>
-                            New Job
-                        </v-btn>
-                    </v-card-title>
-                    <v-spacer></v-spacer>
-                    <!-- <v-text-field
-                        append-icon="search"
-                        label="Search"
-                        single-line
-                        hide-details
-                        v-model="searchJob"
-                    ></v-text-field> -->
-                </v-card-title>
+                <v-card-text class="title font-w blue cb-white-text">
+                    <v-icon color="white">work</v-icon> Jobs
+                    <v-btn outline dark  :href="'#/job/0/0'">
+                        New Job
+                    </v-btn>
+                </v-card-text>
                     <v-data-table v-bind:headers="jobHeaders" :items="jobs" v-bind:pagination.sync="paginationJob" class="elevation-1" :search="searchJob" :total-items="totalJobs" :loading="loading">
                         <template slot="items" slot-scope="props">
                             <tr @click="goToJob(props.item.id)">

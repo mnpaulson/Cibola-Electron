@@ -2,16 +2,12 @@
     <div>
         <v-flex d-flex xs12 md12 lg8 xl6  class="mt-2">
             <v-card class="">
-                <v-card-title>
-                    <v-card-title primary-title>
-                        <h3 class="headline mb-0">Custom Sheets</h3>
-                        <v-spacer></v-spacer>
-                        <v-btn color="primary" outline :href="'#/customsheet/0'">
-                            <v-icon>list_alt</v-icon>
-                            New Custom Sheet
-                        </v-btn>
-                    </v-card-title>
-                </v-card-title>
+                <v-card-text class="title font-w blue cb-white-text">
+                    <v-icon color="white">list_alt</v-icon> Custom Sheets
+                    <v-btn outline dark  :href="'#/customsheet/0'">
+                        New Custom Sheet
+                    </v-btn>
+                </v-card-text>
                     <v-data-table v-bind:headers="customSheetHeaders" :items="customSheets" v-bind:pagination.sync="pagination" class="elevation-1" :loading="loading">
                         <template slot="items" slot-scope="props">
                             <tr @click="emitCustomSheetId(props.item.id)">

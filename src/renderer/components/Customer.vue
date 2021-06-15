@@ -39,10 +39,10 @@
                 <!-- <v-toolbar color="indigo" dark clipped-left flat>
                     <v-toolbar-title>Customers</v-toolbar-title>
                 </v-toolbar> -->
-                <v-card-title>
-                    <v-card-title primary-title>
-                        <h3 class="headline mb-0">Customers</h3>
-                    </v-card-title>
+                <v-card-text class="title font-w blue cb-white-text">
+                    <v-icon color="white">account_circle</v-icon> Customers
+                </v-card-text>
+                <v-flex ma-2>
                     <v-spacer></v-spacer>
                     <v-text-field
                         append-icon="search"
@@ -51,6 +51,7 @@
                         hide-details
                         v-model="searchCus"
                     ></v-text-field>
+                </v-flex>
                 </v-card-title>
                 <template>
                     <v-data-table v-bind:headers="customerHeaders" :items="customers" v-bind:pagination.sync="paginationCus" class="elevation-1" :search="searchCus" :loading="loadingCustomers">
@@ -66,18 +67,15 @@
                 </template>
             </v-card>
             <v-card v-show="id" class="">
-                <v-card-title>
-                    <v-card-title primary-title>
-                        <h3 class="headline mb-0">Jobs</h3>
-                    </v-card-title>
+                    <v-card-text class="title font-w blue cb-white-text"><v-icon color="white">work</v-icon> Jobs</v-card-text>
                     <v-spacer></v-spacer>
-                    <v-text-field
+                    <!-- <v-text-field
                         append-icon="search"
                         label="Search"
                         single-line
                         hide-details
                         v-model="searchJob"
-                    ></v-text-field>
+                    ></v-text-field> -->
                 </v-card-title>
                     <v-data-table v-bind:headers="jobHeaders" :items="jobs" v-bind:pagination.sync="paginationJob" class="elevation-1" :search="searchJob" :loading="loadingJobs">
                         <template slot="items" slot-scope="props">
@@ -96,11 +94,7 @@
         <transition>
         <v-flex d-flex xs12 md12 lg8 xl6  class="mt-2">
             <v-card v-show="id" class="">
-                <v-card-title>
-                    <v-card-title primary-title>
-                        <h3 class="headline mb-0">Gold Credits</h3>
-                    </v-card-title>
-                </v-card-title>
+                <v-card-text class="title font-w blue cb-white-text"><v-icon color="white">credit_card</v-icon> Gold Credits</v-card-text>
                     <v-data-table v-bind:headers="creditHeaders" :items="credits" v-bind:pagination.sync="paginationCredit" class="elevation-1" :loading="loadingCredits">
                         <template slot="items" slot-scope="props">
                             <tr @click="goToCredit(props.item.id)">
@@ -115,11 +109,7 @@
         <transition>
         <v-flex d-flex xs12 md12 lg8 xl6  class="mt-2">
             <v-card v-show="id" class="">
-                <v-card-title>
-                    <v-card-title primary-title>
-                        <h3 class="headline mb-0">Custom Sheets</h3>
-                    </v-card-title>
-                </v-card-title>
+                    <v-card-text class="title font-w blue cb-white-text"><v-icon color="white">list_alt</v-icon> Custom Sheets</v-card-text>
                     <v-data-table v-bind:headers="customSheetHeaders" :items="customSheets" v-bind:pagination.sync="paginationCustomSheet" class="elevation-1" :loading="loadingCustomSheets">
                         <template slot="items" slot-scope="props">
                             <tr @click="goToCustomSheet(props.item.id)">

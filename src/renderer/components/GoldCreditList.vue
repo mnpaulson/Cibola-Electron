@@ -2,17 +2,12 @@
     <div>
         <v-flex row wrap xs12>
             <v-card>
-                <v-card-title>
-                    <v-card-title primary-title>
-                        <h3 class="headline mb-0">Credits</h3>
-                        <v-spacer></v-spacer>
-                        <v-btn outline color="primary" :href="'#/goldcredit/0/0'">
-                            <v-icon>credit_card</v-icon>
-                            New Credit
-                        </v-btn>
-                    </v-card-title>
-                    <v-spacer></v-spacer>
-                </v-card-title>
+                <v-card-text class="title font-w blue cb-white-text">
+                    <v-icon color="white">credit_card</v-icon> Credits
+                    <v-btn outline dark  :href="'#/goldcredit/0/0'">
+                        New Credit
+                    </v-btn>
+                </v-card-text>
                     <v-data-table v-bind:headers="creditHeaders" :items="credits" v-bind:pagination.sync="paginationCredit" class="elevation-1" :search="searchCredit" :total-items="totalCredits" :loading="loading">
                         <template slot="items" slot-scope="props">
                             <tr @click="emitGoldCreditId(props.item.id)">
