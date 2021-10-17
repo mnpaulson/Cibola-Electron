@@ -20,7 +20,7 @@
                                 required
                                 :rules="employeeRules"
                                 prepend-icon="person_pin"
-                                :items="employeeList"
+                                :items="activeEmployeeList"
                                 v-model="job.employee_id"
                                 item-text="name"
                                 item-value="id"
@@ -301,7 +301,8 @@ const { remote, BrowserWindow } = require('electron')
             deleteImageId: null,
             deleteImageIndex: null,
             employee: null,
-            employeeList: [],
+            activeEmployeeList: [],
+            allEmployeeList: [],
             img: {},
             job: {
                 id: null,
@@ -348,9 +349,12 @@ const { remote, BrowserWindow } = require('electron')
                 this.lightBoxDialog = true;
             },
             getEmployees() {
-                this.$http.get(this.store.serverURL +  '/employees/active')
+                this.$http.get(this.store.serverURL +  '/employees/index')
                     .then((response) => {
-                        this.employeeList = response.data;
+                        response.data.forEach( r=> {
+                            if (r.active == 1) this.activeEmployeeList.push(r);
+                        })
+                        this.allEmployeeList = response.data;
                     })
                     .catch((error) => {
                         console.log(error);
@@ -637,12 +641,12 @@ const { remote, BrowserWindow } = require('electron')
             },
             employeeName() {
                 if (this.job.employee_id != null) {
-                    var e = this.employeeList.find((element) => {
+                    var e = this.allEmployeeList.find((element) => {
                         if (element.id == this.job.employee_id) {
+                            if (element.active == 0) this.activeEmployeeList.push (element);
                             return element.name;
                         }
                     });
-                    // console.log(e);
                     return e.name;
                 } else {
                     return null;

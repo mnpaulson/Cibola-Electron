@@ -21,7 +21,7 @@
                                     required
                                     :rules="employeeRules"
                                     prepend-icon="person_pin"
-                                    :items="employeeList"
+                                    :items="activeEmployeeList"
                                     v-model="credit.employee_id"
                                     item-text="name"
                                     item-value="id"
@@ -391,7 +391,8 @@ const sharp = require('sharp')
     export default {
         data: () => ({
             valid: true,
-            employeeList: [],
+            activeEmployeeList: [],
+            allEmployeeList: [],
             employee: null,
             valueList: [],
             itemList: [],
@@ -436,9 +437,12 @@ const sharp = require('sharp')
         methods: {
             //Gets employee list
             getEmployees() {
-                this.$http.get(this.store.serverURL +  '/employees/active')
+                this.$http.get(this.store.serverURL +  '/employees/index')
                     .then((response) => {
-                        this.employeeList = response.data;
+                        response.data.forEach( r=> {
+                            if (r.active == 1) this.activeEmployeeList.push(r);
+                        })
+                        this.allEmployeeList = response.data;
                     })
                     .catch((error) => {
                         console.log(error);
@@ -869,13 +873,13 @@ const sharp = require('sharp')
               return this.$root.$data.store.toolbarText;
             },
             employeeName() {
-                if (this.credit.employee_id != null && this.employeeList.length > 0) {
-                    var e = this.employeeList.find((element) => {
+                if (this.credit.employee_id != null && this.activeEmployeeList.length > 0) {
+                    var e = this.allEmployeeList.find((element) => {
+                        if (element.active == 0) this.activeEmployeeList.push (element);
                         if (element.id == this.credit.employee_id) {
                             return element.name;
                         }
                     });
-                    // console.log(e);
                     return e.name;
                 } else {
                     return null;
