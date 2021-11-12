@@ -1,9 +1,6 @@
 <template>
     <transition name="component-fade" appear>
         <div>
-        <v-layout row wrap>
-            <customer-form :id.sync="credit.customer_id"></customer-form>
-        </v-layout>
     <v-layout row wrap>
         <v-flex d-flex xs12 lg6 xl6 mt-2>
                 <v-card>
@@ -112,7 +109,7 @@
         </v-flex>
     </v-layout>
     <v-layout mt-2 mb-2 row wrap>
-            <v-flex d-flex xs12 lg6 xl3>
+            <v-flex d-flex xs12 lg8 xl8>
                     <v-card color="blue text--darken-10 white--text">
                         <v-card-text class="pa-2 text-lg-left">
                         <v-layout row wrap>

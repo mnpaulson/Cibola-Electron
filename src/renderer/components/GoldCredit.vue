@@ -1,7 +1,10 @@
 <template>
     <div>
+        <v-layout row wrap v-show="idSet">
+            <customer-form :id.sync="customer_id"></customer-form>
+        </v-layout>  
         <div v-show="idSet">
-            <goldcredit-form :goldcredit_id="goldcredit_id" :customer_id="customer_id" :key="goldcredit_id"></goldcredit-form>
+            <goldcredit-form :goldcredit_id.sync="goldcredit_id" :customer_id.sync="customer_id" :key="goldcredit_id"></goldcredit-form>
         </div>
         <transition name="component-fade" appear>            
             <div v-if="!idSet">
@@ -21,6 +24,9 @@
             setGoldCreditId(id) {
                 this.goldcredit_id = Number(id);
                 this.$forceUpdate();
+            },
+            setCustomerId(id) {
+                this.customer_id = id;
             },
             updateRoute(id) {
                 this.$router.push('/goldcredit/' + id);

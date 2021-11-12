@@ -10,5 +10,6 @@
     <v-layout row wrap>
       <value-config></value-config>
     </v-layout>
+    <div>Current version: 1.2.2</div>
   </div>
 </template>
