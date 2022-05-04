@@ -47,7 +47,8 @@
             </p>
           </v-flex>
           <v-flex xs12 md6  pr-2>
-            <v-textarea hide-details no-resize v-on:blur="noteBlur()" v-model.lazy="customer.note" class="" label="Customer Notes"></v-textarea>                                
+            <v-icon class="cus-note-cover" v-if="coverNote" v-on:mouseover="toggleCoverNote(false)">visibility</v-icon>
+            <v-textarea v-if="!coverNote" hide-details no-resize v-on:focus="noteFocus = true" v-on:blur="noteBlur()" v-model.lazy="customer.note" class="" label="Customer Notes" v-on:mouseleave="toggleCoverNote(true)"></v-textarea>                                
           </v-flex>
         </v-layout>
         <v-form>
@@ -83,6 +84,7 @@
         </div>
         <!-- <v-btn style="z-index:0" v-show="isInfo" dark small bottom right absolute fab color="primary" @click="setFormState(true)" class="fab-up"><v-icon class="fab-fix" dark>edit</v-icon></v-btn> -->
         <v-btn v-show="isInfo"  :class="{success: noteChanged, shake: noteChanged, 'blue--text': !noteChanged}" flat small right absolute class="cus-save-btn" @click="updateCustomer()">Save Note</v-btn>
+        <v-btn v-show="isInfo" fab flat small right absolute class="cus-vis-btn" @click="toggleNoteVisibility()"><v-icon v-if="!customer.noteVisibility" dark>visibility</v-icon><v-icon v-if="customer.noteVisibility" dark>visibility_off</v-icon></v-btn>
         <v-btn v-show="isInfo" color="grey" flat small left absolute class="cus-edit-btn" @click="setFormState(true)">Edit</v-btn>
             <v-progress-linear v-show="loading" :indeterminate="true" class="mb-0"></v-progress-linear>      
     </v-card>
@@ -133,6 +135,7 @@ class customer {
     this.addr_postal = null;
     this.addr_country = null;
     this.note = null;
+    this.noteVisibility = null;
     this.id = null;
   }
 
@@ -181,6 +184,8 @@ class customer {
       },
       customer: new customer(),
       startingNote: null,
+      coverNote: false,
+      noteFocus: false,
       noteChanged: false,
       nameRules: [
         (v) => !!v || 'Name is required',
@@ -243,16 +248,17 @@ class customer {
 
       fuseMatch() {
         this.fuseList = [];
+        var workingList = [];
         this.$search(this.search, this.searchList, this.searchOptions).then(results => {
           //Only load the 20 best matches into the display
           var length = results.length;
           // console.log(length);
           if (length > 20) length = 20;
           for (var i = 0; i < length; i++) {
-            this.fuseList.push({name: results[i].fname + " " + results[i].lname  + " - " + results[i].phone, id: results[i].id});
+            workingList.push({name: results[i].fname + " " + results[i].lname  + " - " + results[i].phone, id: results[i].id});
           }
-          console.table(this.fuseList);
-          this.fuseList.sort((a,b) => {
+          // console.table(this.fuseList);
+          workingList.sort((a,b) => {
             var x,y;
 
             x = a.name.toLowerCase();
@@ -263,8 +269,8 @@ class customer {
             return 0;
         });
 
-          this.fuseList = [...this.fuseList];
-          console.table(this.fuseList);
+          this.fuseList = [...workingList];
+          // console.table(this.fuseList);
 
         })
       },
@@ -379,6 +385,7 @@ class customer {
         this.customer.addr_postal = null;
         this.customer.addr_country = null;
         this.customer.note = null;
+        this.customer.noteVisibility = null;
         this.startingNote = null;
         this.customer.id = 0;
         this.$emit('update:id', 0);
@@ -413,8 +420,10 @@ class customer {
             this.customer.addr_postal = response.data[0].addr_postal;
             this.customer.addr_country = response.data[0].addr_country;
             this.customer.note = response.data[0].note;
+            this.customer.noteVisibility = response.data[0].noteVisibility;
             this.startingNote = response.data[0].note;
             this.setFormState(false);
+            this.toggleCoverNote(!this.customer.noteVisibility);
             this.loading = false;                        
           })
           .catch((error) => {
@@ -435,8 +444,22 @@ class customer {
       },
       noteBlur() {
         if (this.customer.note !== this.startingNote) this.noteChanged = true;
-        console.log(this.noteChanged);
+        this.noteFocus = false;
+        this.toggleCoverNote(true);
         return;
+      },
+      toggleNoteVisibility() {
+        this.customer.noteVisibility = !this.customer.noteVisibility;
+        this.toggleCoverNote(!this.customer.noteVisibility);
+        this.updateCustomer();
+      },
+      toggleCoverNote(state) {
+        console.log(`State: ${state}`);
+        if (this.customer.noteVisibility || this.noteFocus) {
+          this.coverNote = false;
+          return;
+        }
+        this.coverNote = state;
       }
     },
 

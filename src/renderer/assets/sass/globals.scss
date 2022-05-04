@@ -66,6 +66,19 @@
     bottom: 0px !important;
 }
 
+.cus-vis-btn {
+    right: 0px !important;
+    top: 55px !important;
+}
+
+.cus-note-cover {
+    font-size: 10em;
+    position: absolute;
+    float: right;
+    right: 1em;
+    bottom: .01em;
+}
+
 .redText > div.v-input__control > div.v-input__slot > div.v-text-field__slot input{
     color: red !important;
 }
