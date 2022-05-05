@@ -46,9 +46,9 @@
               <span v-show="!hasAddress" style="color:grey">No Address</span>
             </p>
           </v-flex>
-          <v-flex xs12 md6  pr-2>
-            <v-icon class="cus-note-cover" v-if="coverNote" v-on:mouseover="toggleCoverNote(false)">visibility</v-icon>
-            <v-textarea v-if="!coverNote" hide-details no-resize v-on:focus="noteFocus = true" v-on:blur="noteBlur()" v-model.lazy="customer.note" class="" label="Customer Notes" v-on:mouseleave="toggleCoverNote(true)"></v-textarea>                                
+          <v-flex ref="custNoteContainer" xs12 md6  pr-2 v-bind:style="hideNoteStyles">
+            <p ref="hideBox" class="text-xs-center mb-0 cus-para-sizer "><v-icon class="cus-note-cover text-xs-center" v-if="coverNote" v-on:mouseover="toggleCoverNote(false)">visibility</v-icon></p>
+            <v-textarea ref="noteBox" v-if="!coverNote" hide-details no-resize v-on:focus="noteFocus = true" v-on:blur="noteBlur()" v-model.lazy="customer.note" class="" label="Customer Notes" v-on:mouseleave="toggleCoverNote(true)"></v-textarea>                                
           </v-flex>
         </v-layout>
         <v-form>
@@ -185,6 +185,8 @@ class customer {
       customer: new customer(),
       startingNote: null,
       coverNote: false,
+      hideNoteStyles: { },
+      targetHeight: 129,
       noteFocus: false,
       noteChanged: false,
       nameRules: [
@@ -454,11 +456,15 @@ class customer {
         this.updateCustomer();
       },
       toggleCoverNote(state) {
-        console.log(`State: ${state}`);
+        let newHeight = this.$refs.custNoteContainer.clientHeight;
+        if (newHeight > this.targetHeight) this.targetHeight = this.$refs.custNoteContainer.clientHeight;
+        console.log(this.targetHeight);
         if (this.customer.noteVisibility || this.noteFocus) {
           this.coverNote = false;
           return;
         }
+        
+        this.hideNoteStyles = {height: `${this.targetHeight}px`};
         this.coverNote = state;
       }
     },
@@ -478,11 +484,11 @@ class customer {
           return this.$root.$data.store;
       },
       hasAddress() {
-        if (this.customer.addr_st != null) return true;
-        if (this.customer.addr_city != null) return true;
-        if (this.customer.addr_prov != null) return true;
-        if (this.customer.addr_postal != null) return true;
-        if (this.customer.addr_country != null) return true;
+        if (this.customer.addr_st != null && this.customer.addr_st != '') return true;
+        if (this.customer.addr_city != null && this.customer.addr_city != '') return true;
+        if (this.customer.addr_prov != null && this.customer.addr_prov != '') return true;
+        if (this.customer.addr_postal != null && this.customer.addr_postal != '') return true;
+        if (this.customer.addr_country != null && this.customer.addr_country != '') return true;
       }
     }
   }

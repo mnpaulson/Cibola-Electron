@@ -72,11 +72,18 @@
 }
 
 .cus-note-cover {
-    font-size: 10em;
-    position: absolute;
-    float: right;
-    right: 1em;
-    bottom: .01em;
+    font-size: 8em;
+    // position: relative;
+    vertical-align: top;
+    display: inline;
+    text-align: center;
+    // float: right;
+    // right: 2em;
+    // bottom: -20px;
+}
+
+.cus-para-sizer {
+    // height: 377px;
 }
 
 .redText > div.v-input__control > div.v-input__slot > div.v-text-field__slot input{
