@@ -4,7 +4,7 @@
             <customer-form :id.sync="customer_id"></customer-form>
         </v-layout>  
         <div v-show="idSet">
-            <goldcredit-form :goldcredit_id.sync="goldcredit_id" :customer_id.sync="customer_id" :key="goldcredit_id"></goldcredit-form>
+            <goldcredit-form :goldcredit_id.sync="goldcredit_id" :customer_id.sync="customer_id" :key="goldcredit_id" v-on:customerId="setCustomerId"></goldcredit-form>
         </div>
         <transition name="component-fade" appear>            
             <div v-if="!idSet">
@@ -41,7 +41,6 @@
                     this.setGoldCreditId(Number(to.params.id));
                 }
             }
-            
         },
         mounted() {
             this.goldcredit_id = null;

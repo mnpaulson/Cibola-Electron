@@ -96,7 +96,6 @@ export default {
 			let i = 0;
 			let droppedFiles;
 			let selectedFile;
-			console.log(e);
 			//If dropped file
 			if (e.hasOwnProperty('dataTransfer')) droppedFiles = e.dataTransfer.files;
 			//If selected file
@@ -131,7 +130,6 @@ export default {
 						note: null,
 						id: null
 					};
-					console.log(this.final);
 					this.emitFile();
 				});
 		},
@@ -151,7 +149,6 @@ export default {
                             note: null,
                             id: null
                         };
-						console.log(this.final);
 						this.emitFile();
                     });
                 this.img = null;
@@ -164,7 +161,6 @@ export default {
 					tracks[i].stop();
 				}
 			}
-			console.log(this.videoDeviceId);
 			//This one works with at leat one camera
 			// var constraints = {
 			// 	video: { video: { deviceId: { exact: this.videoDeviceId } } }
@@ -209,7 +205,6 @@ export default {
 				if (d[i].kind == 'videoinput') this.deviceList.push({text: d[i].label, value: d[i].deviceId});
 			}
 			this.videoDeviceId = this.store.cameraDevice;
-			console.log(this.store.cameraDevice);
 		});
 	},
 	computed: {

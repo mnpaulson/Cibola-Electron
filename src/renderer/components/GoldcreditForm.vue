@@ -401,6 +401,7 @@ const sharp = require('sharp')
             multiplierDisable: true,
             credit: {
                 id: null,
+                customer_id: null,
                 employee_id: null,
                 redit: null,
                 goldCAD: null,
@@ -484,11 +485,6 @@ const sharp = require('sharp')
                     x = Number(a.value1);
                     y = Number(b.value1);
 
-                    // console.log(a);
-                    // console.log(b);
-                    // console.log(x);
-                    // console.log(y);
-
                     if (x < y) return -1;
                     if (x > y) return 1;
                     return 0;
@@ -516,7 +512,6 @@ const sharp = require('sharp')
             getNewGoldValue() {
                 this.$http.get(this.store.serverURL +  '/values/getGoldValue')
                     .then((response) => {
-                        // console.log(response);
                         var goldG = response.data[0];
                         this.credit.goldCAD = this.round(goldG, 2);
                         this.getNewPlatValue();
@@ -644,7 +639,7 @@ const sharp = require('sharp')
 
                         this.itemList = this.credit.credit_items;
 
-                        // this.$emit('customerId', this.credit.customer_id);
+                        this.$emit('customerId', this.credit.customer_id);
 
                         this.loading = false;
                     })
@@ -723,15 +718,6 @@ const sharp = require('sharp')
                     if (element.name === "18k") element.value2 = this.round(change, 2);
                     if (element.name === "20k") element.value2 = this.round(change, 2);
                     if (element.name === "22k") element.value2 = this.round(change, 2);
-                    // if (element.name === "8k") element.value2 = this.round(Number(element.value2) + Number(change), 2);
-                    // if (element.name === "9k") element.value2 = this.round(Number(element.value2) + Number(change), 2);
-                    // if (element.name === "10k") element.value2 = this.round(Number(element.value2) + Number(change), 2);
-                    // if (element.name === "12k") element.value2 = this.round(Number(element.value2) + Number(change), 2);
-                    // if (element.name === "14k") element.value2 = this.round(Number(element.value2) + Number(change), 2);
-                    // if (element.name === "18k") element.value2 = this.round(Number(element.value2) + Number(change), 2);
-                    // if (element.name === "20k") element.value2 = Number(element.value2) + Number(change);
-                    // if (element.name === "22k") element.value2 = Number(element.value2) + Number(change);
-                    // if (element.name === "24k") element.value2 = Number(element.value2) + Number(change);
                 });
                 this.itemList.forEach(element => {
                     if (element.itemObj.name === "8k") element.markup = this.round(change, 2);
@@ -742,12 +728,6 @@ const sharp = require('sharp')
                     if (element.itemObj.name === "18k") element.markup = this.round(change, 2);
                     if (element.itemObj.name === "20k") element.markup = this.round(change, 2);
                     if (element.itemObj.name === "22k") element.markup = this.round(change, 2);
-                    // if (element.itemObj.name === "8k") element.markup = this.round(Number(element.markup) + Number(change), 2);
-                    // if (element.itemObj.name === "9k") element.markup = this.round(Number(element.markup) + Number(change), 2);
-                    // if (element.itemObj.name === "10k") element.markup = this.round(Number(element.markup) + Number(change), 2);
-                    // if (element.itemObj.name === "12k") element.markup = this.round(Number(element.markup) + Number(change), 2);
-                    // if (element.itemObj.name === "14k") element.markup = this.round(Number(element.markup) + Number(change), 2);
-                    // if (element.itemObj.name === "18k") element.markup = this.round(Number(element.markup) + Number(change), 2);
                 });
             },
             handleDragDrop(image) {
@@ -764,24 +744,11 @@ const sharp = require('sharp')
         },
         watch: {
             customer_id (val) {
-                if (this.credit.customer_id == null) this.credit.customer_id = val;
+                if (!isNaN(this.customer_id) && this.customer_id !== null) {
+                    this.credit.customer_id = val;
+                }
             },
             goldcredit_id (val) {
-                // this.credit.id = null;
-                // this.credit.employee_id = null;
-                // this.credit.goldCAD = null;
-                // this.credit.platCAD = null;
-                // this.credit.metalPriceDate = "";
-                // // this.credit.creditDate = null;
-                // this.credit.created_at = null;
-                // this.credit.creditValue = null;
-                // this.credit.used = false;
-                // this.credit.note = null;
-                // this.credit.note = 'credit';
-                // this.credit.credit_items = [];
-                // this.credit.credit_images = [];
-                // this.itemList = [];
-                // this.disabled = false;
                 var id = this.goldcredit_id;
                 if (!isNaN(id) && id !== null && id !== 0 && this.customSheet.goldcredit_id !== val) {
                     this.getCustomSheet(val);
@@ -799,14 +766,6 @@ const sharp = require('sharp')
                         if(e.id == null) {
                             var metal;
                             if (e.itemObj) {
-                                // if (e.itemObj.name == "Other" || e.itemObj.name == "Diamonds") {
-                                //     this.multiplierDisable = false;
-                                //     e.multiplier = e.itemObj.value1;
-                                // }
-                                // else {
-                                //     this.multiplierDisable = true;
-                                //     e.multiplier = e.itemObj.value1;
-                                // }
                                 if (e.item == e.itemObj.id) {
 
                                 } else {
@@ -910,9 +869,7 @@ const sharp = require('sharp')
                 return mm + "-" + dd + "-" + yyyy
             },
             creditDateMMDDYY() {
-                console.log(this.credit.metalPriceDate.length);
                 var time = this.credit.metalPriceDate;
-                console.log(time);
                 if (this.credit.metalPriceDate.length == 10) time += "T00:00:00";
                 var today = new Date(time);
                 var yyyy = today.getFullYear();

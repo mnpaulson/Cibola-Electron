@@ -154,8 +154,6 @@ export default {
             if (quarterEnds.includes(m)) {
                 i = 0;
             }
-            console.log(i);
-            console.log(this.stats.monthJobs[i]);
           }
           return total;
       },

@@ -458,7 +458,6 @@ class customer {
       toggleCoverNote(state) {
         let newHeight = this.$refs.custNoteContainer.clientHeight;
         if (newHeight > this.targetHeight) this.targetHeight = this.$refs.custNoteContainer.clientHeight;
-        console.log(this.targetHeight);
         if (this.customer.noteVisibility || this.noteFocus) {
           this.coverNote = false;
           return;
@@ -471,7 +470,6 @@ class customer {
 
     mounted() {
       if (this.id !== null && this.id !== undefined) {
-        console.log(this.id);
         this.getCustomer(this.id);
       }
       else {
